@@ -26,7 +26,9 @@ import { randomUUID } from "crypto"
 import { FEE_MULTIPLY } from "./app/utils/data"
 const saltRounds = 12
 
-const prisma = new PrismaClient()
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
+const prisma = globalForPrisma.prisma ?? new PrismaClient()
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
 const authCode =
 	"Basic " +
 	Buffer.from(
@@ -74,11 +76,9 @@ export async function getUser(email: string) {
 				email,
 			},
 		})
-		await prisma.$disconnect()
 		return user
 	} catch (e) {
 		console.error("Error getting user")
-		await prisma.$disconnect()
 		return undefined
 	}
 }
@@ -89,11 +89,9 @@ export async function getUserById(id: number) {
 				id,
 			},
 		})
-		await prisma.$disconnect()
 		return user
 	} catch (e) {
 		console.error("Error getting user")
-		await prisma.$disconnect()
 		return undefined
 	}
 }
@@ -101,10 +99,8 @@ export async function createUser(data: IUserData) {
 	try {
 		const user = await prisma.user.create({ data })
 		console.log(user)
-		await prisma.$disconnect()
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }
@@ -112,32 +108,26 @@ export async function updateUser(id: number, data: IUserUpdateData) {
 	try {
 		const user = await prisma.user.update({ where: { id }, data })
 		console.log(user)
-		await prisma.$disconnect()
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }
 export async function getPropertyTypes() {
 	try {
 		const propertyTypes = await prisma.propertyType.findMany()
-		await prisma.$disconnect()
 		return propertyTypes
 	} catch (e) {
 		console.error("Error getting propertyTypes")
-		await prisma.$disconnect()
 		return undefined
 	}
 }
 export async function findPropertyType(id: number) {
 	try {
 		const propertyType = await prisma.propertyType.findFirst({ where: { id } })
-		await prisma.$disconnect()
 		return propertyType
 	} catch (e) {
 		console.error("Error getting propertyType")
-		await prisma.$disconnect()
 		return undefined
 	}
 }
@@ -146,11 +136,9 @@ export async function findPropertyTypeByCode(code: string) {
 		const propertyType = await prisma.propertyType.findFirst({
 			where: { code },
 		})
-		await prisma.$disconnect()
 		return propertyType
 	} catch (e) {
 		console.error("Error getting propertyType")
-		await prisma.$disconnect()
 		return undefined
 	}
 }
@@ -159,11 +147,9 @@ export async function getCountries() {
 		const countries = await prisma.country.findMany({
 			orderBy: { name: "asc" },
 		})
-		await prisma.$disconnect()
 		return countries
 	} catch (e) {
 		console.error("Error getting Countries", e)
-		await prisma.$disconnect()
 		return undefined
 	}
 }
@@ -187,22 +173,18 @@ export async function findCountryByCode(code: string) {
 				code,
 			},
 		})
-		await prisma.$disconnect()
 		return country
 	} catch (e) {
 		console.error("Error getting Country", e)
-		await prisma.$disconnect()
 		return undefined
 	}
 }
 export async function getCurrencies() {
 	try {
 		const currencies = await prisma.currency.findMany()
-		await prisma.$disconnect()
 		return currencies
 	} catch (e) {
 		console.error("Error getting Currencies")
-		await prisma.$disconnect()
 		return undefined
 	}
 }
@@ -320,11 +302,9 @@ export async function createProperty(data: IPropertyCreateDTO) {
 				},
 			})
 		})
-		await prisma.$disconnect()
 		return createdProperty
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }
@@ -338,11 +318,9 @@ export async function updateProperty(id: number, data: IPropertyUpdateDTO) {
 		console.log(createdProperty)
 		//continous revision
 		//to add other modules
-		await prisma.$disconnect()
 		return createdProperty
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }
@@ -350,11 +328,9 @@ export async function deleteProperty(id: number) {
 	try {
 		const propertyDeleted = await prisma.property.delete({ where: { id } })
 		console.log(propertyDeleted)
-		await prisma.$disconnect()
 		return propertyDeleted
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }
@@ -371,11 +347,9 @@ export async function activeMultipleProperty(ids: number[]) {
 			})
 		)
 		console.log(updatedProperties)
-		await prisma.$disconnect()
 		return updatedProperties
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }
@@ -392,11 +366,9 @@ export async function deactivateMultipleProperty(ids: number[]) {
 			})
 		)
 		console.log(updatedProperties)
-		await prisma.$disconnect()
 		return updatedProperties
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }
@@ -404,11 +376,9 @@ export async function createPropertyType(data: IPropertyTypeData) {
 	try {
 		const propertyType = await prisma.propertyType.create({ data })
 		console.log(propertyType)
-		await prisma.$disconnect()
 		return propertyType
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }
@@ -416,11 +386,9 @@ export async function createPropertyImage(data: IPropertyImageCreate) {
 	try {
 		const propertyImage = await prisma.propertyImage.create({ data })
 		console.log(propertyImage)
-		await prisma.$disconnect()
 		return propertyImage
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }
@@ -428,11 +396,9 @@ export async function deletePropertyImage(id: number) {
 	try {
 		const propertyImage = await prisma.propertyImage.delete({ where: { id } })
 		console.log(propertyImage)
-		await prisma.$disconnect()
 		return propertyImage
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }
@@ -453,11 +419,9 @@ export const createPay = async (data: ICreatePay) => {
 	try {
 		const pay = await prisma.pay.create({ data })
 		console.log(pay)
-		await prisma.$disconnect()
 		return pay
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }
@@ -465,11 +429,9 @@ export const updatePay = async (data: IUpdatePay) => {
 	try {
 		const pay = await prisma.pay.update({ where: { id: data.id }, data })
 		console.log(pay)
-		await prisma.$disconnect()
 		return pay
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }
@@ -477,11 +439,9 @@ export const createAffiliate = async (data: ICreateAffiliateData) => {
 	try {
 		const affiliate = await prisma.affiliate.create({ data })
 		console.log("createAffiliate service for: ", affiliate)
-		await prisma.$disconnect()
 		return affiliate
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }
@@ -492,11 +452,9 @@ export const updateAffiliate = async (data: IUpdateAffiliateData) => {
 			data,
 		})
 		console.log(affiliate)
-		await prisma.$disconnect()
 		return affiliate
 	} catch (e) {
 		console.error(e)
-		await prisma.$disconnect()
 		process.exit(1)
 	}
 }

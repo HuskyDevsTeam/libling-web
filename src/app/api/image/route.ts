@@ -1,5 +1,4 @@
 import { createPropertyImage, updateProperty } from "@/services"
-import { put } from "@vercel/blob"
 import { NextResponse } from "next/server"
 import {
 	S3Client,
@@ -7,13 +6,16 @@ import {
 	GetObjectCommand,
 } from "@aws-sdk/client-s3"
 
-const bucketClient = new S3Client({
-	region: process.env.S3_REGION || "",
-	credentials: {
-		accessKeyId: process.env.S3_ACCESS_KEY || "",
-		secretAccessKey: process.env.S3_SECRET_KEY || "",
-	},
-})
+// Se crea bajo demanda: en el build de Docker no hay variables de entorno
+let _bucketClient: S3Client | undefined
+const getBucketClient = () =>
+	(_bucketClient ??= new S3Client({
+		region: process.env.S3_REGION || "",
+		credentials: {
+			accessKeyId: process.env.S3_ACCESS_KEY || "",
+			secretAccessKey: process.env.S3_SECRET_KEY || "",
+		},
+	}))
 const uploadFileToS3 = async (file: Buffer, filename: string) => {
 	const key = `${Date.now()}-${filename}`
 	const params = {
@@ -23,7 +25,7 @@ const uploadFileToS3 = async (file: Buffer, filename: string) => {
 		ContentType: "image/jpeg",
 	}
 	const command = new PutObjectCommand(params)
-	await bucketClient.send(command)
+	await getBucketClient().send(command)
 	const url = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_REGION}.amazonaws.com/${key}`
 	const response = {
 		filename: key,
@@ -32,7 +34,7 @@ const uploadFileToS3 = async (file: Buffer, filename: string) => {
 	return response
 }
 const getFileFromS3 = async (key: string) => {
-	const { Body } = await bucketClient.send(
+	const { Body } = await getBucketClient().send(
 		new GetObjectCommand({
 			Bucket: process.env.S3_BUCKET_NAME,
 			Key: key,
