@@ -40,3 +40,11 @@
     justify-content: flex-end;
     gap: 16px;
 }
+
+
+@media (max-width: 768px) {
+    .card {
+        padding: 16px;
+        min-width: 0;
+    }
+}

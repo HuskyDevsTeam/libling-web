@@ -152,3 +152,20 @@
     color: #1973FA;
 
 }
+
+/* Mobile: lateral margins max 16px */
+@media (max-width: 768px) {
+    .section {
+        padding: 16px;
+    }
+
+    .titleBar {
+        padding: 0px 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .card {
+        padding: 16px;
+    }
+}

@@ -90,7 +90,7 @@ const Preview: React.FC<IPreview> = ({ params: { lang }, onNext, onGo, files, fa
     }, [interfaceStore?.setBarContent])
     return (<div className={styles.previewContainer}>
         <h1 className={styles.titlePreview} style={poppinsMedium.style}>{glosary.formPreviewTitle}</h1>
-        <div className={styles.card} style={{ width: 760 }}>
+        <div className={styles.card} style={{ width: '100%', maxWidth: 760 }}>
             <Modal open={open} onRequestClose={() => { setOpen(false) }}>
                 <FiHome className={styles.modalIcon} />
                 <h3 style={poppinsMedium.style} className={styles.sectionTitle}>{glosary.modalCreateTitle}</h3>

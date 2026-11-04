@@ -385,3 +385,82 @@
     gap: 24px;
     padding-top: 8px;
 }
+
+/* Mobile: lateral margins max 16px and fluid form */
+@media (max-width: 768px) {
+    .section {
+        padding: 16px;
+        width: 100%;
+    }
+
+    .titleBar {
+        height: auto;
+        min-height: 60px;
+        padding: 8px 16px;
+        gap: 16px;
+        justify-content: space-between;
+    }
+
+    .indicator,
+    .indicatorFill {
+        width: 36px;
+    }
+
+    .card {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .cardBody {
+        padding: 20px 16px;
+    }
+
+    .cardFooter {
+        padding: 16px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .inputRow {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    .inputRowHalf {
+        width: 100%;
+    }
+
+    .stepOneInputRight {
+        padding-top: 0;
+    }
+
+    .sectionContentRow {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .sectionContentRowHalf {
+        width: 100%;
+    }
+
+    .sectionSeparator {
+        padding: 0;
+    }
+
+    .titlePreview {
+        font-size: 20px;
+    }
+
+    .actionBar {
+        width: 100%;
+        max-width: none !important;
+        padding: 0 16px;
+        gap: 12px;
+    }
+
+    .modalButtons {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+}

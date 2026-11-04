@@ -100,3 +100,14 @@
     min-height: 70vh;
     flex-grow: 1;
 }
+
+/* Mobile: lateral margins max 16px */
+@media (max-width: 768px) {
+    .section {
+        padding: 16px;
+    }
+
+    .titleBar {
+        padding: 0px 16px;
+    }
+}

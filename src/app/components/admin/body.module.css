@@ -99,3 +99,9 @@
         width: 100%;
     }
 }
+
+@media (max-width: 768px) {
+    .containerBar {
+        padding-bottom: 80px;
+    }
+}
