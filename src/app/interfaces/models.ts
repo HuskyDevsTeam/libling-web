@@ -182,6 +182,7 @@ export interface IPropertyCreateDTO extends IPropertyCreate {
 	NearPlace?: INearPlaceCreate[]
 	LegalNotice?: ILegalNoticeCreate[]
 }
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 export interface IPropertyUpdateDTO {
 	title?: string
 	content?: string
@@ -205,10 +206,10 @@ export interface IPropertyUpdateDTO {
 	countryId?: number
 	currencyId?: number
 	propertyTypeId?: number
-	Surface?: ISurfaceCreate[]
-	Benefits?: IBenefitsCreate[]
-	NearPlace?: INearPlaceCreate[]
-	LegalNotice?: ILegalNoticeCreate[]
+	Surface?: Optional<ISurfaceCreate, 'propertyId'>[]
+	Benefits?: Optional<IBenefitsCreate, 'propertyId'>[]
+	NearPlace?: Optional<INearPlaceCreate, 'propertyId'>[]
+	LegalNotice?: Optional<ILegalNoticeCreate, 'propertyId'>[]
 }
 
 export interface IPropertyType {

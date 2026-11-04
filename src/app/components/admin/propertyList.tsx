@@ -13,7 +13,7 @@ import { useInterfaceStore } from '@/app/hooks/useInterfaceStore'
 import InputSelectMini from './inputSelecMini'
 import { activeMultipleProperty, deactivateMultipleProperty, deleteProperty, indexProperty } from '@/services'
 import { IMetaPaginate } from '@/app/interfaces/models'
-import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight, FiHome, FiMonitor, FiPause, FiPlay } from 'react-icons/fi'
+import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight, FiEdit2, FiHome, FiMonitor, FiPause, FiPlay } from 'react-icons/fi'
 import Modal from './modal'
 import { toast } from 'react-toastify'
 import CustomToast from '../toast'
@@ -177,6 +177,13 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
                     </div>
                     {
                         (selected.length === 1) &&
+                        <div className={styles.actionButton} onClick={() => { router.push(`/admin/properties/${selected[0]}/edit`) }} >
+                            <FiEdit2 className={styles.actionIcon} />
+                            <span>{glosary.actionEdit}</span>
+                        </div>
+                    }
+                    {
+                        (selected.length === 1) &&
                         <div className={styles.actionButton} onClick={handleDetail} >
                             <FiMonitor className={styles.actionIcon} />
                             <span>{glosary.actionPreview}</span>
@@ -270,7 +277,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
                         {
                             properties?.map((el, index) => (
 
-                                <PropertyListItem key={index} item={el} lang={lang} onSelect={handleSelect} isChecked={selected.some(element => el.id === element)} onDelete={handleDelete} />
+                                <PropertyListItem key={index} item={el} lang={lang} onSelect={handleSelect} isChecked={selected.some(element => el.id === element)} onDelete={handleDelete} onEdit={(id) => { router.push(`/admin/properties/${id}/edit`) }} />
                             ))
                         }
                     </tbody>

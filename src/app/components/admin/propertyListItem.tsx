@@ -84,8 +84,8 @@ const PropertyListItem: React.FC<IListItem> = ({ item, lang, onSelect, onPreview
             <td>
                 <div className={styles.actionContainer}>
                     {/* <FiEye className={styles.action} onClick={!!onPreview ? onPreview : () => { }} /> */}
-                    {/* <FiEdit2 className={styles.action} onClick={!!onEdit ? onEdit : () => { }} /> */}
-                    <FiTrash className={styles.action} onClick={!!onDelete ? () => { onDelete(item.id, item.active) } : () => { }} />
+                    <FiEdit2 className={styles.action} data-testid={`edit-property-${item.id}`} aria-label={glosaryAdmin.actionEdit} onClick={!!onEdit ? () => { onEdit(item.id) } : () => { }} />
+                    <FiTrash className={styles.action} aria-label="delete" onClick={!!onDelete ? () => { onDelete(item.id, item.active) } : () => { }} />
                 </div>
             </td>
         </tr>

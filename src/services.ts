@@ -309,20 +309,54 @@ export async function createProperty(data: IPropertyCreateDTO) {
 	}
 }
 export async function updateProperty(id: number, data: IPropertyUpdateDTO) {
-	try {
-		const newProperty = new PropertyUpdate(data)
-		const createdProperty = await prisma.property.update({
-			where: { id },
-			data: newProperty,
-		})
-		console.log(createdProperty)
-		//continous revision
-		//to add other modules
-		return createdProperty
-	} catch (e) {
-		console.error(e)
-		process.exit(1)
+	// Scalar fields left undefined are ignored by Prisma. The child lists
+	// (Surface, Benefits, NearPlace, LegalNotice) are replaced as a whole only
+	// when they are provided, all inside one transaction.
+	const scalars = new PropertyUpdate(data)
+	const withoutPropertyId = <T extends { propertyId?: number }>(el: T) => {
+		const { propertyId, ...rest } = el
+		return rest
 	}
+	return await prisma.$transaction(async (tx) => {
+		const updatedProperty = await tx.property.update({
+			where: { id },
+			data: scalars,
+		})
+		if (data.Surface) {
+			await tx.surface.deleteMany({ where: { propertyId: id } })
+			await tx.surface.createMany({
+				data: data.Surface.map((el) => ({ ...withoutPropertyId(el), propertyId: id })),
+			})
+		}
+		if (data.Benefits) {
+			await tx.benefits.deleteMany({ where: { propertyId: id } })
+			await tx.benefits.createMany({
+				data: data.Benefits.map((el) => ({ ...withoutPropertyId(el), propertyId: id })),
+			})
+		}
+		if (data.NearPlace) {
+			await tx.nearPlace.deleteMany({ where: { propertyId: id } })
+			await tx.nearPlace.createMany({
+				data: data.NearPlace.map((el) => ({ ...withoutPropertyId(el), propertyId: id })),
+			})
+		}
+		if (data.LegalNotice) {
+			await tx.legalNotice.deleteMany({ where: { propertyId: id } })
+			await tx.legalNotice.createMany({
+				data: data.LegalNotice.map((el) => ({ ...withoutPropertyId(el), propertyId: id })),
+			})
+		}
+		// Decimal no es serializable hacia componentes cliente (server action)
+		return {
+			...updatedProperty,
+			longitude: updatedProperty.longitude?.toNumber(),
+			latitude: updatedProperty.latitude?.toNumber(),
+			area: updatedProperty.area?.toNumber(),
+			bedrooms: updatedProperty.bedrooms?.toNumber(),
+			bathrooms: updatedProperty.bathrooms?.toNumber(),
+			price: updatedProperty.price?.toNumber(),
+		}
+	})
 }
 export async function deleteProperty(id: number) {
 	try {
