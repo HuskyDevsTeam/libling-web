@@ -6,7 +6,7 @@ import Aside from './aside';
 import { poppinsMedium, poppinsRegular } from '@/app/fonts';
 import Navbar from './navbar';
 import { dict } from '@/app/utils';
-import { FiHome, FiCreditCard, FiExternalLink } from 'react-icons/fi';
+import { FiGrid, FiHome, FiCreditCard, FiExternalLink } from 'react-icons/fi';
 import { SIDEBAR_COOKIE } from './sidebarCookie';
 import { IUserSession } from '@/services';
 import ActionBar from './actionBar';
@@ -48,7 +48,8 @@ export const Body = ({
     const routes = [
         {
             name: glosary.dashboardTitle,
-            uri: '/admin/dashboard'
+            uri: '/admin/dashboard',
+            icon: FiGrid
         },
         {
             name: glosary.propertiesTitle,

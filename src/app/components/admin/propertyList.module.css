@@ -91,11 +91,11 @@
 }
 
 .colSummary {
-    width: 32%;
+    width: 40%;
 }
 
 .colPrice {
-    width: 22%;
+    width: 20%;
     min-width: 200px;
 }
 
@@ -126,6 +126,11 @@
 
 .basicMini {
     border-radius: 10px;
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
 .basicTextContainer {

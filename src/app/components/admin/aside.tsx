@@ -16,11 +16,8 @@ export default function Aside({ lang, open = false, mobileOpen = false, onNaviga
     }
     return (<>
         <aside className={`${open ? styles.aside : styles.asideClosed} ${mobileOpen ? styles.mobileOpen : ''}`}>
-            <Link href={routes[0].uri}>
-                <span className={styles.asideTitle} style={poppinsMedium.style}>{routes[0].name}</span>
-            </Link>
             {
-                routes.slice(1).map((el, index) => (
+                routes.map((el, index) => (
                     <Link href={el.uri} key={index} onClick={el.external ? undefined : onNavigate} {...(el.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
                         <div className={verifyCurrentLink(el.uri, el.external) ? styles.asideItemSelected : styles.asideItem}>
                             {
