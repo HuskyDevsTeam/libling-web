@@ -1,0 +1,23 @@
+# Desarrollo local: app + Postgres. Uso: docker compose up --build
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: libling
+      POSTGRES_PASSWORD: libling
+      POSTGRES_DB: libling
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+  app:
+    build: .
+    depends_on: [db]
+    ports: ["3000:3000"]
+    env_file: [.env]
+    environment:
+      POSTGRES_PRISMA_URL: postgresql://libling:libling@db:5432/libling
+      POSTGRES_URL_NON_POOLING: postgresql://libling:libling@db:5432/libling
+      APP_URL: http://localhost:3000
+      APP_ENV: development
+      AUTH_TRUST_HOST: "true"
+volumes:
+  pgdata:
