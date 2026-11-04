@@ -5,10 +5,7 @@ import { getUser } from "@/services"
 import { sendEmailToClient } from "@/app/utils/emails"
 import { subjects, templates } from "@/app/utils/funtions"
 
-const BASE_URL =
-	process.env.VERCEL_ENV === "production"
-		? "https://libling.lu"
-		: "http://localhost:3000"
+const BASE_URL = process.env.APP_URL || "http://localhost:3000"
 
 export async function POST(request: NextRequest, response: NextResponse) {
 	try {
