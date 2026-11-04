@@ -8,7 +8,8 @@ import { IRoute } from './body';
 
 export default function Aside({ lang, open = false, mobileOpen = false, onNavigate, routes }: { lang: "es" | "en" | "fr", open: boolean, mobileOpen?: boolean, onNavigate?: VoidFunction, routes:IRoute[] }) {
     const pathname = usePathname()
-    const verifyCurrentLink = (site: string) => {
+    const verifyCurrentLink = (site: string, external?: boolean) => {
+        if (external) return false
         let currentLocation = pathname
         if (currentLocation.includes(site)) return true
         return false
@@ -21,9 +22,9 @@ export default function Aside({ lang, open = false, mobileOpen = false, onNaviga
             {
                 routes.slice(1).map((el, index) => (
                     <Link href={el.uri} key={index} onClick={el.external ? undefined : onNavigate} {...(el.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
-                        <div className={verifyCurrentLink(el.uri) ? styles.asideItemSelected : styles.asideItem}>
+                        <div className={verifyCurrentLink(el.uri, el.external) ? styles.asideItemSelected : styles.asideItem}>
                             {
-                                !!el.icon && <el.icon className={verifyCurrentLink(el.uri) ? styles.asideItemIconSelected : styles.asideItemIcon} />
+                                !!el.icon && <el.icon className={verifyCurrentLink(el.uri, el.external) ? styles.asideItemIconSelected : styles.asideItemIcon} />
                             }
                             <span className={styles.asideItemText}>{el.name}</span>
                         </div>

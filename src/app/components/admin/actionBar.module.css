@@ -18,3 +18,15 @@
     justify-content: center;
     flex-grow: 1;
 }
+
+@media (max-width: 768px) {
+    .container {
+        height: auto;
+        min-height: 72px;
+    }
+
+    .innerContainer {
+        width: 100% !important;
+        overflow-x: auto;
+    }
+}

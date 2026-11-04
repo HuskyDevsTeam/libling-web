@@ -340,3 +340,64 @@
         padding-left: 0;
     }
 }
+
+/* Register button: FAB on mobile only */
+.fab {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .registerDesktop {
+        display: none;
+    }
+
+    .fab {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: none;
+        background-color: var(--libling-main-ui-color);
+        color: #fff;
+        font-size: 28px;
+        box-shadow: 0px 6px 16px #1973FA66;
+        cursor: pointer;
+        z-index: 3;
+    }
+
+    .fab:active {
+        background-color: var(--button-flat-pressed-color);
+    }
+
+    /* Bulk actions bar */
+    .actionBar {
+        justify-content: flex-start;
+        width: max-content;
+        min-width: 100%;
+    }
+
+    .actionInfo {
+        flex-shrink: 0;
+        padding: 0 16px;
+        white-space: nowrap;
+        font-size: 14px;
+    }
+
+    .actionButton,
+    .actionButton:hover {
+        flex-shrink: 0;
+        padding: 8px 16px;
+        white-space: nowrap;
+    }
+
+    .actionIcon,
+    .actionButton:hover .actionIcon {
+        font-size: 24px;
+        padding: 2px;
+    }
+}

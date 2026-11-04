@@ -343,3 +343,92 @@
     width: 33%;
     padding: 20px 0px;
 }
+
+/* Mobile only: table becomes stacked cards */
+@media (max-width: 768px) {
+    .cardTop {
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-top: 16px;
+    }
+
+    .cardHeader {
+        padding-bottom: 16px;
+    }
+
+    .cardContent {
+        padding: 8px 12px 16px;
+    }
+
+    .tableContainer,
+    .tableContainer tbody {
+        display: block;
+        width: 100%;
+        padding: 0;
+    }
+
+    .tableContainer thead {
+        display: none;
+    }
+
+    .tableContainer tbody tr {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 6px 12px;
+        padding: 16px 0;
+        border-bottom: 1px solid #0000001F;
+    }
+
+    .tableContainer tbody tr td,
+    .tableContainer tbody tr:last-child td {
+        padding: 0;
+        border-bottom: none;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .tableContainer tbody tr td:nth-child(1) { grid-column: 1; grid-row: 1; font-weight: 500; }
+    .tableContainer tbody tr td:nth-child(2) { grid-column: 1; grid-row: 2; color: #00000099; font-size: 13px; }
+    .tableContainer tbody tr td:nth-child(3) { grid-column: 1; grid-row: 3; color: #00000099; font-size: 13px; }
+    .tableContainer tbody tr td:nth-child(4) { grid-column: 1; grid-row: 4; color: #00000099; font-size: 13px; }
+    .tableContainer tbody tr td:nth-child(5) { grid-column: 2; grid-row: 1; justify-self: end; }
+    .tableContainer tbody tr td:nth-child(6) { grid-column: 2; grid-row: 2 / 5; align-self: end; }
+
+    .paginatorContainer {
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 24px 8px 8px;
+        gap: 12px;
+    }
+
+    .pageControlContainer {
+        padding-left: 0;
+    }
+
+    .rowDescription {
+        flex-wrap: wrap;
+        gap: 4px 12px;
+    }
+
+    .rowDescriptionBase {
+        width: auto;
+        min-width: 110px;
+    }
+
+    .sectionTitle {
+        font-size: 20px;
+    }
+
+    .listColumnTitle,
+    .listColumnContent {
+        padding: 10px 4px;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .modalButtons {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+}

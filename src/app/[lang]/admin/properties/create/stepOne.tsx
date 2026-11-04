@@ -168,7 +168,7 @@ const StepOne: React.FC<IStepOne> = ({ params: { lang }, onNext }) => {
                                                 formRef.current?.setFieldValue('latitude', e.viewState.latitude)
 
                                             }}
-                                            style={{ width: 600, height: 400, borderRadius: 10 }}
+                                            style={{ width: '100%', maxWidth: 600, height: 400, borderRadius: 10 }}
                                             mapStyle={mapStyle}
                                         >
                                             <Marker draggable={true} latitude={values.latitude} longitude={values.longitude} onDragEnd={(e) => {
@@ -181,7 +181,7 @@ const StepOne: React.FC<IStepOne> = ({ params: { lang }, onNext }) => {
                                             </Marker>
                                         </Map>
                                         :
-                                        <div style={{ width: 600, height: 400, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        <div style={{ width: '100%', maxWidth: 600, height: 400, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                             <Loader color='#000' />
                                         </div>
                                 }

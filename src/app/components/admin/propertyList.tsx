@@ -13,7 +13,7 @@ import { useInterfaceStore } from '@/app/hooks/useInterfaceStore'
 import InputSelectMini from './inputSelecMini'
 import { activeMultipleProperty, deactivateMultipleProperty, deleteProperty, indexProperty } from '@/services'
 import { IMetaPaginate } from '@/app/interfaces/models'
-import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight, FiEdit2, FiHome, FiMonitor, FiPause, FiPlay } from 'react-icons/fi'
+import { FiPlus, FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight, FiEdit2, FiHome, FiMonitor, FiPause, FiPlay } from 'react-icons/fi'
 import Modal from './modal'
 import { toast } from 'react-toastify'
 import CustomToast from '../toast'
@@ -247,9 +247,17 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
                     <h2 className={styles.cardTitle} style={poppinsMedium.style}>{glosary.indexTitle}</h2>
                     <div className={styles.listTools}>
                         <InputSearch placeholder={glosaryImmo.headerButton} />
-                        <Button title={glosary.formButtonRegister} goTo={'/admin/properties/create'} type='main' />
+                        <div className={styles.registerDesktop}>
+                            <Button title={glosary.formButtonRegister} goTo={'/admin/properties/create'} type='main' />
+                        </div>
                     </div>
                 </div>
+                {
+                    selected.length === 0 &&
+                    <button type='button' className={styles.fab} aria-label={glosary.formButtonRegister} title={glosary.formButtonRegister} onClick={() => { router.push('/admin/properties/create') }}>
+                        <FiPlus />
+                    </button>
+                }
                 <div className={styles.tabContainer}>
                     {
                         tabList.map((el, index) => (<div key={index} className={tab === el.tab ? styles.selectedTab : styles.tab} style={poppinsMedium.style} onClick={() => {
