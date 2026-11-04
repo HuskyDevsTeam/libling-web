@@ -10,7 +10,9 @@ COPY prisma ./prisma
 RUN npm ci
 
 FROM base AS builder
-ENV NEXT_TELEMETRY_DISABLED=1
+ARG IMAGE_HOST
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    IMAGE_HOST=$IMAGE_HOST
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate && npx next build
