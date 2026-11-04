@@ -1,9 +1,8 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
-import { dict } from '@/app/utils'
 import { showProperty } from '@/services'
-import InnerNav from '@/app/components/innerNav'
-import EditForm from './editForm'
+import { IEditInitial } from '@/app/utils/propertyEdit'
+import EditWizard from './editWizard'
 
 interface IEdit {
     params: {
@@ -17,27 +16,36 @@ const Edit: React.FC<IEdit> = async ({ params: { id, lang } }) => {
     if (Number.isNaN(propertyId)) notFound()
     const property = await showProperty({ id: propertyId })
     if (!property) notFound()
-    const glosary = dict[lang].adminProperties
-    const initial = {
+    // Solo datos serializables: los Decimal de Prisma no pasan a componentes cliente
+    const initial: IEditInitial = {
         id: property.id,
-        title: property.title,
-        content: property.content || '',
+        type: property.type,
+        propertyTypeId: property.propertyTypeId,
+        countryId: property.countryId,
         address: property.address,
-        price: property.price?.toString() || '',
-        area: property.area?.toString() || '',
-        bedrooms: property.bedrooms?.toString() || '',
-        bathrooms: property.bathrooms?.toString() || '',
-        view: property.view || '',
+        longitude: property.longitude?.toNumber(),
+        latitude: property.latitude?.toNumber(),
+        area: property.area?.toNumber(),
+        bedrooms: property.bedrooms?.toNumber(),
+        bathrooms: property.bathrooms?.toNumber(),
+        heatingType: property.heatingType,
+        heatingMedium: property.heatingMedium,
+        heatingEnergy: property.heatingEnergy,
         furnished: property.furnished,
-        active: property.active,
-        benefits: property.Benefits.map(el => el.name).join('\n'),
-        nearPlaces: property.NearPlace.map(el => el.name).join('\n'),
-        legalNotes: property.LegalNotice.map(el => el.name).join('\n'),
+        view: property.view,
+        Surface: property.Surface.map(el => ({ name: el.name, description: el.description, quantity: el.quantity, areaId: el.areaId })),
+        Benefits: property.Benefits.map(el => ({ name: el.name })),
+        NearPlace: property.NearPlace.map(el => ({ name: el.name })),
+        LegalNotice: property.LegalNotice.map(el => ({ name: el.name })),
+        title: property.title,
+        content: property.content,
+        thumbnail: property.thumbnail,
+        images: property.PropertyImage.map(el => ({ id: el.id, path: el.path })),
+        price: property.price?.toNumber(),
+        currencyId: property.currencyId,
+        frecuency: property.frecuency,
     }
-    return (<>
-        <InnerNav text={glosary.editTitle} admin={true} />
-        <EditForm lang={lang} initial={initial} />
-    </>)
+    return <EditWizard lang={lang} initial={initial} />
 }
 
 export default Edit

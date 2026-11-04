@@ -14,7 +14,7 @@ import { Button } from '@/app/components/admin/button'
 import InputSelect from '@/app/components/admin/inputSelect';
 import { InputText } from '@/app/components/admin/inputText';
 import useStore from '@/app/hooks/useStore';
-import { usePropertyStore } from '@/app/hooks/usePropertyStore';
+import { usePropertyStoreFromContext } from '@/app/hooks/PropertyStoreContext'
 import { rentPaymentPeriods } from '@/app/utils/data';
 
 
@@ -31,7 +31,7 @@ interface IStepFive extends IPage {
 
 
 const StepFive: React.FC<IStepFive> = ({ params: { lang }, onNext, onBack }) => {
-    const store = useStore(usePropertyStore, (state) => state)
+    const store = useStore(usePropertyStoreFromContext(), (state) => state)
     const glosary = dict[lang]?.adminProperties
     const glosaryError = dict[lang]?.auth
     const [list, setList] = useState<ISelectElement[]>([])

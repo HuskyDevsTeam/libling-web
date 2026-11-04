@@ -1,4 +1,4 @@
-import { create } from "zustand"
+import { create, StoreApi, UseBoundStore } from "zustand"
 import { persist } from "zustand/middleware"
 
 // the store itself does not need any change
@@ -66,36 +66,39 @@ interface TypePropertyStore {
 	resetForm: VoidFunction
 }
 
-export const usePropertyStore = create<TypePropertyStore>()(
-	persist(
-		(set, get) => ({
-			lastStep: 1,
+const initializer = (set: (partial: Partial<TypePropertyStore>) => void, get: () => TypePropertyStore): TypePropertyStore => ({
+	lastStep: 1,
+	form_1: undefined,
+	form_2: undefined,
+	form_3: undefined,
+	form_4: undefined,
+	form_5: undefined,
+	//Actions
+	setForm_1: (form: IForm1) => set({ form_1: form }),
+	setForm_2: (form: IForm2) => set({ form_2: form }),
+	setForm_3: (form: IForm3) => set({ form_3: form }),
+	setForm_4: (form: IForm4) => set({ form_4: form }),
+	setForm_5: (form: IForm5) => set({ form_5: form }),
+	resetForm: () =>
+		set({
 			form_1: undefined,
 			form_2: undefined,
 			form_3: undefined,
 			form_4: undefined,
 			form_5: undefined,
-			//Actions
-			setForm_1: (form: IForm1) => set({ form_1: form }),
-			setForm_2: (form: IForm2) => set({ form_2: form }),
-			setForm_3: (form: IForm3) => set({ form_3: form }),
-			setForm_4: (form: IForm4) => set({ form_4: form }),
-			setForm_5: (form: IForm5) => set({ form_5: form }),
-			resetForm: () =>
-				set({
-					form_1: undefined,
-					form_2: undefined,
-					form_3: undefined,
-					form_4: undefined,
-					form_5: undefined,
-				}),
-			addStep: () => set({ lastStep: get().lastStep + 1 }),
-			removeStep: () => set({ lastStep: get().lastStep - 1 }),
-			setStep: (step: number) => set({ lastStep: step }),
-			resetStep: () => set({ lastStep: 1 }),
 		}),
-		{
-			name: "property-libling-storage",
-		}
-	)
+	addStep: () => set({ lastStep: get().lastStep + 1 }),
+	removeStep: () => set({ lastStep: get().lastStep - 1 }),
+	setStep: (step: number) => set({ lastStep: step }),
+	resetStep: () => set({ lastStep: 1 }),
+})
+
+// Borrador del formulario de registrar (persistido en localStorage)
+export const usePropertyStore = create<TypePropertyStore>()(
+	persist(initializer, { name: "property-libling-storage" })
 )
+
+// Estado del formulario de editar: en memoria, no pisa el borrador de registrar
+export const useEditPropertyStore = create<TypePropertyStore>()(initializer)
+
+export type PropertyStoreHook = UseBoundStore<StoreApi<TypePropertyStore>>

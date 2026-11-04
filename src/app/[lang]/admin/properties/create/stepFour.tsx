@@ -15,7 +15,7 @@ import { InputText } from '@/app/components/admin/inputText';
 import { FiInfo } from 'react-icons/fi';
 import InputPhoto from '@/app/components/admin/inputPhoto';
 import useStore from '@/app/hooks/useStore';
-import { usePropertyStore } from '@/app/hooks/usePropertyStore';
+import { usePropertyStoreFromContext } from '@/app/hooks/PropertyStoreContext'
 
 
 interface IValues {
@@ -29,12 +29,15 @@ interface IStepFour extends IPage {
     onBack: VoidFunction
     files: any[]
     handleFiles: (files: any[], face:number) => void
+    // Solo en editar: fotos ya guardadas (contenido extra y exención de la foto obligatoria)
+    extra?: React.ReactNode
+    hasExistingPhotos?: boolean
 }
 
 
 
-const StepFour: React.FC<IStepFour> = ({ params: { lang }, onNext, onBack, files, handleFiles }) => {
-    const store = useStore(usePropertyStore, (state) => state)
+const StepFour: React.FC<IStepFour> = ({ params: { lang }, onNext, onBack, files, handleFiles, extra, hasExistingPhotos = false }) => {
+    const store = useStore(usePropertyStoreFromContext(), (state) => state)
     const initialValues = {
         title: store?.form_4?.title || '',
         description: store?.form_4?.description || '',
@@ -56,14 +59,14 @@ const StepFour: React.FC<IStepFour> = ({ params: { lang }, onNext, onBack, files
     const validationSchema = Yup.object({
         title: Yup.string().required(glosary.formValidationRequired),
         description: Yup.string().optional(),
-        uploadedPhotos: Yup.string().required(glosary.formValidationRequired),
+        uploadedPhotos: hasExistingPhotos ? Yup.boolean() : Yup.string().required(glosary.formValidationRequired),
     });
     const handleSubmit = async (values: IValues, { setSubmitting }: FormikHelpers<IValues>) => {
         const formData = values
         try {
             console.log(formData)
             console.log(files)
-            if (files.length <= 0) return toast.error(<CustomToast type='error' title='Error' content={glosary.formValidationPhotos} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
+            if (files.length <= 0 && !hasExistingPhotos) return toast.error(<CustomToast type='error' title='Error' content={glosary.formValidationPhotos} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
             store?.setForm_4({
                 ...formData
             })
@@ -102,6 +105,7 @@ const StepFour: React.FC<IStepFour> = ({ params: { lang }, onNext, onBack, files
                                     <FiInfo className={styles.advertisingIcon} />
                                     <span className={styles.avertisingText}>{glosary.formLabelPhotosAdvertise}</span>
                                 </div>
+                                {extra}
                                 <InputPhoto description={glosary.formButtonAddPhoto} facename={glosary.formLabelTumbnail} onChange={handlePhoto} initialValues={files || []} />
                             </div>
                         </Form>

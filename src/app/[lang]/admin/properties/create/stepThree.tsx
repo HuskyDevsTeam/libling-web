@@ -15,7 +15,7 @@ import { Button } from '@/app/components/admin/button'
 import { InputText } from '@/app/components/admin/inputText'
 import { FiPlus, FiX } from 'react-icons/fi';
 import useStore from '@/app/hooks/useStore';
-import { usePropertyStore } from '@/app/hooks/usePropertyStore';
+import { usePropertyStoreFromContext } from '@/app/hooks/PropertyStoreContext'
 import { medidasAreaTerrenos } from '@/app/utils/data';
 
 
@@ -40,7 +40,7 @@ interface IStepThree extends IPage {
 
 
 const StepThree: React.FC<IStepThree> = ({ params: { lang }, onNext, onBack }) => {
-    const store = useStore(usePropertyStore, (state) => state)
+    const store = useStore(usePropertyStoreFromContext(), (state) => state)
     const initalValues = {
         view: store?.form_3?.view || null,
         surfaces: store?.form_3?.surfaces || [],

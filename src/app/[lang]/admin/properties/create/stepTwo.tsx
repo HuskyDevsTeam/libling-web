@@ -14,7 +14,7 @@ import { Form, Formik, FormikHelpers, FormikProps } from 'formik'
 import { Button } from '@/app/components/admin/button'
 import { InputText } from '@/app/components/admin/inputText'
 import useStore from '@/app/hooks/useStore';
-import { usePropertyStore } from '@/app/hooks/usePropertyStore';
+import { usePropertyStoreFromContext } from '@/app/hooks/PropertyStoreContext'
 import { combustiblesCalefaccion, mecanismosCalefaccion, mediosCalefaccion } from '@/app/utils/data';
 
 
@@ -38,7 +38,7 @@ const StepTwo: React.FC<IStepTwo> = ({ params: { lang }, onNext, onBack }) => {
     const glosary = dict[lang]?.adminProperties
     const glosaryError = dict[lang]?.auth
     const formRef = useRef<FormikProps<IValues>>(null)
-    const store = useStore(usePropertyStore, (state) => state)
+    const store = useStore(usePropertyStoreFromContext(), (state) => state)
     const initialValues: IValues = {
         area: store?.form_2?.area,
         bedrooms: store?.form_2?.bedrooms,
