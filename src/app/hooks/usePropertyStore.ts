@@ -18,6 +18,8 @@ interface IForm2 {
 	heatingMedium?: number
 	heatingEnergy?: number
 	furnished?: boolean
+	parking?: string
+	elevator?: boolean
 }
 interface IForm3 {
 	view?: string | null

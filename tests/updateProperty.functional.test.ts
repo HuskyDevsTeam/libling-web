@@ -71,6 +71,17 @@ describe.skipIf(!hasDb)('updateProperty (functional, DB real)', () => {
 		expect(p?.NearPlace).toHaveLength(2)
 	})
 
+	it('guarda parking y ascensor (por defecto 0 y sin ascensor)', async () => {
+		const before = await showProperty({ id: propertyId })
+		expect(before?.parking).toBe(0)
+		expect(before?.elevator).toBe(false)
+		await updateProperty(propertyId, { parking: 2, elevator: true })
+		const after = await showProperty({ id: propertyId })
+		expect(after?.parking).toBe(2)
+		expect(after?.elevator).toBe(true)
+		expect(after?.title).toBe('Editado')
+	})
+
 	it('falla (sin cerrar el proceso) si la propiedad no existe', async () => {
 		await expect(updateProperty(999999999, { title: 'x' })).rejects.toThrow()
 	})

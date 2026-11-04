@@ -16,6 +16,8 @@ export interface IEditInitial {
     heatingMedium: string | null
     heatingEnergy: string | null
     furnished: boolean
+    parking: number
+    elevator: boolean
     view: string | null
     Surface: { name: string; description: string; quantity: string; areaId: number }[]
     Benefits: { name: string }[]
@@ -33,7 +35,7 @@ export interface IEditInitial {
 // Forma que usan los pasos del formulario (misma que el store de registrar)
 export interface IEditForms {
     form_1: { propertyType?: number; country?: number; type?: number; address?: string; longitude?: number; latitude?: number }
-    form_2: { area?: string; bedrooms?: string; bathrooms?: string; heatingType?: number; heatingMedium?: number; heatingEnergy?: number; furnished?: boolean }
+    form_2: { area?: string; bedrooms?: string; bathrooms?: string; heatingType?: number; heatingMedium?: number; heatingEnergy?: number; furnished?: boolean; parking?: string; elevator?: boolean }
     form_3: { view?: string | null; surfaces: { quantity: string; description: string; area: string; areaUnit: number }[]; benefits: string[]; nearPlaces: string[]; legalNotes: string[] }
     form_4: { title: string; description?: string; uploadedPhotos: boolean; faceIndex?: number }
     form_5: { price?: string; currency?: number; frecuency?: number | null }
@@ -44,7 +46,7 @@ const num = (s: string | null | undefined) => (s === undefined || s === null || 
 
 export const formsFromProperty = (p: IEditInitial): IEditForms => ({
     form_1: { propertyType: p.propertyTypeId, country: p.countryId, type: p.type ? 1 : 0, address: p.address, longitude: p.longitude, latitude: p.latitude },
-    form_2: { area: str(p.area), bedrooms: str(p.bedrooms), bathrooms: str(p.bathrooms), heatingType: num(p.heatingType), heatingMedium: num(p.heatingMedium), heatingEnergy: num(p.heatingEnergy), furnished: p.furnished },
+    form_2: { area: str(p.area), bedrooms: str(p.bedrooms), bathrooms: str(p.bathrooms), heatingType: num(p.heatingType), heatingMedium: num(p.heatingMedium), heatingEnergy: num(p.heatingEnergy), furnished: p.furnished, parking: str(p.parking), elevator: p.elevator },
     form_3: {
         view: p.view,
         surfaces: p.Surface.map(el => ({ quantity: el.quantity, description: el.description, area: el.name, areaUnit: el.areaId })),
@@ -72,6 +74,8 @@ export const buildUpdateDTO = (f: Partial<IEditForms>): IPropertyUpdateDTO => ({
     heatingEnergy: (f.form_2?.heatingEnergy || 0).toString(),
     view: f.form_3?.view || '',
     furnished: !!f.form_2?.furnished,
+    parking: parseInt(f.form_2?.parking || '0'),
+    elevator: !!f.form_2?.elevator,
     type: !!f.form_1?.type,
     frecuency: (f.form_5?.frecuency || 0).toString(),
     countryId: parseInt(f.form_1?.country?.toString() || '0'),

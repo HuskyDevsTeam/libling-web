@@ -53,6 +53,8 @@ test('editar una propiedad pasa por los 5 pasos precargados y guarda todo', asyn
 	// Paso 2: características precargadas
 	await expect(page.getByLabel('Área')).toHaveValue('70')
 	await page.getByLabel('Área').fill('85')
+	await page.getByLabel('Plazas de parking').fill('2')
+	await page.getByText('Ascensor').locator('xpath=ancestor::div[1]').getByText('Sí', { exact: true }).click()
 	await next()
 	// Paso 3: superficies, beneficios, etc. (sin cambios)
 	await expect(page.getByPlaceholder('Ejemplo: terraza, jardín, balcón...').first()).toHaveValue('Terraza')
@@ -76,6 +78,8 @@ test('editar una propiedad pasa por los 5 pasos precargados y guarda todo', asyn
 	const saved = await prisma.property.findUnique({ where: { id: propertyId }, include: { Benefits: true, PropertyImage: true } })
 	expect(saved?.price?.toNumber()).toBe(350000)
 	expect(saved?.area?.toNumber()).toBe(85)
+	expect(saved?.parking).toBe(2)
+	expect(saved?.elevator).toBe(true)
 	expect(saved?.Benefits.map(b => b.name).sort()).toEqual(['Garaje', 'Terraza'])
 	expect(saved?.PropertyImage.map(i => i.id)).toEqual([photos[0].id])
 	expect(saved?.thumbnail).toBe(`${IMG}/a.jpg`)

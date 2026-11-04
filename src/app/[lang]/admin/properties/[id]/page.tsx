@@ -149,6 +149,30 @@ const Detail: React.FC<IDetail> = async ({ params: { id, lang } }) => {
                                 }
                             </div>
                         </div>
+                        <div className={styles.sectionContentRow}>
+                            <div className={styles.sectionContentRowTitle}>
+                                {
+                                    glosaryAdmin.formLabelElevator
+                                }
+                            </div>
+                            <div className={styles.sectionContentRowDescription}>
+                                {
+                                    property?.elevator ? glosaryAdmin.formOptionYes : glosaryAdmin.formOptionNo
+                                }
+                            </div>
+                        </div>
+                        <div className={styles.sectionContentRow}>
+                            <div className={styles.sectionContentRowTitle}>
+                                {
+                                    glosaryAdmin.formLabelParking
+                                }
+                            </div>
+                            <div className={styles.sectionContentRowDescription}>
+                                {
+                                    property?.parking || glosaryAdmin.formOptionNo
+                                }
+                            </div>
+                        </div>
 
 
                     </div>

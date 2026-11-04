@@ -26,6 +26,8 @@ interface IValues {
     heatingMedium?: number
     heatingEnergy?: number
     furnished?: boolean
+    parking?: string
+    elevator?: boolean
 }
 interface IStepTwo extends IPage {
     onNext: VoidFunction
@@ -47,11 +49,16 @@ const StepTwo: React.FC<IStepTwo> = ({ params: { lang }, onNext, onBack }) => {
         heatingMedium: store?.form_2?.heatingMedium,
         heatingEnergy: store?.form_2?.heatingEnergy,
         furnished: !!store?.form_2?.furnished,
+        parking: store?.form_2?.parking,
+        elevator: !!store?.form_2?.elevator,
     }
 
     const handleFurnishedChange = (key: boolean) => {
         console.log('selected key', key)
         formRef.current?.setFieldValue('furnished', key)
+    }
+    const handleElevatorChange = (key: boolean) => {
+        formRef.current?.setFieldValue('elevator', key)
     }
     const handleHeatingType = (key: string) => {
         console.log('selected key', key)
@@ -72,6 +79,7 @@ const StepTwo: React.FC<IStepTwo> = ({ params: { lang }, onNext, onBack }) => {
         heatingType: Yup.number().optional(),
         heatingMedium: Yup.number().optional(),
         heatingEnergy: Yup.number().optional(),
+        parking: Yup.number().integer(glosary.formValidationNumbers).min(0, glosary.formValidationNumbers).optional().typeError(glosary.formValidationNumbers),
     });
     const handleSubmit = async (values: IValues, { setSubmitting }: FormikHelpers<IValues>) => {
         const formData = values
@@ -133,9 +141,17 @@ const StepTwo: React.FC<IStepTwo> = ({ params: { lang }, onNext, onBack }) => {
                                     <InputRadio label={glosary.formLabelFurnished} option_1={glosary.formOptionYes} option_2={glosary.formOptionNo} initialValue={!!values.furnished} onChange={handleFurnishedChange} />
                                 </div>
                                 <div className={styles.inputRowHalf}>
-
+                                    <InputRadio label={glosary.formLabelElevator} option_1={glosary.formOptionYes} option_2={glosary.formOptionNo} initialValue={!!values.elevator} onChange={handleElevatorChange} />
                                 </div>
 
+                            </div>
+                            <div className={styles.inputRow}>
+                                <div className={styles.inputRowHalf}>
+                                    <InputText label={glosary.formLabelParking} description={glosary.formLabelOptional} placeholder={glosary.formPlaceholderText} error={errors.parking} touched={touched.parking} value={values.parking} onChange={handleChange('parking')} />
+                                </div>
+                                <div className={styles.inputRowHalf}>
+
+                                </div>
                             </div>
 
 

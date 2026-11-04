@@ -32,6 +32,8 @@ const Edit: React.FC<IEdit> = async ({ params: { id, lang } }) => {
         heatingMedium: property.heatingMedium,
         heatingEnergy: property.heatingEnergy,
         furnished: property.furnished,
+        parking: property.parking,
+        elevator: property.elevator,
         view: property.view,
         Surface: property.Surface.map(el => ({ name: el.name, description: el.description, quantity: el.quantity, areaId: el.areaId })),
         Benefits: property.Benefits.map(el => ({ name: el.name })),

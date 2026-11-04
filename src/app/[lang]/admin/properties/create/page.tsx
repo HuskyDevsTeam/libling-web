@@ -69,6 +69,8 @@ const PropertyCreate: React.FC<IPage> = ({ params: { lang } }) => {
                 heatingEnergy: (store?.form_2?.heatingEnergy || 0).toString(),
                 view: store?.form_3?.view || '',
                 furnished: !!store?.form_2?.furnished,
+                parking: parseInt(store?.form_2?.parking || '0'),
+                elevator: !!store?.form_2?.elevator,
                 active,
                 type: !!store?.form_1?.type,
                 frecuency: (store?.form_5?.frecuency || 0).toString(),

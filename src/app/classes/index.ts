@@ -16,6 +16,8 @@ export class PropertyCreate {
       heatingEnergy
       view
       furnished
+      parking
+      elevator
       active
       type
       frecuency
@@ -39,6 +41,8 @@ export class PropertyCreate {
       this.heatingEnergy = data.heatingEnergy
       this.view = data.view
       this.furnished = data.furnished
+      this.parking = data.parking
+      this.elevator = data.elevator
       this.active = data.active
       this.type = data.type
       this.frecuency = data.frecuency
@@ -64,6 +68,8 @@ export class PropertyUpdate {
       heatingEnergy
       view
       furnished
+      parking
+      elevator
       active
       type
       frecuency
@@ -87,6 +93,8 @@ export class PropertyUpdate {
       this.heatingEnergy = data.heatingEnergy
       this.view = data.view
       this.furnished = data.furnished
+      this.parking = data.parking
+      this.elevator = data.elevator
       this.active = data.active
       this.type = data.type
       this.frecuency = data.frecuency

@@ -40,6 +40,8 @@ export interface IProperty {
 	heatingEnergy?: string
 	view?: string
 	furnished: boolean
+	parking?: number
+	elevator?: boolean
 	active: boolean
 	type: boolean
 	frecuency?: string
@@ -76,6 +78,8 @@ export interface IPropertyData {
 	heatingEnergy: string | null
 	view: string | null
 	furnished: boolean
+	parking?: number
+	elevator?: boolean
 	active: boolean
 	type: boolean
 	frecuency: string | null
@@ -111,6 +115,8 @@ export interface IPropertyCreate {
 	heatingEnergy?: string
 	view?: string
 	furnished: boolean
+	parking?: number
+	elevator?: boolean
 	active: boolean
 	type: boolean
 	frecuency?: string
@@ -143,6 +149,8 @@ export interface IPropertySearch {
 	heatingEnergy?: string
 	view?: string
 	furnished?: boolean
+	parking?: number
+	elevator?: boolean
 	active?: boolean
 	type?: boolean
 	frecuency?: string
@@ -168,6 +176,8 @@ export interface IPropertyOrderBy {
 	heatingEnergy?: "asc" | "desc"
 	view?: "asc" | "desc"
 	furnished?: "asc" | "desc"
+	parking?: "asc" | "desc"
+	elevator?: "asc" | "desc"
 	active?: "asc" | "desc"
 	type?: "asc" | "desc"
 	frecuency?: "asc" | "desc"
@@ -199,6 +209,8 @@ export interface IPropertyUpdateDTO {
 	heatingEnergy?: string
 	view?: string
 	furnished?: boolean
+	parking?: number
+	elevator?: boolean
 	active?: boolean
 	type?: boolean
 	frecuency?: string

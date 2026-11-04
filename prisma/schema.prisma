@@ -36,6 +36,8 @@ model Property {
   heatingEnergy  String?
   view           String?
   furnished      Boolean         @default(false)
+  parking        Int             @default(0)
+  elevator       Boolean         @default(false)
   active         Boolean         @default(false)
   type           Boolean         @default(false)
   frecuency      String?

@@ -167,6 +167,14 @@ const Preview: React.FC<IPreview> = ({ params: { lang }, onNext, onGo, files, fa
                                 <span className={styles.sectionDescription}>{store?.form_2?.furnished ? glosary.formOptionYes : glosary.formOptionNo}</span>
 
                             </div>
+                            <div className={styles.sectionContentRowHalf}>
+                                <span style={poppinsMedium.style} className={styles.sectionSubtitle}>{glosary.formLabelElevator}</span>
+                                <span className={styles.sectionDescription}>{store?.form_2?.elevator ? glosary.formOptionYes : glosary.formOptionNo}</span>
+                            </div>
+                            <div className={styles.sectionContentRowHalf}>
+                                <span style={poppinsMedium.style} className={styles.sectionSubtitle}>{glosary.formLabelParking}</span>
+                                <span className={styles.sectionDescription}>{store?.form_2?.parking || 0}</span>
+                            </div>
 
                         </div>
 
