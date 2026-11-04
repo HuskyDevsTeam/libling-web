@@ -543,13 +543,47 @@ export const getAffiliates = async (
 	}
 }
 export const getDashboardStats = async () => {
-	const [properties, active, draft, affiliates] = await Promise.all([
+	const now = new Date()
+	const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+	const [
+		properties,
+		active,
+		draft,
+		sale,
+		rent,
+		newProperties,
+		affiliates,
+		activeAffiliates,
+		payments,
+		recent,
+	] = await Promise.all([
 		prisma.property.count(),
 		prisma.property.count({ where: { active: true } }),
 		prisma.property.count({ where: { active: false } }),
+		prisma.property.count({ where: { type: true } }),
+		prisma.property.count({ where: { type: false } }),
+		prisma.property.count({ where: { createdAt: { gte: monthAgo } } }),
 		prisma.affiliate.count(),
+		prisma.affiliate.count({ where: { plan_date: { gt: now } } }),
+		prisma.pay.count({ where: { status: true } }),
+		prisma.property.findMany({
+			orderBy: { createdAt: "desc" },
+			take: 5,
+			select: { id: true, title: true, active: true, createdAt: true },
+		}),
 	])
-	return { properties, active, draft, affiliates }
+	return {
+		properties,
+		active,
+		draft,
+		sale,
+		rent,
+		newProperties,
+		affiliates,
+		activeAffiliates,
+		payments,
+		recent,
+	}
 }
 export const getPaysCount = async () => {
 	return prisma.pay.count()

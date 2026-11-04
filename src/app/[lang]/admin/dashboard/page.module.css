@@ -78,6 +78,65 @@
     color: #00000099;
 }
 
+.recent {
+    background-color: #fff;
+    box-shadow: 0px 2px 4px #1973FA1A;
+    border-radius: 10px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.recentTitle {
+    font-size: 18px;
+    color: #000000DE;
+    margin-bottom: 8px;
+}
+
+.recentRow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #0000001F;
+    font-size: 14px;
+}
+
+.recentRow:last-child {
+    border-bottom: none;
+}
+
+.recentName {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.recentDate {
+    color: #00000099;
+    font-size: 12px;
+}
+
+.badge {
+    background-color: #EEEEEE;
+    border-radius: 13px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: #000000DD;
+}
+
+.badgeActive {
+    background-color: #E3F2FD;
+    border-radius: 13px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: #1973FA;
+}
+
 @media (max-width: 1100px) {
     .widgets {
         grid-template-columns: repeat(2, 1fr);
