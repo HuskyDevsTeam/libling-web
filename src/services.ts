@@ -24,6 +24,7 @@ import countries from "@/app/utils/countries.json"
 import axios, { AxiosError, AxiosRequestConfig } from "axios"
 import { randomUUID } from "crypto"
 import { FEE_MULTIPLY } from "./app/utils/data"
+import { slugify } from "./app/utils/slug"
 const saltRounds = 12
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
@@ -295,10 +296,19 @@ export async function showProperty(filters: IPropertySearch) {
 	})
 	return property
 }
+async function uniqueSlug(title: string) {
+	const base = slugify(title)
+	let candidate = base
+	for (let i = 2; await prisma.property.findUnique({ where: { slug: candidate }, select: { id: true } }); i++) {
+		candidate = `${base}-${i}`
+	}
+	return candidate
+}
 export async function createProperty(data: IPropertyCreateDTO) {
 	try {
 		const newProperty = new PropertyCreate(data)
-		const createdProperty = await prisma.property.create({ data: newProperty })
+		const slug = await uniqueSlug(data.title)
+		const createdProperty = await prisma.property.create({ data: { ...newProperty, slug } })
 		console.log(createdProperty)
 		const surfaces = data.Surface?.map(async (el) => {
 			return await prisma.surface.create({

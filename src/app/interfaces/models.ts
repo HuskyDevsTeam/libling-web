@@ -64,6 +64,7 @@ export interface IProperty {
 export interface IPropertyData {
 	id: number
 	title: string
+	slug: string
 	content: string | null
 	address: string
 	thumbnail: string | null
@@ -135,6 +136,7 @@ export interface INumberSearch{
 export interface IPropertySearch {
 	search?: string
 	id?: number
+	slug?: string
 	title?: string
 	content?: string
 	address?: string

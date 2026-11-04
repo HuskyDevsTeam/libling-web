@@ -40,6 +40,18 @@ describe.skipIf(!hasDb)('updateProperty (functional, DB real)', () => {
 		await prisma.$disconnect()
 	})
 
+	it('genera un slug único a partir del título', async () => {
+		const mk = (title: string) => createProperty({
+			title, address: 'x', publishedById: ids.user, countryId: ids.country, currencyId: ids.currency,
+			propertyTypeId: ids.type, furnished: false, active: false, type: true,
+		})
+		const a = await mk('Piso Único Ñandú')
+		const b = await mk('Piso Único Ñandú')
+		expect(a.slug).toMatch(/^piso-unico-nandu(-\d+)?$/)
+		expect(b.slug).not.toBe(a.slug)
+		expect((await showProperty({ slug: b.slug }))?.id).toBe(b.id)
+	})
+
 	it('actualiza los campos enviados y deja intactos los demás', async () => {
 		await updateProperty(propertyId, { title: 'Editado', price: 120000, active: true })
 		const p = await showProperty({ id: propertyId })

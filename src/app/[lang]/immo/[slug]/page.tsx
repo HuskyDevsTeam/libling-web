@@ -14,10 +14,15 @@ import { ISelectElement, dataTranslate } from '@/app/interfaces'
 import { getMapStyles } from '@/app/actions'
 import CustomMap from '@/app/components/map'
 import { Metadata, ResolvingMetadata } from 'next'
+import { notFound, permanentRedirect } from 'next/navigation'
+
+// Las URLs antiguas usaban el id numérico: /immo/12
+const findProperty = (slug: string) =>
+    /^\d+$/.test(slug) ? showProperty({ id: parseInt(slug) }) : showProperty({ slug })
 
 interface IDetail {
     params: {
-        id: string
+        slug: string
         lang: "es" | "en" | "fr"
     }
 }
@@ -25,8 +30,7 @@ export async function generateMetadata(
     { params }: IDetail,
     parent: ResolvingMetadata
   ): Promise<Metadata> {
-    const id = params.id
-    const property = await showProperty({ id: parseInt(id) })   
+    const property = await findProperty(params.slug)
     const previousImages = property?.PropertyImage?.map(el=>el.path || "") || []
     return {
       title: `Libling Immo | ${property?.title}`,
@@ -34,16 +38,20 @@ export async function generateMetadata(
         images: [property?.thumbnail || "", ...previousImages],
         title: property?.title,
         description:property?.content || property?.title,
-        url:"https://libling.lu/immo/"+id,
+        url:`https://libling.lu/${params.lang}/immo/${property?.slug}`,
       },
+      alternates: { canonical: `https://libling.lu/${params.lang}/immo/${property?.slug}` },
       robots:"index,follow",
       
     }
   }
 
 
-const Detail: React.FC<IDetail> = async ({ params: { id, lang } }) => {
-    const property = await showProperty({ id: parseInt(id) })
+const Detail: React.FC<IDetail> = async ({ params: { slug, lang } }) => {
+    const property = await findProperty(slug)
+    if (!property) notFound()
+    // URL antigua (id numérico) -> redirección permanente a la URL semántica
+    if (slug !== property.slug) permanentRedirect(`/${lang}/immo/${property.slug}`)
     const mapStyle = await getMapStyles()
     const glosary = dict[lang].immo
     const glosaryAdmin = dict[lang].adminProperties

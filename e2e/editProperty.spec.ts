@@ -17,7 +17,7 @@ test.beforeAll(async () => {
 	const type = await prisma.propertyType.create({ data: { name: tag, code: tag } })
 	const property = await prisma.property.create({
 		data: {
-			title: 'Piso original', content: 'Descripción original', address: 'Rue de Test 1', area: 70, bedrooms: 2, bathrooms: 1,
+			title: 'Piso original', slug: `piso-original-${tag}`, content: 'Descripción original', address: 'Rue de Test 1', area: 70, bedrooms: 2, bathrooms: 1,
 			price: 300000, type: true, active: false, publishedById: user.id, countryId: country.id, currencyId: currency.id, propertyTypeId: type.id,
 			Benefits: { create: [{ name: 'Terraza' }] },
 			PropertyImage: { create: [{ name: 'a.jpg', description: '', path: `${IMG}/a.jpg` }, { name: 'b.jpg', description: '', path: `${IMG}/b.jpg` }] },

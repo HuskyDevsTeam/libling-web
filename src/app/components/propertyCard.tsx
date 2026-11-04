@@ -20,13 +20,13 @@ interface IPropertyCard {
     area?: string
     bedrooms?: string
     bathrooms?: string
-    id: string
+    slug: string
 }
 
-const PropertyCard: React.FC<IPropertyCard> = ({ thumbnail, location, currency, price, frecuency, subtitle, area, bedrooms, bathrooms, id }) => {
+const PropertyCard: React.FC<IPropertyCard> = ({ thumbnail, location, currency, price, frecuency, subtitle, area, bedrooms, bathrooms, slug }) => {
     const router = useRouter()
     return (
-        <div className={styles.propertiesCard} onClick={()=>{router.push(`/immo/${id}`)}}>
+        <div className={styles.propertiesCard} onClick={()=>{router.push(`/immo/${slug}`)}}>
             <Image src={thumbnail || placeholder} alt='Property photo' className={styles.propertyPhoto} width={280} height={188}/>
             <div className={styles.textContainer}>
                 <div className={styles.locationContainer}> <FiMapPin className={styles.icon} /> <span>{location}</span></div>

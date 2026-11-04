@@ -1,6 +1,28 @@
 import { MetadataRoute } from "next"
+import { PrismaClient } from "@prisma/client"
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const dynamic = "force-dynamic"
+
+const prisma = new PrismaClient()
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+	const properties = await prisma.property.findMany({
+		where: { active: true },
+		select: { slug: true, updatedAt: true },
+	})
+	const propertyEntries: MetadataRoute.Sitemap = properties.map((p) => ({
+		url: `https://libling.lu/immo/${p.slug}`,
+		lastModified: p.updatedAt,
+		priority: 0.7,
+		//@ts-ignore
+		alternates: {
+			languages: {
+				es: `https://libling.lu/es/immo/${p.slug}`,
+				en: `https://libling.lu/en/immo/${p.slug}`,
+				fr: `https://libling.lu/fr/immo/${p.slug}`,
+			},
+		},
+	}))
 	return [
 		{
 			url: "https://libling.lu",
@@ -67,5 +89,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 				},
 			},
 		},
+		...propertyEntries,
 	]
 }
