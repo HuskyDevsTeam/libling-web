@@ -36,6 +36,9 @@ const Detail: React.FC<IDetail> = async ({ params: { id, lang } }) => {
     return (<>
         <InnerNav text={glosaryAdmin.actionPreview} admin={true} />
         <div className={styles.card}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button title={glosaryAdmin.actionEdit} type='outline' goTo={`/admin/properties/${id}/edit`} />
+            </div>
             <div className={styles.head}>
                 <ImageGallery images={property?.PropertyImage} thumbnail={property?.thumbnail} />
                 <div className={styles.summaryContainer}>

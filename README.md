@@ -38,3 +38,16 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 # libling-web
 website for Libling solutions, that works as landing page and base for a web app too
 
+
+## Tests
+
+Los tests funcionales necesitan una base PostgreSQL con las migraciones aplicadas (`npx prisma migrate deploy`).
+
+```bash
+export POSTGRES_PRISMA_URL=postgresql://user:pass@localhost:5432/libling_test
+export POSTGRES_URL_NON_POOLING=$POSTGRES_PRISMA_URL
+npm test            # vitest: helpers de edición + updateProperty contra la BD real
+AUTH_SECRET=test AUTH_TRUST_HOST=true npm run test:e2e   # Playwright: editar una propiedad desde el admin
+```
+
+Los tests crean sus propios datos y los eliminan al terminar; usa una BD de pruebas, no la de producción.
