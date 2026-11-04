@@ -43,6 +43,28 @@ const saferpayConfig: AxiosRequestConfig = {
 	},
 }
 
+
+const buildMeta = (
+	totalData: number,
+	page: number,
+	limit: number
+): IMetaPaginate => {
+	const totalPages = Math.max(Math.ceil(totalData / limit), 1)
+	const newPage = Math.min(Math.max(page, 1), totalPages)
+	return {
+		page: newPage,
+		prevPage: newPage <= 1 ? null : newPage - 1,
+		nextPage: newPage >= totalPages ? null : newPage + 1,
+		dataPerPage: totalData >= limit ? limit : totalData,
+		totalData,
+		totalPages,
+	}
+}
+const normalizePage = (page: number, limit: number) => {
+	const safeLimit = Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : 15
+	const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1
+	return { page: safePage, limit: safeLimit }
+}
 export interface IPropertyTypeData {
 	id?: number
 	name: string
@@ -200,13 +222,19 @@ export async function indexProperty(
 	if (country) {
 		countryFilter = await getCountryFilter()
 	}
+	const where = {
+		...filters,
+		address: filters.address ? { contains: filters.address } : undefined,
+		countryId: countryFilter,
+	}
+	const total = await prisma.property.count({ where })
+	const paging = normalizePage(page, limit)
+	const meta0 = buildMeta(total, paging.page, paging.limit)
 	const properties = await prisma.property.findMany({
-		where: {
-			...filters,
-			address: filters.address ? { contains: filters.address } : undefined,
-			countryId: countryFilter,
-		},
+		where,
 		orderBy,
+		skip: (meta0.page - 1) * paging.limit,
+		take: paging.limit,
 		include: {
 			publishedBy: true,
 			country: true,
@@ -219,30 +247,16 @@ export async function indexProperty(
 			Benefits: true,
 		},
 	})
-	const fromResult = (page - 1) * limit
-	const toResult = fromResult + limit
-	console.log("properties found:", properties.length, fromResult, toResult)
-	const data: IPropertyData[] = properties
-		.slice(fromResult, toResult)
-		.map((el) => ({
-			...el,
-			longitude: el.longitude?.toNumber(),
-			latitude: el.latitude?.toNumber(),
-			area: el.area?.toNumber(),
-			bedrooms: el.bedrooms?.toNumber(),
-			bathrooms: el.bathrooms?.toNumber(),
-			price: el.price?.toNumber(),
-		}))
-	const totalPages = Math.ceil(properties.length / limit)
-	const newPage = page > totalPages ? totalPages : page
-	const meta: IMetaPaginate = {
-		page: newPage,
-		prevPage: newPage <= 1 ? null : newPage - 1,
-		nextPage: newPage >= totalPages ? null : newPage + 1,
-		dataPerPage: properties.length >= limit ? limit : properties.length,
-		totalData: properties.length,
-		totalPages,
-	}
+	const data: IPropertyData[] = properties.map((el) => ({
+		...el,
+		longitude: el.longitude?.toNumber(),
+		latitude: el.latitude?.toNumber(),
+		area: el.area?.toNumber(),
+		bedrooms: el.bedrooms?.toNumber(),
+		bathrooms: el.bathrooms?.toNumber(),
+		price: el.price?.toNumber(),
+	}))
+	const meta = buildMeta(total, paging.page, paging.limit)
 	return {
 		data,
 		meta,
@@ -500,44 +514,45 @@ export const getAffiliates = async (
 	limit: number = 15
 ) => {
 	console.log("index request", filters, orderBy, page, limit)
+	const total = await prisma.affiliate.count({ where: { ...filters } })
+	const paging = normalizePage(page, limit)
+	const meta0 = buildMeta(total, paging.page, paging.limit)
 	const affiliates = await prisma.affiliate.findMany({
 		where: {
 			...filters,
 		},
 		orderBy,
+		skip: (meta0.page - 1) * paging.limit,
+		take: paging.limit,
 		include: {
 			country: true,
 			Pay: true,
 		},
 	})
-	const fromResult = (page - 1) * limit
-	const toResult = fromResult + limit
-	console.log("affiliates found:", affiliates.length, fromResult, toResult)
-	const data = affiliates.slice(fromResult, toResult).map((el) => ({
+	const data = affiliates.map((el) => ({
 		...el,
 		Pay: el.Pay.map((element) => ({
 			...element,
 			quantity: element.quantity?.toNumber(),
 		})),
 	}))
-	const totalPages = Math.ceil(affiliates.length / limit)
-	const newPage = page > totalPages ? totalPages : page
-	const meta: IMetaPaginate = {
-		page: newPage,
-		prevPage: newPage <= 1 ? null : newPage - 1,
-		nextPage: newPage >= totalPages ? null : newPage + 1,
-		dataPerPage: affiliates.length >= limit ? limit : affiliates.length,
-		totalData: affiliates.length,
-		totalPages,
-	}
+	const meta = buildMeta(total, paging.page, paging.limit)
 	return {
 		data,
 		meta,
 	}
 }
+export const getDashboardStats = async () => {
+	const [properties, active, draft, affiliates] = await Promise.all([
+		prisma.property.count(),
+		prisma.property.count({ where: { active: true } }),
+		prisma.property.count({ where: { active: false } }),
+		prisma.affiliate.count(),
+	])
+	return { properties, active, draft, affiliates }
+}
 export const getPaysCount = async () => {
-	const pays = await getPays()
-	return pays.meta.totalData
+	return prisma.pay.count()
 }
 export const getPays = async (
 	filters: IPaySearch = {},
@@ -546,32 +561,25 @@ export const getPays = async (
 	limit: number = 15
 ) => {
 	console.log("index request", filters, orderBy, page, limit)
+	const total = await prisma.pay.count({ where: { ...filters } })
+	const paging = normalizePage(page, limit)
+	const meta0 = buildMeta(total, paging.page, paging.limit)
 	const pays = await prisma.pay.findMany({
 		where: {
 			...filters,
 		},
 		orderBy,
+		skip: (meta0.page - 1) * paging.limit,
+		take: paging.limit,
 		include: {
 			affiliate: true,
 		},
 	})
-	const fromResult = (page - 1) * limit
-	const toResult = fromResult + limit
-	console.log("pays found:", pays.length, fromResult, toResult)
-	const data = pays.slice(fromResult, toResult).map((el) => ({
+	const data = pays.map((el) => ({
 		...el,
 		quantity: el.quantity?.toNumber(),
 	}))
-	const totalPages = Math.ceil(pays.length / limit)
-	const newPage = page > totalPages ? totalPages : page
-	const meta: IMetaPaginate = {
-		page: newPage,
-		prevPage: newPage <= 1 ? null : newPage - 1,
-		nextPage: newPage >= totalPages ? null : newPage + 1,
-		dataPerPage: pays.length >= limit ? limit : pays.length,
-		totalData: pays.length,
-		totalPages,
-	}
+	const meta = buildMeta(total, paging.page, paging.limit)
 	return {
 		data,
 		meta,

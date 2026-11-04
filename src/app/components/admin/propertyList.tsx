@@ -60,6 +60,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
         console.log('propertyData', data)
         setMeta(data?.meta)
         setProperties(data?.data)
+        if (data?.meta && data.meta.page !== currentPage) setCurrentPage(data.meta.page)
         store?.setLoading(false)
     }
 
@@ -275,8 +276,8 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
                                 <input type="checkbox" id="cboxInput" name="select_all" onChange={handleCheck} checked={selected.length === properties?.length} />
                             </div>
                         </th>
-                        <th style={poppinsMedium.style}>{glosary.listBasic}</th>
-                        <th style={poppinsMedium.style}>{glosary.formLabelPrice}</th>
+                        <th style={poppinsMedium.style} className={styles.colSummary}>{glosary.listBasic}</th>
+                        <th style={poppinsMedium.style} className={styles.colPrice}>{glosary.formLabelPrice}</th>
                         <th style={poppinsMedium.style}>{glosary.formLabelPropertyType}</th>
                         <th style={poppinsMedium.style}>{glosary.listStatus}</th>
                         <th style={poppinsMedium.style}>{glosary.listActions}</th>
@@ -294,7 +295,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
                     <span>{glosary.linesPerPage}</span>
                     <InputSelectMini initialValue={store?.limit} list={paginationList} placeholder='15' onChange={handleLimit} />
                     <span>
-                        {((meta?.dataPerPage || 15) * (currentPage - 1)) + 1}
+                        {(properties?.length || 0) === 0 ? 0 : ((meta?.dataPerPage || 15) * (currentPage - 1)) + 1}
                         {" - "}
                         {((meta?.dataPerPage || 15) * (currentPage - 1)) + (properties?.length || 0)}
                         {` ${glosary.formStepConnector} `}

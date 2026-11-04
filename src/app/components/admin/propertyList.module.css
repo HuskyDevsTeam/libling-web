@@ -90,6 +90,33 @@
     text-align: left;
 }
 
+.colSummary {
+    width: 32%;
+}
+
+.colPrice {
+    width: 22%;
+    min-width: 200px;
+}
+
+.priceContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    gap: 4px;
+}
+
+.price {
+    font-size: 15px;
+}
+
+.frecuency {
+    font-size: 12px;
+    color: #00000099;
+}
+
 .basicContainer {
     display: flex;
     flex-direction: row;

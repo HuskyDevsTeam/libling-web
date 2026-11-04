@@ -11,6 +11,12 @@ import placeholder from '@/app/img/100.jpeg'
 
 import Image from 'next/image'
 
+export const SUMMARY_MAX_CHARS = 150
+export const truncateText = (text: string | null | undefined, max: number = SUMMARY_MAX_CHARS) => {
+    const clean = (text ?? '').replace(/\s+/g, ' ').trim()
+    return clean.length > max ? `${clean.slice(0, max).trimEnd()}…` : clean
+}
+
 interface IListItem {
     item: IPropertyData
     lang: langType
@@ -44,7 +50,7 @@ const PropertyListItem: React.FC<IListItem> = ({ item, lang, onSelect, onPreview
                     <Image className={styles.basicMini} src={item.thumbnail || placeholder} alt={item.title} width={70} height={70} />
                     <div className={styles.basicTextContainer}>
                         <span>{item.title}</span>
-                        <span className={styles.basicSubtitle}>{item.content}</span>
+                        <span className={styles.basicSubtitle}>{truncateText(item.content)}</span>
                     </div>
                 </div>
             </td>

@@ -1,0 +1,99 @@
+.titleBar {
+    height: 60px;
+    width: 100%;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    box-shadow: 0px 8px 10px #1973FA14;
+    padding: 0px 24px;
+}
+
+.titleBarTitle {
+    color: #000000DE;
+    font-size: 21px;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px;
+    min-height: 70vh;
+    flex-grow: 1;
+}
+
+.greetingTitle {
+    font-size: 24px;
+    color: #000000DE;
+}
+
+.greetingSubtitle {
+    color: #00000099;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.widgets {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.widget {
+    background-color: #fff;
+    box-shadow: 0px 2px 4px #1973FA1A;
+    border-radius: 10px;
+    padding: 24px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+}
+
+.widgetIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.widgetText {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.widgetValue {
+    font-size: 28px;
+    color: #000000DE;
+    line-height: 1.1;
+}
+
+.widgetLabel {
+    font-size: 13px;
+    color: #00000099;
+}
+
+@media (max-width: 1100px) {
+    .widgets {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .section {
+        padding: 16px;
+    }
+
+    .titleBar {
+        padding: 0 16px;
+    }
+
+    .widgets {
+        grid-template-columns: 1fr;
+    }
+}

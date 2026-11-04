@@ -190,7 +190,7 @@ export const dict = {
 			formButtonSave: "Guardar cambios",
 			toastUpdate: "El inmueble fue actualizado con éxito.",
 			tabAll: "Todos",
-			listBasic: "Básico",
+			listBasic: "Resumen",
 			listStatus: "Estado",
 			listActions: "Acciones",
 			listActive: "Activo",
@@ -222,6 +222,16 @@ export const dict = {
 			detailAction : "Cerrar",
 			formStepConnector: "de",
 
+		},
+		adminDashboard: {
+			greetingMorning: "Buenos días",
+			greetingAfternoon: "Buenas tardes",
+			greetingEvening: "Buenas noches",
+			subtitle: "Resumen de la actividad de tu sitio.",
+			widgetProperties: "Inmuebles registrados",
+			widgetActive: "Inmuebles activos",
+			widgetDraft: "Inmuebles en borrador",
+			widgetAffiliates: "Afiliados",
 		},
 		adminNav: {
 			propertiesTitle: "Inmuebles",
@@ -871,7 +881,7 @@ export const dict = {
 			formButtonSave: "Save changes",
 			toastUpdate: "Property successfully updated.",
 			tabAll: "All",
-			listBasic: "Basic",
+			listBasic: "Summary",
 			listStatus: "Status",
 			listActions: "Actions",
 			listActive: "Active",
@@ -903,6 +913,16 @@ export const dict = {
 			detailAction: "Close",
 			formStepConnector: "of",
 
+		},
+		adminDashboard: {
+			greetingMorning: "Good morning",
+			greetingAfternoon: "Good afternoon",
+			greetingEvening: "Good evening",
+			subtitle: "An overview of your site activity.",
+			widgetProperties: "Registered properties",
+			widgetActive: "Active properties",
+			widgetDraft: "Draft properties",
+			widgetAffiliates: "Affiliates",
 		},
 		adminNav: {
 			affiliateTitle: "Memberships",
@@ -1551,7 +1571,7 @@ export const dict = {
 			formButtonSave: "Enregistrer les modifications",
 			toastUpdate: "Le bien a été mis à jour avec succès.",
 			tabAll: "Tous",
-			listBasic: "Basique",
+			listBasic: "Résumé",
 			listStatus: "État",
 			listActions: "Actions",
 			listActive: "Actif",
@@ -1583,6 +1603,16 @@ export const dict = {
 			detailAction: "Fermer",
 			formStepConnector: "de",
 
+		},
+		adminDashboard: {
+			greetingMorning: "Bonjour",
+			greetingAfternoon: "Bon après-midi",
+			greetingEvening: "Bonsoir",
+			subtitle: "Aperçu de l'activité de votre site.",
+			widgetProperties: "Biens enregistrés",
+			widgetActive: "Biens actifs",
+			widgetDraft: "Biens en brouillon",
+			widgetAffiliates: "Affiliés",
 		},
 		adminNav: {
 			affiliateTitle: "Affiliations",

@@ -62,6 +62,7 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
         console.log('affiliateData', data)
         setMeta(data?.meta)
         setProperties(data?.data)
+        if (data?.meta && data.meta.page !== currentPage) setCurrentPage(data.meta.page)
         store?.setLoading(false)
     }
 
@@ -233,7 +234,7 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
                     <span>{glosary.linesPerPage}</span>
                     <InputSelectMini initialValue={store?.limit} list={paginationList} placeholder='15' onChange={handleLimit} />
                     <span>
-                        {((meta?.dataPerPage || 15) * (currentPage - 1)) + 1}
+                        {(properties?.length || 0) === 0 ? 0 : ((meta?.dataPerPage || 15) * (currentPage - 1)) + 1}
                         {" - "}
                         {((meta?.dataPerPage || 15) * (currentPage - 1)) + (properties?.length || 0)}
                         {` ${glosary.formStepConnector} `}
