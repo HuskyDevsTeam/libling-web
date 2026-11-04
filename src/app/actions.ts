@@ -1,5 +1,8 @@
 'use server'
-import { auth, signIn, signOut } from "@/auth"
+import { auth, signIn, signOut, unstable_update } from "@/auth"
+import bcrypt from "bcryptjs"
+import { getUser, updateUser } from "@/services"
+import { validateName, validatePasswordChange } from "@/app/utils/profile"
 import { AuthError } from "next-auth"
 
 export async function getMapStyles(){
@@ -49,4 +52,32 @@ export async function getSession() {
 		}
 		throw error
 	}
+}
+
+export type ProfileResult = { ok: true } | { ok: false, error: 'nameRequired' | 'passwordMin' | 'passwordMismatch' | 'wrongPassword' | 'genericError' }
+
+export async function updateProfileName(name: string): Promise<ProfileResult> {
+	const session = await auth()
+	const email = session?.user?.email
+	if (!email) return { ok: false, error: 'genericError' }
+	const error = validateName(name)
+	if (error) return { ok: false, error }
+	const user = await getUser(email)
+	if (!user) return { ok: false, error: 'genericError' }
+	await updateUser(user.id, { name: name.trim() })
+	await unstable_update({ user: { name: name.trim() } })
+	return { ok: true }
+}
+
+export async function changeOwnPassword(current: string, next: string, confirm: string): Promise<ProfileResult> {
+	const session = await auth()
+	const email = session?.user?.email
+	if (!email) return { ok: false, error: 'genericError' }
+	const error = validatePasswordChange(next, confirm)
+	if (error) return { ok: false, error }
+	const user = await getUser(email)
+	if (!user) return { ok: false, error: 'genericError' }
+	if (!(await bcrypt.compare(current, user.password))) return { ok: false, error: 'wrongPassword' }
+	await updateUser(user.id, { password: await bcrypt.hash(next, 12) })
+	return { ok: true }
 }

@@ -28,40 +28,84 @@
     gap: 16px;
 }
 
-.userData {
+.logoLink {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: end;
-    position: relative;
-}
-.menu{
-    position: absolute;
-    background-color: #fff;
-    padding: 16px;
-    border-radius: 10px;
-    z-index: 999;
-    top:64px;
-    right: 0px;
-    box-shadow: 0px 8px 10px #1973FA14;
+    align-items: center;
 }
 
-.userRole {
+.userData {
+    position: relative;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background-color: #fff;
+    color: #1973FA;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
     display: flex;
-    flex-direction: row;
     justify-content: center;
     align-items: center;
-    color: #FFFFFFBD;
-    cursor: pointer;
-    
 }
-.userRole span{
+
+.menu {
+    position: absolute;
+    top: 48px;
+    right: 0px;
+    min-width: 220px;
+    background-color: #fff;
+    padding: 8px;
+    border-radius: 10px;
+    z-index: 999;
+    box-shadow: 0px 8px 10px #1973FA14, 0px 2px 12px #00000026;
+    display: flex;
+    flex-direction: column;
+}
+
+.menuUser {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 12px 12px;
+    border-bottom: 1px solid #0000001F;
+    margin-bottom: 4px;
+}
+
+.menuName {
+    color: #000000DE;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.menuEmail {
+    color: #00000099;
     font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.roleIcon{
-    padding: 4px;
-    font-size: 24px;
+
+.menuItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: none;
+    background: none;
+    border-radius: 8px;
+    color: #000000DE;
+    font-size: 14px;
     cursor: pointer;
+    text-align: left;
+    text-decoration: none;
+    font-family: inherit;
+}
+
+.menuItem:hover {
+    background-color: #1973FA14;
 }
 
 .selectedLink {

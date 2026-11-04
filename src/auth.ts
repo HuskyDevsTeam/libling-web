@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs"
 import { getUser } from "./services"
 import { UserDTO } from "./dto"
 
-export const { auth, signIn, signOut } = NextAuth({
+export const { auth, signIn, signOut, unstable_update } = NextAuth({
 	...authConfig,
 	providers: [
 		credentials({
