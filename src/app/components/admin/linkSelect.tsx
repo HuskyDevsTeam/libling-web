@@ -15,12 +15,21 @@ const LinkSelect: React.FC<ILinkSelect> = ({list, lang, title, disabled = false 
     const handleClick = () => {
         setOpenList(state => !state)
     }
-    const handleBlur = () => {
-        setTimeout(()=>{
-            setOpenList(false)
-        },200)
-    }
+    const containerRef = useRef<HTMLDivElement | null>(null)
+    useEffect(() => {
+        if (!openList) return
+        const handleOutside = (ev: MouseEvent | TouchEvent) => {
+            if (containerRef.current && !containerRef.current.contains(ev.target as Node)) setOpenList(false)
+        }
+        document.addEventListener('mousedown', handleOutside)
+        document.addEventListener('touchstart', handleOutside)
+        return () => {
+            document.removeEventListener('mousedown', handleOutside)
+            document.removeEventListener('touchstart', handleOutside)
+        }
+    }, [openList])
     const handleChange = (e:ISelectElement)=>{
+        setOpenList(false)
         if(e?.extra) return router.push(e?.extra)
     }
     useEffect(() => {
@@ -30,8 +39,8 @@ const LinkSelect: React.FC<ILinkSelect> = ({list, lang, title, disabled = false 
     }, [list])
     return (
         <div className={styles.formControl}>
-            <div className={styles.inputContainer} onClick={handleClick} >
-                <span className={currentStyle} onBlur={handleBlur}>
+            <div className={styles.inputContainer} onClick={handleClick} ref={containerRef}>
+                <span className={currentStyle}>
                     {title}
                     {
                         openList ?

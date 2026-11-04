@@ -5,6 +5,7 @@ import styles from './affiliateList.module.css'
 import { dict } from '@/app/utils'
 import { poppinsMedium, poppinsRegular, poppinsSemiBold } from '@/app/fonts'
 import { InputSearch } from './inputSearch'
+import { useDebounce } from '@/app/hooks/useDebounce'
 import { Button } from './button'
 import useStore from '@/app/hooks/useStore'
 import { useInterfaceStore } from '@/app/hooks/useInterfaceStore'
@@ -30,6 +31,8 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
     const [openPreview, setOpenPreview] = useState<boolean>(false)
     const [affiliate, setAffiliate] = useState<IAffiliateShow>()
     const [tab, setTab] = useState(0)
+    const [search, setSearch] = useState('')
+    const debouncedSearch = useDebounce(search.trim(), 400)
     const router = useRouter()
     const plans = {
         'Student':glosaryService.planTitle1,
@@ -55,10 +58,14 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
             setSelected(state => [...state, id])
         }
     }
+    const handleSearch = (e: string | React.ChangeEvent<any>) => {
+        setCurrentPage(1)
+        setSearch(typeof e === 'string' ? e : e.target.value)
+    }
     const fetchProperties = async () => {
         store?.setLoading(true)
         console.log('executing fetch')
-        const data = await getAffiliates({}, {}, currentPage, store?.limit)
+        const data = await getAffiliates({ search: debouncedSearch || undefined }, {}, currentPage, store?.limit)
         console.log('affiliateData', data)
         setMeta(data?.meta)
         setProperties(data?.data)
@@ -118,7 +125,7 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
         if (store?.limit) {
             fetchProperties()
         }
-    }, [store?.limit, currentPage, tab])
+    }, [store?.limit, currentPage, tab, debouncedSearch])
     return (
         <div className={styles.card}>
             <Modal open={openPreview} onRequestClose={() => { setOpenPreview(false) }} width='80vw'>
@@ -207,7 +214,7 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
                 <div className={styles.cardHeader}>
                     <h2 className={styles.cardTitle} style={poppinsMedium.style}>{glosary.indexTitle}</h2>
                     <div className={styles.listTools}>
-                        {/* <InputSearch placeholder={glosaryImmo.headerButton} /> */}
+                        <InputSearch placeholder={glosaryImmo.headerButton} value={search} onChange={handleSearch} />
                     </div>
                 </div>
             </div>

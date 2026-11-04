@@ -12,27 +12,15 @@ const InputSelectButton: React.FC<IInputSelectButton> = ({list, error, touched, 
     const [currentStyle, setCurrentStyle] = useState(disabled ? buttonStyles.buttonDisabled : buttonStyles.button)
     const [listFiltered, setListFiltered] = useState<ISelectElement[]>(list || [])
     const inputRef = useRef<HTMLInputElement | null>(null)
-    if (!!initialValue) {
-        const initialElement = list.find(el => el.key.toString() === initialValue.toString())
-        if (initialElement && inputRef?.current) {
-            inputRef.current.value = initialElement.value.toString()
-        }
-    }
+    const labelOf = (el: ISelectElement) => (!!lang && !!el.value && el.value in dict[lang].data && dict[lang].data[el.value as dataTranslate]) ? dict[lang].data[el.value as dataTranslate] : el.value.toString()
+    const hasValue = (v: unknown) => v !== undefined && v !== null && v !== ''
 
     const handleChange: ((el: ISelectElement) => void) | undefined = (e) => {
-        console.log(e)
-        if (!!e.value && (!error || !touched)) setFocused(true)
-        if (!!e.key && !!e.value && !!onChange) {
+                if (hasValue(e.value) && (!error || !touched)) setFocused(true)
+        if (hasValue(e.key) && hasValue(e.value) && !!onChange) {
             if (inputRef?.current) {
 
-                if (!!lang && !!e.value && e.value in dict[lang].data && dict[lang].data[e.value as dataTranslate]) {
-
-                    inputRef.current.value = dict[lang].data[e.value.toString() as dataTranslate]
-
-                } else {
-
-                    inputRef.current.value = e.value.toString()
-                }
+                inputRef.current.value = labelOf(e)
 
 
             }
@@ -72,6 +60,16 @@ const InputSelectButton: React.FC<IInputSelectButton> = ({list, error, touched, 
             setListFiltered(list)
         }
     }, [list])
+    useEffect(() => {
+        if (!inputRef.current) return
+        if (hasValue(initialValue)) {
+            const initialElement = list?.find(el => el.key.toString() === initialValue?.toString())
+            if (initialElement) inputRef.current.value = labelOf(initialElement)
+        } else if (initialValue === '') {
+            inputRef.current.value = ''
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialValue, list, lang])
     return (
         <div className={styles.formControl}>
             <div className={styles.inputContainer}>
@@ -91,7 +89,7 @@ const InputSelectButton: React.FC<IInputSelectButton> = ({list, error, touched, 
                 <div className={openList ? styles.listContainer : styles.listContainerHidden}>
                     {
                         listFiltered.map((el, index) => (
-                            <div key={index} className={styles.listItemButton} onClick={() => { handleChange(el) }} onMouseDown={() => { handleChange(el) }}>
+                            <div key={index} className={styles.listItemButton} onMouseDown={(ev) => { ev.preventDefault(); handleChange(el) }}>
                                 {
                                     (!!lang && !!el.value && el.value in dict[lang].data && dict[lang].data[el.value as dataTranslate])
                                         ?

@@ -222,9 +222,25 @@ export async function indexProperty(
 	if (country) {
 		countryFilter = await getCountryFilter()
 	}
+	const { search, address, ...rest } = filters
+	const term = search?.trim()
 	const where = {
-		...filters,
-		address: filters.address ? { contains: filters.address } : undefined,
+		...rest,
+		address: address
+			? { contains: address.trim(), mode: "insensitive" as const }
+			: undefined,
+		OR: term
+			? [
+					{ title: { contains: term, mode: "insensitive" as const } },
+					{ address: { contains: term, mode: "insensitive" as const } },
+					{ content: { contains: term, mode: "insensitive" as const } },
+					{
+						propertyType: {
+							name: { contains: term, mode: "insensitive" as const },
+						},
+					},
+			  ]
+			: undefined,
 		countryId: countryFilter,
 	}
 	const total = await prisma.property.count({ where })
@@ -514,13 +530,23 @@ export const getAffiliates = async (
 	limit: number = 15
 ) => {
 	console.log("index request", filters, orderBy, page, limit)
-	const total = await prisma.affiliate.count({ where: { ...filters } })
+	const { search, ...rest } = filters
+	const term = search?.trim()
+	const where = {
+		...rest,
+		OR: term
+			? [
+					{ name: { contains: term, mode: "insensitive" as const } },
+					{ email: { contains: term, mode: "insensitive" as const } },
+					{ phone: { contains: term, mode: "insensitive" as const } },
+			  ]
+			: undefined,
+	}
+	const total = await prisma.affiliate.count({ where })
 	const paging = normalizePage(page, limit)
 	const meta0 = buildMeta(total, paging.page, paging.limit)
 	const affiliates = await prisma.affiliate.findMany({
-		where: {
-			...filters,
-		},
+		where,
 		orderBy,
 		skip: (meta0.page - 1) * paging.limit,
 		take: paging.limit,
@@ -595,13 +621,31 @@ export const getPays = async (
 	limit: number = 15
 ) => {
 	console.log("index request", filters, orderBy, page, limit)
-	const total = await prisma.pay.count({ where: { ...filters } })
+	const { search, ...rest } = filters
+	const term = search?.trim()
+	const where = {
+		...rest,
+		OR: term
+			? [
+					{ reference: { contains: term, mode: "insensitive" as const } },
+					{
+						affiliate: {
+							name: { contains: term, mode: "insensitive" as const },
+						},
+					},
+					{
+						affiliate: {
+							email: { contains: term, mode: "insensitive" as const },
+						},
+					},
+			  ]
+			: undefined,
+	}
+	const total = await prisma.pay.count({ where })
 	const paging = normalizePage(page, limit)
 	const meta0 = buildMeta(total, paging.page, paging.limit)
 	const pays = await prisma.pay.findMany({
-		where: {
-			...filters,
-		},
+		where,
 		orderBy,
 		skip: (meta0.page - 1) * paging.limit,
 		take: paging.limit,

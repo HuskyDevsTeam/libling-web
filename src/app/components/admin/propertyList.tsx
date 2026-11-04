@@ -6,6 +6,7 @@ import globalStyles from '@/app/globals.module.css'
 import { dict } from '@/app/utils'
 import { poppinsMedium } from '@/app/fonts'
 import { InputSearch } from './inputSearch'
+import { useDebounce } from '@/app/hooks/useDebounce'
 import { Button } from './button'
 import PropertyListItem from './propertyListItem'
 import useStore from '@/app/hooks/useStore'
@@ -33,6 +34,8 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
     const [openDelete, setOpenDelete] = useState<boolean>(false)
     const [selectedDelete, setSelectedDelete] = useState<{ id: number, active: boolean } | undefined>()
     const [tab, setTab] = useState(0)
+    const [search, setSearch] = useState('')
+    const debouncedSearch = useDebounce(search.trim(), 400)
     const router = useRouter()
     const handlePrevPage = (jump: number) => {
         const canGoBack = currentPage - jump > 0
@@ -53,10 +56,14 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
             setSelected(state => [...state, id])
         }
     }
+    const handleSearch = (e: string | React.ChangeEvent<any>) => {
+        setCurrentPage(1)
+        setSearch(typeof e === 'string' ? e : e.target.value)
+    }
     const fetchProperties = async () => {
         store?.setLoading(true)
         console.log('executing fetch')
-        const data = await indexProperty({ type: tab === 0 ? undefined : tab === 1 ? true : false }, {}, currentPage, store?.limit, false)
+        const data = await indexProperty({ type: tab === 0 ? undefined : tab === 1 ? true : false, search: debouncedSearch || undefined }, {}, currentPage, store?.limit, false)
         console.log('propertyData', data)
         setMeta(data?.meta)
         setProperties(data?.data)
@@ -200,7 +207,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
         if (store?.limit) {
             fetchProperties()
         }
-    }, [store?.limit, currentPage, tab])
+    }, [store?.limit, currentPage, tab, debouncedSearch])
     return (
         <div className={styles.card}>
             <Modal open={openPublish} onRequestClose={() => { setOpenPublish(false) }}>
@@ -247,7 +254,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
                 <div className={styles.cardHeader}>
                     <h2 className={styles.cardTitle} style={poppinsMedium.style}>{glosary.indexTitle}</h2>
                     <div className={styles.listTools}>
-                        <InputSearch placeholder={glosaryImmo.headerButton} />
+                        <InputSearch placeholder={glosaryImmo.headerButton} value={search} onChange={handleSearch} />
                         <div className={styles.registerDesktop}>
                             <Button title={glosary.formButtonRegister} goTo={'/admin/properties/create'} type='main' />
                         </div>

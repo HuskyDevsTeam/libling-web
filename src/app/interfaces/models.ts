@@ -133,6 +133,7 @@ export interface INumberSearch{
 	lte?: number,
 }
 export interface IPropertySearch {
+	search?: string
 	id?: number
 	title?: string
 	content?: string
@@ -397,6 +398,7 @@ export interface IUpdateAffiliateData {
 	reference?: string | null; // Uses UUID
   }
   export interface IAffiliateSearch {
+	search?: string
 	id?: number
 	name?:string
 	email?:string
@@ -412,6 +414,7 @@ export interface IAffiliateOrderBy {
 	plan_date?: "asc" | "desc"
 }
   export interface IPaySearch {
+	search?: string
 	id?: number;
 	date?: Date;
 	reference?: string; // Uses UUID
