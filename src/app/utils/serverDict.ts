@@ -226,6 +226,7 @@ export const dict = {
 			affiliateTitle: "Afiliaciones",
 			dashboardTitle: "Inicio",
 			closeSession: "Cerrar sesión",
+			websiteTitle: "Ir al sitio web",
 		},
 		auth: {
 			login_title: "Vamos a ingresar a tu cuenta",
@@ -903,6 +904,7 @@ export const dict = {
 			propertiesTitle: "Real estate",
 			dashboardTitle: "Home",
 			closeSession: "Close session",
+			websiteTitle: "Go to website",
 		},
 		auth: {
 			login_title: "Let's log in to your account",
@@ -1579,6 +1581,7 @@ export const dict = {
 			propertiesTitle: "Immobilier",
 			dashboardTitle: "Home",
 			closeSession: "Fermer la session",
+			websiteTitle: "Aller au site web",
 		},
 		auth: {
 			login_title: "Nous allons nous connecter à votre compte",

@@ -6,7 +6,8 @@ import Aside from './aside';
 import { poppinsMedium, poppinsRegular } from '@/app/fonts';
 import Navbar from './navbar';
 import { dict } from '@/app/utils';
-import { FiHome, FiCreditCard } from 'react-icons/fi';
+import { FiHome, FiCreditCard, FiExternalLink } from 'react-icons/fi';
+import { SIDEBAR_COOKIE } from './sidebarCookie';
 import { IUserSession } from '@/services';
 import ActionBar from './actionBar';
 import useStore from '@/app/hooks/useStore';
@@ -21,19 +22,25 @@ export interface IRoute {
 
     // Optional icon component for navigation display
     icon?: React.ComponentType<any>;
+
+    // Opens in a new tab (e.g. the public website)
+    external?: boolean;
 }
 
 export const Body = ({
     children,
     lang,
-    user
+    user,
+    initialOpen = true
 }: {
     children: React.ReactNode,
     lang: "es" | "en" | "fr",
-    user?: IUserSession
+    user?: IUserSession,
+    initialOpen?: boolean
 
 }) => {
-    const [open, setOpen] = useState<boolean>(false)
+    const [open, setOpen] = useState<boolean>(initialOpen)
+    const [mobileOpen, setMobileOpen] = useState<boolean>(false)
     const glosary = dict[lang]?.adminNav
     const store = useStore(useInterfaceStore, (state) => state)
 
@@ -53,13 +60,27 @@ export const Body = ({
             uri: '/admin/affiliates',
             icon: FiCreditCard
         },
+        {
+            name: glosary.websiteTitle,
+            uri: `/${lang}`,
+            icon: FiExternalLink,
+            external: true
+        },
     ]
-    const toggleOpen = () => { setOpen(state => !state) }
+    const toggleOpen = () => {
+        // On mobile the sidebar is a temporary overlay (never persisted).
+        if (window.matchMedia('(max-width: 768px)').matches) {
+            setMobileOpen(state => !state)
+            return
+        }
+        const next = !open
+        setOpen(next)
+        document.cookie = `${SIDEBAR_COOKIE}=${next ? '1' : '0'}; path=/; max-age=31536000; samesite=lax`
+    }
     useEffect(() => {
         if (store?.setUser) {
             store.setUser(user)
         }
-        console.log('render')
     }, [store?.setUser, user])
     return (
         <body style={poppinsRegular.style} className={styles.layout}>
@@ -72,7 +93,8 @@ export const Body = ({
             }
             <Navbar lang={lang} handleAside={toggleOpen} user={user} />
             <div className={!!store?.showBar && !!store?.barContent ? styles.containerBar : styles.container}>
-                <Aside lang={lang} open={open} routes={routes} />
+                <Aside lang={lang} open={open} mobileOpen={mobileOpen} onNavigate={() => setMobileOpen(false)} routes={routes} />
+                {mobileOpen && <div className={styles.backdrop} onClick={() => setMobileOpen(false)} />}
                 <main className={styles.main}>
                     {children}
                     <div className={styles.footerBar}>

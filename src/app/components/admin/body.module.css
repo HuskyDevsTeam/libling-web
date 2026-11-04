@@ -77,3 +77,25 @@
         box-shadow: -38px 0, -14px 0, 14px 0, 38px -12px;
     }
 }
+
+.backdrop {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .backdrop {
+        display: block;
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #00000060;
+        z-index: 10;
+    }
+
+    .main {
+        min-width: 0;
+        width: 100%;
+    }
+}
