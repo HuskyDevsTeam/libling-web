@@ -109,11 +109,6 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
         console.log('selected key', key)
         store?.setLimit(parseInt(key))
     }
-    const handleDetail = () => {
-        store?.setLoading(true)
-        router.push(`/admin/properties/${selected[0]}`)
-        store?.setLoading(false)
-    }
     const handleDelete = (id: number, active: boolean) => {
         setSelectedDelete({ id, active })
         setOpenDelete(true)
@@ -189,14 +184,6 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
                             <FiEdit2 className={styles.actionIcon} />
                             <span>{glosary.actionEdit}</span>
                         </div>
-                    }
-                    {
-                        (selected.length === 1) &&
-                        <div className={styles.actionButton} onClick={handleDetail} >
-                            <FiMonitor className={styles.actionIcon} />
-                            <span>{glosary.actionPreview}</span>
-                        </div>
-
                     }
                 </div>
             ))
@@ -293,7 +280,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
                         {
                             properties?.map((el, index) => (
 
-                                <PropertyListItem key={index} item={el} lang={lang} onSelect={handleSelect} isChecked={selected.some(element => el.id === element)} onDelete={handleDelete} onEdit={(id) => { router.push(`/admin/properties/${id}/edit`) }} />
+                                <PropertyListItem key={index} item={el} lang={lang} onSelect={handleSelect} isChecked={selected.some(element => el.id === element)} onDelete={handleDelete} onPreview={(id) => { router.push(`/admin/properties/${id}`) }} onEdit={(id) => { router.push(`/admin/properties/${id}/edit`) }} />
                             ))
                         }
                     </tbody>

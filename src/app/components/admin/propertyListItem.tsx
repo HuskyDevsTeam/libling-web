@@ -90,7 +90,7 @@ const PropertyListItem: React.FC<IListItem> = ({ item, lang, onSelect, onPreview
             </td>
             <td>
                 <div className={styles.actionContainer}>
-                    {/* <FiEye className={styles.action} onClick={!!onPreview ? onPreview : () => { }} /> */}
+                    <FiEye className={styles.action} data-testid={`preview-property-${item.id}`} aria-label={glosaryAdmin.actionPreview} onClick={!!onPreview ? () => { onPreview(item.id) } : () => { }} />
                     <FiEdit2 className={styles.action} data-testid={`edit-property-${item.id}`} aria-label={glosaryAdmin.actionEdit} onClick={!!onEdit ? () => { onEdit(item.id) } : () => { }} />
                     <FiTrash className={styles.action} aria-label="delete" onClick={!!onDelete ? () => { onDelete(item.id, item.active) } : () => { }} />
                 </div>
