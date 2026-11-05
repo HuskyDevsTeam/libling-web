@@ -63,7 +63,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
     const fetchProperties = async () => {
         store?.setLoading(true)
         console.log('executing fetch')
-        const data = await indexProperty({ type: tab === 0 ? undefined : tab === 1 ? true : false, search: debouncedSearch || undefined }, {}, currentPage, store?.limit, false)
+        const data = await indexProperty({ type: tab === 0 ? undefined : tab === 1 ? true : false, search: debouncedSearch || undefined }, {}, currentPage, store?.limit, false, true)
         console.log('propertyData', data)
         setMeta(data?.meta)
         setProperties(data?.data)

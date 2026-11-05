@@ -1,0 +1,13 @@
+CREATE INDEX IF NOT EXISTS "Property_countryId_idx" ON "Property"("countryId");
+CREATE INDEX IF NOT EXISTS "Property_currencyId_idx" ON "Property"("currencyId");
+CREATE INDEX IF NOT EXISTS "Property_propertyTypeId_idx" ON "Property"("propertyTypeId");
+CREATE INDEX IF NOT EXISTS "Property_publishedById_idx" ON "Property"("publishedById");
+CREATE INDEX IF NOT EXISTS "Property_active_idx" ON "Property"("active");
+CREATE INDEX IF NOT EXISTS "Property_createdAt_idx" ON "Property"("createdAt");
+CREATE INDEX IF NOT EXISTS "PropertyImage_propertyId_idx" ON "PropertyImage"("propertyId");
+CREATE INDEX IF NOT EXISTS "Surface_propertyId_idx" ON "Surface"("propertyId");
+CREATE INDEX IF NOT EXISTS "Benefits_propertyId_idx" ON "Benefits"("propertyId");
+CREATE INDEX IF NOT EXISTS "LegalNotice_propertyId_idx" ON "LegalNotice"("propertyId");
+CREATE INDEX IF NOT EXISTS "NearPlace_propertyId_idx" ON "NearPlace"("propertyId");
+CREATE INDEX IF NOT EXISTS "Affiliate_countryId_idx" ON "Affiliate"("countryId");
+CREATE INDEX IF NOT EXISTS "Pay_affiliateId_idx" ON "Pay"("affiliateId");

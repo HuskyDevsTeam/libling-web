@@ -216,7 +216,8 @@ export async function indexProperty(
 	orderBy: IPropertyOrderBy = {},
 	page: number = 1,
 	limit: number = 15,
-	country: boolean = true
+	country: boolean = true,
+	lean: boolean = false
 ) {
 	console.log("index request", filters, orderBy, page, limit, country)
 	let countryFilter
@@ -252,19 +253,22 @@ export async function indexProperty(
 		orderBy,
 		skip: (meta0.page - 1) * paging.limit,
 		take: paging.limit,
-		include: {
-			publishedBy: true,
-			country: true,
-			currency: true,
-			propertyType: true,
-			Surface: true,
-			NearPlace: true,
-			LegalNotice: true,
-			PropertyImage: true,
-			Benefits: true,
-		},
+		// Admin tables only need currency and type; skip the heavy relations.
+		include: lean
+			? { currency: true, propertyType: true }
+			: {
+					publishedBy: true,
+					country: true,
+					currency: true,
+					propertyType: true,
+					Surface: true,
+					NearPlace: true,
+					LegalNotice: true,
+					PropertyImage: true,
+					Benefits: true,
+			  },
 	})
-	const data: IPropertyData[] = properties.map((el) => ({
+	const data: IPropertyData[] = (properties as any[]).map((el) => ({
 		...el,
 		longitude: el.longitude?.toNumber(),
 		latitude: el.latitude?.toNumber(),

@@ -57,6 +57,13 @@ model Property {
   LegalNotice    LegalNotice[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+
+  @@index([countryId])
+  @@index([currencyId])
+  @@index([propertyTypeId])
+  @@index([publishedById])
+  @@index([active])
+  @@index([createdAt])
 }
 
 model PropertyType {
@@ -73,6 +80,8 @@ model PropertyImage {
   path        String
   property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId  Int
+
+  @@index([propertyId])
 }
 
 model Surface {
@@ -83,6 +92,8 @@ model Surface {
   areaId      Int
   property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId  Int
+
+  @@index([propertyId])
 }
 
 model Benefits {
@@ -90,6 +101,8 @@ model Benefits {
   name       String
   property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId Int
+
+  @@index([propertyId])
 }
 
 model LegalNotice {
@@ -97,6 +110,8 @@ model LegalNotice {
   name       String
   property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId Int
+
+  @@index([propertyId])
 }
 
 model NearPlace {
@@ -105,6 +120,8 @@ model NearPlace {
   description String
   property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId  Int
+
+  @@index([propertyId])
 }
 
 model Currency {
@@ -141,6 +158,8 @@ model Affiliate {
   country   Country  @relation(fields: [countryId], references: [id])
   countryId Int
   Pay       Pay[]
+
+  @@index([countryId])
 }
 
 enum Plan {
@@ -158,4 +177,6 @@ model Pay {
   status      Boolean
   affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
   affiliateId Int
+
+  @@index([affiliateId])
 }
