@@ -22,8 +22,10 @@ interface IDetail {
 }
 
 const Detail: React.FC<IDetail> = async ({ params: { id, lang } }) => {
-    const property = await showProperty({ id: parseInt(id) })
-    const mapStyle = await getMapStyles()
+    const [property, mapStyle] = await Promise.all([
+        showProperty({ id: parseInt(id) }),
+        getMapStyles(),
+    ])
     const glosary = dict[lang].immo
     const glosaryAdmin = dict[lang].adminProperties
     const glosaryData = dict[lang].data

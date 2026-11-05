@@ -1,6 +1,6 @@
 'use client'
 import { IAffiliateList } from '@/app/interfaces'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styles from './affiliateList.module.css'
 import { dict } from '@/app/utils'
 import { poppinsMedium, poppinsRegular, poppinsSemiBold } from '@/app/fonts'
@@ -121,7 +121,13 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
     useEffect(() => {
         setProperties(initialData)
     }, [initialData])
+    const skipInitialFetch = useRef(true)
     useEffect(() => {
+        // The server already rendered page 1 with default filters; avoid a duplicate query on mount.
+        if (skipInitialFetch.current) {
+            skipInitialFetch.current = false
+            if (store?.limit === 15 && currentPage === 1 && tab === 0 && !debouncedSearch) return
+        }
         if (store?.limit) {
             fetchProperties()
         }

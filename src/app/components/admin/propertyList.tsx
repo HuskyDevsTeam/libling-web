@@ -1,6 +1,6 @@
 'use client'
 import { IPropertyList } from '@/app/interfaces'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styles from './propertyList.module.css'
 import globalStyles from '@/app/globals.module.css'
 import { dict } from '@/app/utils'
@@ -190,7 +190,13 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
         }
         return () => { store?.setShowBar(false) }
     }, [selected])
+    const skipInitialFetch = useRef(true)
     useEffect(() => {
+        // The server already rendered page 1 with default filters; avoid a duplicate query on mount.
+        if (skipInitialFetch.current) {
+            skipInitialFetch.current = false
+            if (store?.limit === 15 && currentPage === 1 && tab === 0 && !debouncedSearch) return
+        }
         if (store?.limit) {
             fetchProperties()
         }
