@@ -3,9 +3,9 @@ import React from 'react'
 import styles from './scheduleBanner.module.css'
 import globalStyles from '@/app/globals.module.css'
 import Image from 'next/image';
-import headerImg1Contact from '@/app/img/banner_contactanos_1440.jpg'
-import headerImg2Contact from '@/app/img/banner_services_mobile_2.jpg'
-import headerImg3Contact from '@/app/img/banner_contactanos_2_1920.jpg'
+import headerImg1Contact from '@/app/img/banner_contactanos_1440.webp'
+import headerImg2Contact from '@/app/img/banner_services_mobile_2.webp'
+import headerImg3Contact from '@/app/img/banner_contactanos_2_1920.webp'
 import { dict } from '../utils';
 import { poppinsMedium, poppinsRegular } from '../fonts';
 import { Button } from './admin/button';

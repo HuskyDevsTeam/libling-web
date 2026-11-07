@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './page.module.css'
 import Image from 'next/image'
-import bannerMedium from '@/app/img/immo/hero_landing_1440x900.jpg'
+import bannerMedium from '@/app/img/immo/hero_landing_1440x900.webp'
 import { poppinsSemiBold } from '@/app/fonts'
 import { dict } from '@/app/utils'
 import { findPropertyTypeByCode, getPropertyTypes, indexProperty } from '@/server/data'

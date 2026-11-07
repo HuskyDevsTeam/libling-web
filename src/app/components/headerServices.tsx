@@ -3,9 +3,9 @@ import React from 'react'
 import styles from './headerServices.module.css'
 import globalStyles from '@/app/globals.module.css'
 import Image from 'next/image';
-import headerImg1 from '@/app/img/services_header_1440.jpg'
-import headerImg2 from '@/app/img/banner_services_mobile_1.png'
-import headerImg3 from '@/app/img/banner_servicios_1920.jpg'
+import headerImg1 from '@/app/img/services_header_1440.webp'
+import headerImg2 from '@/app/img/banner_services_mobile_1.webp'
+import headerImg3 from '@/app/img/banner_servicios_1920.webp'
 import { dict } from '../utils';
 import { poppinsBold, poppinsRegular } from '../fonts';
 import useWindowDimensions from '../hooks/useWindowDimensions';

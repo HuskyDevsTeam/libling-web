@@ -5,15 +5,15 @@ import { Carousel } from 'react-responsive-carousel';
 import styles from './headerHome.module.css'
 import globalStyles from '@/app/globals.module.css'
 import Image from 'next/image';
-import headerImg1_2 from '@/app/img/carrusel_banner_1_1920.jpg'
-import headerImg1 from '@/app/img/carrusel_banner_1_1440.jpg'
-import headerImg1_1 from '@/app/img/banner_home_mobile_1.png'
-import headerImg2_2 from '@/app/img/carrusel_banner_2_1920.jpg'
-import headerImg2 from '@/app/img/carrusel_banner_2_1440.jpg'
-import headerImg2_1 from '@/app/img/banner_home_mobile_2.png'
-import headerImg3_2 from '@/app/img/carrusel_banner_3_1920.jpg'
-import headerImg3 from '@/app/img/carrusel_banner_3_1440.jpg'
-import headerImg3_1 from '@/app/img/banner_home_mobile_3.png'
+import headerImg1_2 from '@/app/img/carrusel_banner_1_1920.webp'
+import headerImg1 from '@/app/img/carrusel_banner_1_1440.webp'
+import headerImg1_1 from '@/app/img/banner_home_mobile_1.webp'
+import headerImg2_2 from '@/app/img/carrusel_banner_2_1920.webp'
+import headerImg2 from '@/app/img/carrusel_banner_2_1440.webp'
+import headerImg2_1 from '@/app/img/banner_home_mobile_2.webp'
+import headerImg3_2 from '@/app/img/carrusel_banner_3_1920.webp'
+import headerImg3 from '@/app/img/carrusel_banner_3_1440.webp'
+import headerImg3_1 from '@/app/img/banner_home_mobile_3.webp'
 import { dict } from '../utils';
 import { Button } from './admin/button';
 import { FaChevronRight } from 'react-icons/fa';

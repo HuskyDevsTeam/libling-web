@@ -3,15 +3,15 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a lo
 import { Carousel } from 'react-responsive-carousel';
 import styles from './partnerSlider.module.css'
 import Image from 'next/image';
-import Logo1 from '@/app/img/logo_partner_assurin-100.jpg'
-import Logo2 from '@/app/img/logo_partner_chamber_of_commerce_luxembourg-100.jpg'
-import Logo3 from '@/app/img/logo_partner_elena_lustina_panescu-100.jpg'
-import Logo4 from '@/app/img/logo_partner_house_of_training-100.jpg'
-import Logo5 from '@/app/img/logo_partner_husky-100.jpg'
-import Logo6 from '@/app/img/logo_partner_lalux-100.jpg'
-import Logo7 from '@/app/img/logo_partner_schemeberger_photographe-100.jpg'
-import Logo8 from '@/app/img/logo_partner_translations_panescu-100.jpg'
-import Logo9 from '@/app/img/logo_partner_zak_architect-100.jpg'
+import Logo1 from '@/app/img/logo_partner_assurin-100.webp'
+import Logo2 from '@/app/img/logo_partner_chamber_of_commerce_luxembourg-100.webp'
+import Logo3 from '@/app/img/logo_partner_elena_lustina_panescu-100.webp'
+import Logo4 from '@/app/img/logo_partner_house_of_training-100.webp'
+import Logo5 from '@/app/img/logo_partner_husky-100.webp'
+import Logo6 from '@/app/img/logo_partner_lalux-100.webp'
+import Logo7 from '@/app/img/logo_partner_schemeberger_photographe-100.webp'
+import Logo8 from '@/app/img/logo_partner_translations_panescu-100.webp'
+import Logo9 from '@/app/img/logo_partner_zak_architect-100.webp'
 
 const PartnerSlider = () => {
   return (

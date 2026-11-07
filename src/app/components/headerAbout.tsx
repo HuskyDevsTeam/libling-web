@@ -3,7 +3,7 @@ import React from 'react'
 import styles from './headerAbout.module.css'
 import globalStyles from '@/app/globals.module.css'
 import Image from 'next/image';
-import headerImg1 from '@/app/img/about_section_header.png'
+import headerImg1 from '@/app/img/about_section_header.webp'
 import { dict } from '../utils';
 import { Button } from './admin/button';
 import { poppinsBold, poppinsMedium } from '../fonts';
