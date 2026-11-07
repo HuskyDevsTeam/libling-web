@@ -13,7 +13,7 @@ const csp = [
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: blob: https://${imageHost} https://api.maptiler.com https://*.google-analytics.com https://*.googletagmanager.com`,
     "font-src 'self' data:",
-    "connect-src 'self' https://api.maptiler.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
+    `connect-src 'self' https://api.maptiler.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com${isDev ? " ws: wss:" : ""}`,
     "frame-src https://challenges.cloudflare.com",
     "worker-src 'self' blob:",
     "media-src 'self'",
