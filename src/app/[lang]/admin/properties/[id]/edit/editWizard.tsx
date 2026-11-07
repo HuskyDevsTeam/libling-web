@@ -32,7 +32,6 @@ const EditWizard: React.FC<IEditWizard> = ({ lang, initial }) => {
     const router = useRouter()
     const store = useStore(useEditPropertyStore, (state) => state)
     const storeInterface = useStore(useInterfaceStore, (state) => state)
-    const [ready, setReady] = useState(false)
     const [files, setFiles] = useState<any[]>([])
     const [face, setFace] = useState(0)
     const [removedIds, setRemovedIds] = useState<number[]>([])
@@ -40,6 +39,8 @@ const EditWizard: React.FC<IEditWizard> = ({ lang, initial }) => {
     // portada elegida entre las fotos existentes; null => portada = foto nueva
     const [coverPath, setCoverPath] = useState<string | null>(initial.thumbnail || initial.images[0]?.path || null)
     const step = store?.lastStep
+    // El efecto de abajo carga los formularios en el store: mientras no estan, no se pinta nada
+    const ready = !!store?.form_1
 
     // Carga la propiedad en el store de editar (en memoria, no toca el borrador de registrar)
     useEffect(() => {
@@ -51,7 +52,6 @@ const EditWizard: React.FC<IEditWizard> = ({ lang, initial }) => {
         state.setForm_4(forms.form_4)
         state.setForm_5(forms.form_5)
         state.setStep(1)
-        setReady(true)
         return () => {
             useEditPropertyStore.getState().resetForm()
             useEditPropertyStore.getState().resetStep()

@@ -1,6 +1,7 @@
 'use client'
 import { IPropertyList } from '@/app/interfaces'
 import React, { useEffect, useRef, useState } from 'react'
+import useSyncedState from '@/app/hooks/useSyncedState'
 import styles from './propertyList.module.css'
 import globalStyles from '@/app/globals.module.css'
 import { dict } from '@/app/utils'
@@ -24,7 +25,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
     const glosary = dict[lang].adminProperties
     const glosaryImmo = dict[lang].immo
     const store = useStore(useInterfaceStore, (state) => state)
-    const [properties, setProperties] = useState(initialData)
+    const [properties, setProperties] = useSyncedState(initialData)
     const [meta, setMeta] = useState<IMetaPaginate | undefined>(metaData)
     const [currentPage, setCurrentPage] = useState<number>(1)
     const [selected, setSelected] = useState<number[]>([])
@@ -60,15 +61,17 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
         setCurrentPage(1)
         setSearch(typeof e === 'string' ? e : e.target.value)
     }
-    const fetchProperties = async () => {
-        store?.setLoading(true)
-        console.log('executing fetch')
-        const data = await indexProperty({ type: tab === 0 ? undefined : tab === 1 ? true : false, search: debouncedSearch || undefined }, {}, currentPage, store?.limit, false, true)
-        console.log('propertyData', data)
+    // Pide la pagina actual al servidor (sin tocar el estado) y la aplica al resolverse
+    const loadPage = () => indexProperty({ type: tab === 0 ? undefined : tab === 1 ? true : false, search: debouncedSearch || undefined }, {}, currentPage, store?.limit, false, true)
+    const applyPage = (data: Awaited<ReturnType<typeof loadPage>>) => {
         setMeta(data?.meta)
         setProperties(data?.data)
         if (data?.meta && data.meta.page !== currentPage) setCurrentPage(data.meta.page)
         store?.setLoading(false)
+    }
+    const fetchProperties = async () => {
+        store?.setLoading(true)
+        applyPage(await loadPage())
     }
 
     const paginationList = [
@@ -159,9 +162,6 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
         },
     ]
     useEffect(() => {
-        setProperties(initialData)
-    }, [initialData])
-    useEffect(() => {
         console.log("selected Id's", selected)
         if (selected.length >= 1) {
             store?.setShowBar(true)
@@ -189,6 +189,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
             ))
         }
         return () => { store?.setShowBar(false) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [selected])
     const skipInitialFetch = useRef(true)
     useEffect(() => {
@@ -198,8 +199,10 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
             if (store?.limit === 15 && currentPage === 1 && tab === 0 && !debouncedSearch) return
         }
         if (store?.limit) {
-            fetchProperties()
+            store?.setLoading(true)
+            loadPage().then(applyPage)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [store?.limit, currentPage, tab, debouncedSearch])
     return (
         <div className={styles.card}>
@@ -270,7 +273,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
             </div>
             <article className={styles.cardContent}>
                 <table className={styles.tableContainer}>
-                    <thead>
+                    <thead><tr>
                         <th style={poppinsMedium.style}>
                             <div className={globalStyles.checkboxControl}>
                                 <input type="checkbox" id="cboxInput" name="select_all" onChange={handleCheck} checked={selected.length === properties?.length} />
@@ -281,7 +284,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
                         <th style={poppinsMedium.style}>{glosary.formLabelPropertyType}</th>
                         <th style={poppinsMedium.style}>{glosary.listStatus}</th>
                         <th style={poppinsMedium.style}>{glosary.listActions}</th>
-                    </thead>
+                    </tr></thead>
                     <tbody>
                         {
                             properties?.map((el, index) => (

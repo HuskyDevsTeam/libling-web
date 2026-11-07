@@ -30,15 +30,22 @@ export const metadata: Metadata = {
   }
 }
 
-export default function RootLandingLayout({
-  children,
-  params: { lang }
-}: {
-  children: React.ReactNode,
-  params: { lang: "es" | "en" | "fr" }
+export default async function RootLandingLayout(
+  props: {
+    children: React.ReactNode,
+    params: Promise<{ lang: string }>
 
-}) {
-  const country = cookies().get('immo-country')?.value as countryType || 'LU'
+  }
+) {
+  const params = await props.params;
+
+  const lang = params.lang as "es" | "en" | "fr";
+
+  const {
+    children
+  } = props;
+
+  const country = (await cookies()).get('immo-country')?.value as countryType || 'LU'
   return (
     <html lang={lang} style={{ backgroundColor: '#FAFAFA', color: '#000000DE' }}>
       <body style={poppinsRegular.style} className={styles.layout}>

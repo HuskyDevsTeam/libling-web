@@ -1,13 +1,17 @@
 # syntax=docker/dockerfile:1
 # Una sola imagen para produccion y stage. Lo que cambia es la configuracion (variables de entorno).
-FROM node:24-bookworm-slim AS base
+FROM node:26-bookworm-slim AS base
 RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
+# Node 25+ ya no incluye corepack: pnpm se instala con npm, con la misma version que "packageManager" en package.json
+ARG PNPM_VERSION=12.18.0
+RUN npm install -g pnpm@${PNPM_VERSION}
+
 FROM base AS deps
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY prisma ./prisma
-RUN npm ci
+RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
 ARG IMAGE_HOST
@@ -15,7 +19,7 @@ ENV NEXT_TELEMETRY_DISABLED=1 \
     IMAGE_HOST=$IMAGE_HOST
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npx prisma generate && npx next build
+RUN pnpm exec prisma generate && pnpm exec next build
 
 FROM base AS runner
 ENV NODE_ENV=production \

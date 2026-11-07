@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { use } from 'react';
 import styles from './page.module.css'
 import globalStyles from '@/app/globals.module.css'
 import { poppinsBold, poppinsRegular, poppinsSemiBold } from '@/app/fonts'
@@ -7,11 +7,17 @@ import Section from '@/app/components/section'
 import { dict } from '@/app/utils'
 import useWindowDimensions from '@/app/hooks/useWindowDimensions'
 interface IPage {
-    params: {
+    params: Promise<{
         lang: "es" | "en" | "fr"
-    }
+    }>
 }
-const Privacy: React.FC<IPage> = ({ params: { lang } }) => {
+const Privacy: React.FC<IPage> = props => {
+    const params = use(props.params);
+
+    const {
+        lang
+    } = params;
+
     const glosary = dict[lang]?.privacy
     const { height, width } = useWindowDimensions();
     const list = [
@@ -20,6 +26,7 @@ const Privacy: React.FC<IPage> = ({ params: { lang } }) => {
         { title: glosary.title3, list: glosary.description3 },
         { title: glosary.title4, list: glosary.description4 },
         { title: glosary.title5, list: glosary.description5 },
+        { title: glosary.title6, list: glosary.description6 },
     ]
 
     return (

@@ -1,6 +1,7 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
-import { showProperty } from '@/services'
+import { showProperty } from '@/server/data'
+import { requireAdminPage } from '@/server/guard'
 import { IEditInitial } from '@/app/utils/propertyEdit'
 import EditWizard from './editWizard'
 
@@ -11,7 +12,15 @@ interface IEdit {
     }
 }
 
-const Edit: React.FC<IEdit> = async ({ params: { id, lang } }) => {
+const Edit: React.FC<IEdit> = async props => {
+    const params = await props.params;
+
+    const {
+        id,
+        lang
+    } = params;
+  await requireAdminPage(params.lang)
+
     const propertyId = parseInt(id)
     if (Number.isNaN(propertyId)) notFound()
     const property = await showProperty({ id: propertyId })

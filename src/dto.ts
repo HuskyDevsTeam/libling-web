@@ -1,4 +1,4 @@
-import { IUserData, IUserResult } from "./services"
+import { IUserData, IUserResult } from "@/server/data"
 
 export class UserDTO {
 	email

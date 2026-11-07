@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -12,11 +13,32 @@ datasource db {
 }
 
 model User {
-  id         Int        @id @default(autoincrement())
-  email      String     @unique
-  name       String?
-  password   String
-  properties Property[]
+  id          Int                  @id @default(autoincrement())
+  email       String               @unique
+  name        String?
+  password    String
+  properties  Property[]
+  resetTokens PasswordResetToken[]
+}
+
+// Token de restablecimiento de contraseña: solo se guarda el hash (SHA-256) del token enviado por correo.
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+// Contadores para limitar intentos (login, reset de contraseña) de forma compartida entre instancias.
+model RateLimit {
+  key         String   @id
+  count       Int
+  windowStart DateTime
 }
 
 model Property {
@@ -26,6 +48,8 @@ model Property {
   content        String?
   address        String
   thumbnail      String?
+  // Miniatura WebP (480 px) de la portada para listados y tarjetas; si falta se usa thumbnail
+  thumbnailWebp  String?
   longitude      Decimal?
   latitude       Decimal?
   area           Decimal?
@@ -57,13 +81,18 @@ model Property {
   LegalNotice    LegalNotice[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+  // Borrado logico: la fila se conserva 90 dias y luego la purga diaria la elimina por completo
+  deletedAt      DateTime?
 
+  @@index([deletedAt])
   @@index([countryId])
   @@index([currencyId])
   @@index([propertyTypeId])
   @@index([publishedById])
   @@index([active])
   @@index([createdAt])
+  // Listados publicos: activos de un pais, ordenados por id
+  @@index([active, countryId, id])
 }
 
 model PropertyType {
@@ -77,11 +106,19 @@ model PropertyImage {
   id          Int      @id @default(autoincrement())
   name        String
   description String
+  // URL de la imagen que se muestra (para subidas nuevas, el WebP optimizado de hasta 1920 px)
   path        String
+  // Miniatura WebP de 480 px (listados, galeria)
+  thumbPath   String?
+  // Clave privada del original subido (respaldo); nunca se muestra
+  originalKey String?
+  // Borrado logico (ver Property.deletedAt)
+  deletedAt   DateTime?
   property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId  Int
 
   @@index([propertyId])
+  @@index([deletedAt])
 }
 
 model Surface {
@@ -160,6 +197,7 @@ model Affiliate {
   Pay       Pay[]
 
   @@index([countryId])
+  @@index([plan_date])
 }
 
 enum Plan {
@@ -175,8 +213,11 @@ model Pay {
   months      Int       @default(1)
   quantity    Decimal?
   status      Boolean
+  // Plan contratado en este pago: se aplica al afiliado solo cuando Saferpay confirma el cobro
+  plan        Plan?
   affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
   affiliateId Int
 
   @@index([affiliateId])
+  @@index([status])
 }

@@ -1,15 +1,17 @@
 'use client'
 import React, { MouseEventHandler, useEffect, useRef, useState } from 'react'
+import useSyncedState from '@/app/hooks/useSyncedState'
 import styles from './input.module.css'
 import { poppinsMedium, poppinsRegular } from '@/app/fonts'
 import { FiChevronDown, FiChevronUp, FiPlus } from 'react-icons/fi'
 import { IInputSelect, ISelectElement, dataTranslate } from '@/app/interfaces'
 import { dict } from '@/app/utils'
 
+const NO_ITEMS: ISelectElement[] = []
 const InputSelect: React.FC<IInputSelect> = ({ label, placeholder, list, error, touched, description, onChange, name, initialValue, lang }) => {
     const [focused, setFocused] = useState(false)
     const [openList, setOpenList] = useState(false)
-    const [listFiltered, setListFiltered] = useState<ISelectElement[]>(list || [])
+    const [listFiltered, setListFiltered] = useSyncedState<ISelectElement[]>(list || NO_ITEMS)
     const inputRef = useRef<HTMLInputElement | null>(null)
     const labelOf = (el: ISelectElement) => (!!lang && !!el.value && el.value in dict[lang].data && dict[lang].data[el.value as dataTranslate]) ? dict[lang].data[el.value as dataTranslate] : el.value.toString()
     const hasValue = (v: unknown) => v !== undefined && v !== null && v !== ''
@@ -48,11 +50,6 @@ const InputSelect: React.FC<IInputSelect> = ({ label, placeholder, list, error, 
             setOpenList(false)
         },200)
     }
-    useEffect(() => {
-        if (!!list) {
-            setListFiltered(list)
-        }
-    }, [list])
     useEffect(() => {
         if (!inputRef.current) return
         if (hasValue(initialValue)) {

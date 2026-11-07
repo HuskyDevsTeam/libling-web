@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
+import { useCurrencies, usePropertyTypes, useCountries } from '@/app/hooks/useCatalogs'
 import InputSwitch from '@/app/components/admin/inputSwitch'
 import { InputTextArea } from '@/app/components/admin/inputTextArea'
 import Map, { Marker } from 'react-map-gl/maplibre';
@@ -14,7 +15,7 @@ import InputTextSelect from '@/app/components/admin/inputTextSelect'
 import { poppinsMedium } from '@/app/fonts'
 import styles from './page.module.css'
 import { dict } from '@/app/utils';
-import { IPage } from '../../layout';
+import { IPageSync as IPage } from '../../layout';
 import { createPropertyType, getCountries, getPropertyTypes } from '@/services'
 import { ISelectElement } from '@/app/interfaces'
 import CustomToast from '@/app/components/toast'
@@ -43,9 +44,10 @@ const StepOne: React.FC<IStepOne> = ({ params: { lang }, onNext }) => {
     const glosary = dict[lang]?.adminProperties
     const glosaryError = dict[lang]?.auth
     const [mapStyle, setMapStyle] = useState<string | null>(null)
-    const [list, setList] = useState<ISelectElement[]>([])
-    const [countries, setCountries] = useState<ISelectElement[]>([])
+    const [list, fetchPropertyTypes] = usePropertyTypes()
+    const countries = useCountries()
     const formRef = useRef<FormikProps<IValues>>(null)
+    const [submitting, setBusy] = useState(false)
     const store = useStore(usePropertyStoreFromContext(), (state) => state)
     const initialValues: IValues = {
         propertyType: store?.form_1?.propertyType,
@@ -67,16 +69,6 @@ const StepOne: React.FC<IStepOne> = ({ params: { lang }, onNext }) => {
             value: glosary.formLabelRent,
         },
     ]
-    const fetchPropertyTypes = async () => {
-        const data = await getPropertyTypes()
-        const newArray = data?.map(el => ({ key: el.id, value: el.name }))
-        setList(newArray || [])
-    }
-    const fetchCountries = async () => {
-        const data = await getCountries()
-        const newArray = data?.map(el => ({ key: el.id, value: el.name }))
-        setCountries(newArray || [])
-    }
     const handleSellType = (key: string | number) => {
         console.log('selected key', key)
         formRef.current?.setFieldValue('type', key)
@@ -105,6 +97,7 @@ const StepOne: React.FC<IStepOne> = ({ params: { lang }, onNext }) => {
 
     });
     const handleSubmit = async (values: IValues, { setSubmitting }: FormikHelpers<IValues>) => {
+        setBusy(true)
         const formData = values
         console.log('formik values', formData)
         console.log('coordinates',latLng)
@@ -116,12 +109,11 @@ const StepOne: React.FC<IStepOne> = ({ params: { lang }, onNext }) => {
             toast.error(<CustomToast type='error' title='Error' content={glosaryError.error_default} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
         } finally {
             setSubmitting(false)
+            setBusy(false)
 
         }
     }
     useEffect(() => {
-        fetchPropertyTypes()
-        fetchCountries()
         getMapStyles().then(result => setMapStyle(result))
     }, [])
     return (
@@ -193,7 +185,7 @@ const StepOne: React.FC<IStepOne> = ({ params: { lang }, onNext }) => {
 
             </div>
             <div className={styles.cardFooter}>
-                <Button title={glosary.formButtonNext} onClick={formRef.current?.handleSubmit} loading={formRef.current?.isSubmitting} />
+                <Button title={glosary.formButtonNext} onClick={() => formRef.current?.handleSubmit()} loading={submitting} />
             </div>
         </div>
     )

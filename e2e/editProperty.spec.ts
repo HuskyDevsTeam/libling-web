@@ -75,13 +75,15 @@ test('editar una propiedad pasa por los 5 pasos precargados y guarda todo', asyn
 	await next() // en editar, el último paso guarda
 
 	await expect.poll(async () => (await prisma.property.findUnique({ where: { id: propertyId } }))?.title).toBe('Piso editado')
-	const saved = await prisma.property.findUnique({ where: { id: propertyId }, include: { Benefits: true, PropertyImage: true } })
+	const saved = await prisma.property.findUnique({ where: { id: propertyId }, include: { Benefits: true, PropertyImage: { orderBy: { id: 'asc' } } } })
 	expect(saved?.price?.toNumber()).toBe(350000)
 	expect(saved?.area?.toNumber()).toBe(85)
 	expect(saved?.parking).toBe(2)
 	expect(saved?.elevator).toBe(true)
 	expect(saved?.Benefits.map(b => b.name).sort()).toEqual(['Garaje', 'Terraza'])
-	expect(saved?.PropertyImage.map(i => i.id)).toEqual([photos[0].id])
+	// Borrado logico: la foto quitada sigue en la base, pero marcada como borrada
+	expect(saved?.PropertyImage.filter(i => !i.deletedAt).map(i => i.id)).toEqual([photos[0].id])
+	expect(saved?.PropertyImage.find(i => i.id === photos[1].id)?.deletedAt).toBeInstanceOf(Date)
 	expect(saved?.thumbnail).toBe(`${IMG}/a.jpg`)
 	expect(saved?.publishedById).toBe(ids[0])
 })

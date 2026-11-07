@@ -18,7 +18,7 @@ const ImageGallery: React.FC<IImageGallery> = ({ images, thumbnail }) => {
                 {
                     images?.map((el, index) => (
 
-                        <Image key={index} onClick={()=>{setImage(el.path)}} src={el.path} alt={`image${index}`} className={el.path === image ? styles.miniSelected : styles.mini} width={74} height={74}/>
+                        <Image key={index} onClick={()=>{setImage(el.path)}} src={el.thumbPath || el.path} alt={`image${index}`} className={el.path === image ? styles.miniSelected : styles.mini} width={74} height={74}/>
 
                     ))
                 }

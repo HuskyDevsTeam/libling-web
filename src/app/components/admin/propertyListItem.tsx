@@ -1,3 +1,4 @@
+import useSyncedState from '@/app/hooks/useSyncedState'
 import React, { useEffect, useState } from 'react'
 import styles from './propertyList.module.css'
 import globalStyles from '@/app/globals.module.css'
@@ -32,13 +33,10 @@ const PropertyListItem: React.FC<IListItem> = ({ item, lang, onSelect, onPreview
     const glosaryData = dict[lang].data
     const glosaryAdmin = dict[lang].adminProperties
     const glosary = dict[lang].immo
-    const [checked, setChecked] = useState(isChecked)
+    const [checked, setChecked] = useSyncedState(isChecked)
     const handleSelect = (event: React.FormEvent<HTMLInputElement>) => {
         if (onSelect) onSelect(item.id)
     }
-    useEffect(() => {
-        setChecked(isChecked)
-    }, [isChecked])
     return (
         <tr>
             <td>
@@ -48,7 +46,7 @@ const PropertyListItem: React.FC<IListItem> = ({ item, lang, onSelect, onPreview
             </td>
             <td>
                 <div className={styles.basicContainer}>
-                    <Image className={styles.basicMini} src={item.thumbnail || placeholder} alt={item.title} width={70} height={70} style={{ width: 70, height: 70, minWidth: 70, objectFit: 'cover' }} />
+                    <Image className={styles.basicMini} src={item.thumbnailWebp || item.thumbnail || placeholder} alt={item.title} width={70} height={70} style={{ width: 70, height: 70, minWidth: 70, objectFit: 'cover' }} />
                     <div className={styles.basicTextContainer}>
                         <span className={styles.basicTitle}>{truncateText(item.title, TITLE_MAX_CHARS)}</span>
                         <span className={styles.basicSubtitle}>{truncateText(item.content)}</span>

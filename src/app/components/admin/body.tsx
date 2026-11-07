@@ -6,9 +6,9 @@ import Aside from './aside';
 import { poppinsMedium, poppinsRegular } from '@/app/fonts';
 import Navbar from './navbar';
 import { dict } from '@/app/utils';
-import { FiGrid, FiHome, FiCreditCard, FiExternalLink } from 'react-icons/fi';
+import { FiGrid, FiHome, FiCreditCard, FiExternalLink, FiTrash2 } from 'react-icons/fi';
 import { SIDEBAR_COOKIE } from './sidebarCookie';
-import { IUserSession } from '@/services';
+import type { IUserSession } from '@/server/data'
 import ActionBar from './actionBar';
 import useStore from '@/app/hooks/useStore';
 import { useInterfaceStore } from '@/app/hooks/useInterfaceStore';
@@ -62,6 +62,11 @@ export const Body = ({
             icon: FiCreditCard
         },
         {
+            name: glosary.trashTitle,
+            uri: '/admin/trash',
+            icon: FiTrash2
+        },
+        {
             name: glosary.websiteTitle,
             uri: `/${lang}`,
             icon: FiExternalLink,
@@ -82,6 +87,7 @@ export const Body = ({
         if (store?.setUser) {
             store.setUser(user)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [store?.setUser, user])
     return (
         <body style={poppinsRegular.style} className={styles.layout}>

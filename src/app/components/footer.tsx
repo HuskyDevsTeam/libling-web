@@ -4,10 +4,11 @@ import styles from './footer.module.css'
 import { poppinsMedium, poppinsRegular, poppinsSemiBold } from '../fonts'
 import { RiFacebookFill, RiInstagramFill, RiLinkedinFill } from "react-icons/ri";
 import { dict } from '../utils'
-import { templates } from '../utils/funtions'
-import { sendEmailToOwner, sendEmailToClient } from '../utils/emails'
+import { sendFooterMessage } from '@/mailActions'
+import { useAntiSpam } from './antiSpam'
 import CustomToast from './toast'
 import { toast } from 'react-toastify'
+import { openCookieSettings } from './cookieConsent'
 import Link from 'next/link';
 
 
@@ -22,6 +23,7 @@ export default function Footer({ lang }: { lang: "es" | "en" | "fr" }) {
     const mailMessages = dict[lang]?.mail
     const [inputValue, setInputValue] = useState('');
     const [loading, setLoading] = useState<boolean | undefined>();
+    const spam = useAntiSpam()
 
 
     const handleClick = (currLang: string) => {
@@ -39,16 +41,9 @@ export default function Footer({ lang }: { lang: "es" | "en" | "fr" }) {
         event.preventDefault()
         setLoading(true)
         try{
-            await sendEmailToClient(
-                inputValue || 'email',
-                templates.infoClient(glosaryHome.bigTitleHeader1_1 + glosaryHome.bigTitleHeader1_2, null, lang),
-                mailMessages.subject_3
-            )
-            await sendEmailToOwner(
-                inputValue || 'email',
-                templates.info(glosaryHome.bigTitleHeader1_1 + glosaryHome.bigTitleHeader1_2,inputValue || '', mailMessages.main, lang),
-                mailMessages.subject_1
-            )
+            const result = await sendFooterMessage({ email: inputValue, lang, ...spam.read() })
+            spam.reset()
+            if (!result.ok) throw new Error(result.reason)
             toast.success(<CustomToast type='success' title={glosaryImmo.success} content={glosaryImmo.successEmail} />, { theme: 'colored', icon: false, style: { backgroundColor: '#00C851', maxWidth: 450, padding: 24, borderRadius: 10 } })
 
         }catch(error){
@@ -120,6 +115,7 @@ export default function Footer({ lang }: { lang: "es" | "en" | "fr" }) {
                                     onChange={(e) => setInputValue(e.target.value)} required />
                             </div>
                         </div>
+                        {spam.field}
                         <button disabled={loading} style={poppinsMedium.style}>{loading ? <span className={styles.loader}></span> : <span>{glosaryContact.form_button}</span>}</button>
                     </form>
                     <div className={styles.socialContainer} style={{ maxWidth: 300 }}>
@@ -146,7 +142,9 @@ export default function Footer({ lang }: { lang: "es" | "en" | "fr" }) {
                     <span className={styles.ribbonText}>{`© Libling 2024 | ${glosary.rights}.`}</span>
                 </div>
                 <div className={styles.ribbonHalf}>
-                    {/* <span className={styles.ribbonTextFaded}>{glosary.cookies}</span> */}
+                    <button type="button" onClick={openCookieSettings} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit' }}>
+                        <span className={styles.ribbonTextFaded}>Cookies</span>
+                    </button>
                     <Link href={'/privacy'}>
                         <span className={styles.ribbonTextFaded}>{glosary.privacy}</span>
                     </Link>

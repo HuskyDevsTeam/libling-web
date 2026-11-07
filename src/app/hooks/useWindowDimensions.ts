@@ -1,33 +1,26 @@
-import { useState, useEffect } from "react"
+import { useSyncExternalStore } from "react"
 
-export default function useWindowDimensions() {
-	const hasWindow = typeof window !== "undefined"
-	
-	function getWindowDimensions() {
-		const width = hasWindow ? window.innerWidth : null
-		const height = hasWindow ? window.innerHeight : null
-		return {
-			width,
-			height,
-		}
+interface Dimensions {
+	width: number | null
+	height: number | null
+}
+
+const serverSnapshot: Dimensions = { width: null, height: null }
+let current: Dimensions = serverSnapshot
+
+function read(): Dimensions {
+	if (typeof window === "undefined") return serverSnapshot
+	if (current.width !== window.innerWidth || current.height !== window.innerHeight) {
+		current = { width: window.innerWidth, height: window.innerHeight }
 	}
+	return current
+}
 
-	const [windowDimensions, setWindowDimensions] = useState(
-		getWindowDimensions()
-	)
-	function handleResize() {
-		setWindowDimensions(getWindowDimensions())
-	}
+function subscribe(onChange: () => void) {
+	window.addEventListener("resize", onChange)
+	return () => window.removeEventListener("resize", onChange)
+}
 
-	useEffect(() => {
-		if (hasWindow) {
-			handleResize()
-			window.addEventListener("DOMContentLoaded", handleResize)
-			window.addEventListener("resize", handleResize)
-			return () => window.removeEventListener("resize", handleResize)
-		}
-	}, [hasWindow])
-
-
-	return windowDimensions
+export default function useWindowDimensions(): Dimensions {
+	return useSyncExternalStore(subscribe, read, () => serverSnapshot)
 }

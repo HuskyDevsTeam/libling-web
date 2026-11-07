@@ -5,10 +5,18 @@ import { IPage } from '../layout'
 import { FiCreditCard, FiHome } from 'react-icons/fi'
 import { poppinsMedium } from '@/app/fonts'
 import Link from 'next/link'
-import { getAffiliates } from '@/services'
+import { getAffiliates } from '@/server/data'
+import { requireAdminPage } from '@/server/guard'
 import AffiliateList from '@/app/components/admin/affiliateList'
 
-const Affiliate: React.FC<IPage> = async ({ params: { lang } }) => {
+const Affiliate: React.FC<IPage> = async props => {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+  await requireAdminPage(params.lang)
+
   const glosary = dict[lang]?.adminAffiliate
   const glosaryNav = dict[lang]?.adminNav
   const affiliates = await getAffiliates(undefined,undefined,undefined,undefined)

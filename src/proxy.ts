@@ -10,7 +10,6 @@ let locales = ["en", "fr", "es"]
 // Get the preferred locale, similar to the above or using a library
 function getLocale(request: NextRequest) {
 	const selectedLanguage = request.cookies.get("NEXT_LOCALE")?.value
-	console.log("selectedLanguage", selectedLanguage)
 	if (
 		selectedLanguage &&
 		locales.includes(selectedLanguage.toLocaleLowerCase())
@@ -21,12 +20,19 @@ function getLocale(request: NextRequest) {
 		"accept-language":
 			request.headers.get("accept-language") || "en-US,en;q=0.5",
 	}
-	let languages = new Negotiator({ headers }).languages()
-	let defaultLocale = "en"
-	return match(languages, locales, defaultLocale)
+	// "*" (comodin de Accept-Language) no es una etiqueta valida y hace que match() lance un RangeError
+	const languages = new Negotiator({ headers })
+		.languages()
+		.filter((language) => language !== "*")
+	const defaultLocale = "en"
+	try {
+		return match(languages, locales, defaultLocale)
+	} catch {
+		return defaultLocale
+	}
 }
 
-export async function middleware(request: any, response: any) {
+export async function proxy(request: any, response: any) {
 	// Check if there is any supported locale in the pathname
 	const { pathname } = request.nextUrl
 	const pathnameHasLocale = locales.some(

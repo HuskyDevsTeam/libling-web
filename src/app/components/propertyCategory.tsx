@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import styles from './propertyCategory.module.css'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { IMetaPaginate, IPropertyData, IPropertyOrderBy, IPropertySearch } from '../interfaces/models'
-import { indexProperty } from '@/services'
+import { indexPublicProperties } from '@/services'
 import PropertyCard from './propertyCard'
 import { rentPaymentPeriods } from '../utils/data'
 import { dict } from '../utils'
@@ -22,8 +22,7 @@ const PropertyCategory: React.FC<IPropertyCategory> = ({ title, description, fil
     const glosary = dict[lang].immo
     const glosaryData = dict[lang].data
     const glosaryAdmin = dict[lang].adminProperties
-    const fetchProperties = async () => {
-        const data = await indexProperty(filters, orderBy, currentPage, limit)
+    const applyPage = (data: Awaited<ReturnType<typeof indexPublicProperties>>) => {
         console.log('propertyData', data)
         const newArray = data?.data
         setMeta(data?.meta)
@@ -37,13 +36,16 @@ const PropertyCategory: React.FC<IPropertyCategory> = ({ title, description, fil
         })
         setCurrentPage(state => state + 1)
     }
-    const handleLeftScroll = (reference: React.RefObject<HTMLDivElement>) => {
+    const fetchProperties = async () => {
+        applyPage(await indexPublicProperties(filters, orderBy, currentPage, limit))
+    }
+    const handleLeftScroll = (reference: React.RefObject<HTMLDivElement | null>) => {
         if (reference.current?.offsetWidth) {
             reference.current?.scrollBy({ left: -reference.current.offsetWidth, behavior: 'smooth' })
         }
 
     }
-    const handleRightScroll = (reference: React.RefObject<HTMLDivElement>) => {
+    const handleRightScroll = (reference: React.RefObject<HTMLDivElement | null>) => {
         if (reference.current?.offsetWidth) {
             reference.current?.scrollBy({ left: reference.current.offsetWidth, behavior: 'smooth' })
         }
@@ -72,8 +74,9 @@ const PropertyCategory: React.FC<IPropertyCategory> = ({ title, description, fil
     };
     useEffect(() => {
         if (properties === undefined) {
-            fetchProperties()
+            indexPublicProperties(filters, orderBy, currentPage, limit).then(applyPage)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [])
     useEffect(() => {
         if (sectionRef.current && sectionRef.current?.scrollWidth > sectionRef.current?.offsetWidth) {
@@ -102,7 +105,7 @@ const PropertyCategory: React.FC<IPropertyCategory> = ({ title, description, fil
                 <div className={styles.propertiesCarrousel} onScroll={handleScroll} ref={sectionRef}>
                     {
                         properties?.map((el, index) => (
-                            <PropertyCard key={index} slug={el.slug} location={el.country.name} currency={el.currency.symbol} price={el.price} frecuency={el.frecuency ? rentPaymentPeriods.find(element => el.frecuency?.toString() === element.key.toString())?.value : undefined} subtitle={`${el.propertyType.name in glosaryData ? glosaryData[el.propertyType.name as dataTranslate] : el.propertyType.name} ${glosary.miniatureConector} ${el.type ? glosaryAdmin.formLabelSale.toLocaleLowerCase() : glosaryAdmin.formLabelRent.toLocaleLowerCase()}`} area={`${el.area} m${"\u00B2"}`} bedrooms={el.bedrooms?.toString()} bathrooms={el.bathrooms?.toString()} thumbnail={el.thumbnail?.toString()} />
+                            <PropertyCard key={index} slug={el.slug} location={el.country.name} currency={el.currency.symbol} price={el.price} frecuency={el.frecuency ? rentPaymentPeriods.find(element => el.frecuency?.toString() === element.key.toString())?.value : undefined} subtitle={`${el.propertyType.name in glosaryData ? glosaryData[el.propertyType.name as dataTranslate] : el.propertyType.name} ${glosary.miniatureConector} ${el.type ? glosaryAdmin.formLabelSale.toLocaleLowerCase() : glosaryAdmin.formLabelRent.toLocaleLowerCase()}`} area={`${el.area} m${"\u00B2"}`} bedrooms={el.bedrooms?.toString()} bathrooms={el.bathrooms?.toString()} thumbnail={(el.thumbnailWebp || el.thumbnail)?.toString()} />
                         ))
                     }
                 </div>

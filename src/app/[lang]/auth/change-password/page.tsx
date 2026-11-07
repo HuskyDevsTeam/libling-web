@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState, use } from 'react';
 import { Formik, Form, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { dict } from '@/app/utils';
@@ -21,9 +21,11 @@ interface IValues {
     passwordConfirmation: string
 }
 
-const ChangePassword = ({ params }: { params: { lang: "es" | "en" | "fr" } }) => {
+const ChangePassword = (props: { params: Promise<{ lang: "es" | "en" | "fr" }> }) => {
+    const params = use(props.params);
     const lang = params.lang
     const glosary = dict[lang]?.auth
+    const glosaryNav = dict[lang]?.adminNav
     const router = useRouter()
     const token = useSearchParams().get('token')
     const authFetch = useAuthFetch()
@@ -34,7 +36,9 @@ const ChangePassword = ({ params }: { params: { lang: "es" | "en" | "fr" } }) =>
         }
     }
     const validationSchema = Yup.object({
-        password: Yup.string().required(glosary.login_password_required),
+        password: Yup.string().required(glosary.login_password_required)
+            .min(8, glosaryNav.passwordMin)
+            .test('max-bytes', glosaryNav.passwordMax, (value) => new TextEncoder().encode(value || '').length <= 72),
         passwordConfirmation: Yup.string().required(glosary.login_password_confirmation_required).nonNullable()
             .oneOf([Yup.ref('password')], glosary.login_password_confirmation_required)
     });

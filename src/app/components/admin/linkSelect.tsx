@@ -1,15 +1,17 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
+import useSyncedState from '@/app/hooks/useSyncedState'
 import styles from './input.module.css'
 import { ILinkSelect, ISelectElement, dataTranslate } from '@/app/interfaces'
 import { dict } from '@/app/utils'
 import { useRouter } from 'next/navigation'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa6'
 
+const NO_ITEMS: ISelectElement[] = []
 const LinkSelect: React.FC<ILinkSelect> = ({list, lang, title, disabled = false }) => {
     const [openList, setOpenList] = useState(false)
     const [currentStyle, setCurrentStyle] = useState(disabled ? styles.linkDisabled : styles.link)
-    const [listFiltered, setListFiltered] = useState<ISelectElement[]>(list || [])
+    const [listFiltered, setListFiltered] = useSyncedState<ISelectElement[]>(list || NO_ITEMS)
     const router = useRouter()
 
     const handleClick = () => {
@@ -32,11 +34,6 @@ const LinkSelect: React.FC<ILinkSelect> = ({list, lang, title, disabled = false 
         setOpenList(false)
         if(e?.extra) return router.push(e?.extra)
     }
-    useEffect(() => {
-        if (!!list) {
-            setListFiltered(list)
-        }
-    }, [list])
     return (
         <div className={styles.formControl}>
             <div className={styles.inputContainer} onClick={handleClick} ref={containerRef}>

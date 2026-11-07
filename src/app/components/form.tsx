@@ -1,15 +1,15 @@
 "use client"
 import Image, { StaticImageData } from 'next/image'
-import React, { SyntheticEvent, useEffect, useState } from 'react'
+import React, { SyntheticEvent, useState } from 'react'
 import styles from './form.module.css'
 import Button from './button'
 import { poppinsBold, poppinsRegular } from '../fonts'
 import { dict } from '../utils'
-import { templates } from '../utils/funtions'
 import { useSearchParams } from 'next/navigation'
 import CustomToast from './toast'
 import { toast } from 'react-toastify'
-import { sendEmailToOwner, sendEmailToClient } from '../utils/emails'
+import { sendContactMessage } from '@/mailActions'
+import { useAntiSpam } from './antiSpam'
 
 
 interface IContactForm {
@@ -32,22 +32,16 @@ const ContactForm: React.FC<IContactForm> = ({ lang }) => {
     const [inputSubject, setInputSubject] = useState('');
     const [inputMessage, setInputMessage] = useState('');
     const [loading, setLoading] = useState<boolean | undefined>();
+    const spam = useAntiSpam()
 
     const handleSubmit = async (event: SyntheticEvent) => {
         if (loading) { return }
         event.preventDefault()
         setLoading(true)
         try{
-            await sendEmailToClient(
-                inputValue || 'email',
-                templates.infoClient(glosaryHome.bigTitleHeader1_1 + glosaryHome.bigTitleHeader1_2, null, lang),
-                mailMessages.subject_3
-            )
-            await sendEmailToOwner(
-                inputValue || 'email',
-                templates.info(glosaryHome.bigTitleHeader1_1 + glosaryHome.bigTitleHeader1_2,inputValue || '', inputMessage, lang),
-                inputSubject
-            )
+            const result = await sendContactMessage({ email: inputValue, name: inputName, subject: inputSubject, message: inputMessage, lang, ...spam.read() })
+            spam.reset()
+            if (!result.ok) throw new Error(result.reason)
             toast.success(<CustomToast type='success' title={glosaryImmo.success} content={glosaryImmo.successEmail} />, { theme: 'colored', icon: false, style: { backgroundColor: '#00C851', maxWidth: 450, padding: 24, borderRadius: 10 } })
             setInputValue('')
             setInputMessage('')
@@ -62,7 +56,11 @@ const ContactForm: React.FC<IContactForm> = ({ lang }) => {
         }
 
     }
-    useEffect(() => {
+    // Asunto y mensaje iniciales segun la URL (?pack= / ?date=). Se recalculan al cambiar la URL,
+    // durante el render, en lugar de en un efecto que pintaria primero el formulario vacio.
+    const [handledQuery, setHandledQuery] = useState<typeof query | undefined>(undefined)
+    if (handledQuery !== query) {
+        setHandledQuery(query)
         let initialSubject = ''
         let initialMessage = ''
         if (query.get('pack')) {
@@ -75,7 +73,7 @@ const ContactForm: React.FC<IContactForm> = ({ lang }) => {
         }
         setInputSubject(initialSubject)
         setInputMessage(initialMessage)
-    },[query])
+    }
 
     return (
         <form className={styles.container} onSubmit={handleSubmit} id='contactForm'>
@@ -103,6 +101,7 @@ const ContactForm: React.FC<IContactForm> = ({ lang }) => {
                     onChange={(e) => setInputMessage(e.target.value)} style={poppinsRegular.style} required></textarea>
 
             </div>
+            {spam.field}
             <Button text={glosary.form_button} disabled={loading} />
 
 

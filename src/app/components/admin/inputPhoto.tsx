@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import useSyncedState from '@/app/hooks/useSyncedState'
 import { useDropzone } from 'react-dropzone'
 import styles from './input.module.css'
 import Image from 'next/image';
@@ -7,7 +8,7 @@ import { IInputPhoto } from '@/app/interfaces';
 import { poppinsMedium } from '@/app/fonts';
 
 const InputPhoto: React.FC<IInputPhoto> = ({ description, facename, onChange, initialValues, initialFace }) => {
-    const [files, setFiles] = useState(initialValues);
+    const [files, setFiles] = useSyncedState(initialValues);
     const deleteFile = (index: number) => {
         if (face > index) {
             setFace(state => state - 1)
@@ -60,12 +61,6 @@ const InputPhoto: React.FC<IInputPhoto> = ({ description, facename, onChange, in
             // }
         },
         [files, onChange, face]
-    );
-    useEffect(
-        () => {
-            setFiles(initialValues)
-        },
-        [initialValues]
     );
 
     return (

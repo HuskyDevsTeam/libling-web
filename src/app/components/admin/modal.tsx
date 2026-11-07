@@ -10,7 +10,7 @@ interface IModal {
 }
 
 const Modal: React.FC<IModal> = ({ open, onRequestClose, children, width }) => {
-    const parent = document.getElementById('#main')
+    const parent = typeof document !== 'undefined' ? document.getElementById('#main') : null
     return (
         <ReactModal isOpen={open} onRequestClose={onRequestClose} appElement={parent || undefined} style={{
             overlay: { backgroundColor: '#00000052', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex:4 },

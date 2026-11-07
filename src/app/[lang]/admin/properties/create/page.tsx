@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, use } from 'react';
 import styles from './page.module.css'
 import { dict } from '@/app/utils'
 import { IPage } from '../../layout'
@@ -14,12 +14,18 @@ import { usePropertyStore } from '@/app/hooks/usePropertyStore'
 import Preview from './preview'
 import { toast } from 'react-toastify'
 import CustomToast from '@/app/components/toast'
-import { createProperty, getUser } from '@/services'
+import { createProperty } from '@/services'
 import { IPropertyCreateDTO } from '@/app/interfaces/models'
 import { useInterfaceStore } from '@/app/hooks/useInterfaceStore'
 
 
-const PropertyCreate: React.FC<IPage> = ({ params: { lang } }) => {
+const PropertyCreate: React.FC<IPage> = props => {
+    const params = use(props.params);
+
+    const {
+        lang
+    } = params;
+
     const store = useStore(usePropertyStore, (state) => state)
     const storeInterface = useStore(useInterfaceStore, (state) => state)
     const step = store?.lastStep
@@ -52,8 +58,7 @@ const PropertyCreate: React.FC<IPage> = ({ params: { lang } }) => {
     const handleSubmit = async (active: boolean) => {
         try {
             storeInterface?.setLoading(true)
-            const user = await getUser(storeInterface?.user?.email || '')
-            const data: IPropertyCreateDTO = {
+            const data: Omit<IPropertyCreateDTO, 'publishedById'> = {
                 title: store?.form_4?.title || '',
                 content: store?.form_4?.description,
                 address: store?.form_1?.address || '',
@@ -74,7 +79,6 @@ const PropertyCreate: React.FC<IPage> = ({ params: { lang } }) => {
                 active,
                 type: !!store?.form_1?.type,
                 frecuency: (store?.form_5?.frecuency || 0).toString(),
-                publishedById: user?.id || 0,
                 countryId: parseInt(store?.form_1?.country?.toString() || '0'),
                 currencyId: parseInt(store?.form_5?.currency?.toString() || '0'),
                 propertyTypeId: parseInt(store?.form_1?.propertyType?.toString() || '0'),

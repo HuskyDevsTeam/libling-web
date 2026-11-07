@@ -1,57 +1,46 @@
 import { NextRequest, NextResponse } from "next/server"
-import jwt from "jsonwebtoken"
-import { auth } from "@/auth"
-import { getUser } from "@/services"
-import { sendEmailToClient } from "@/app/utils/emails"
+import { z } from "zod"
+import { getUser } from "@/server/data"
+import { createResetToken } from "@/server/passwordReset"
+import { clientIp, consume } from "@/server/rateLimit"
+import { deliver, escapeHtml } from "@/server/mail"
 import { subjects, templates } from "@/app/utils/funtions"
 
 const BASE_URL = process.env.APP_URL || "http://localhost:3000"
 
-export async function POST(request: NextRequest, response: NextResponse) {
-	try {
-		console.log(request)
-		const { email } = await request.json()
-		const user = await getUser(email)
-		if (!user) {
-			return NextResponse.json({ message: "user not found" }, { status: 404 })
-		}
-		const tokenData = {
-			email,
-			id: user.id,
-			name: user.name,
-		}
-		const token = jwt.sign(
-			{ data: tokenData },
-			process.env.AUTH_TOKEN || "secreto",
-			{
-				expiresIn: 86400,
-			}
-		)
+// Por IP (frena el envio masivo) y por cuenta (evita inundar el buzon de un usuario)
+const IP_LIMIT = { max: 10, windowSec: 60 * 60 }
+const EMAIL_LIMIT = { max: 3, windowSec: 60 * 60 }
 
-		const url = `${BASE_URL}/auth/change-password?token=${token}`
-		console.log("send this url to email", url)
-		//send an email
-		await sendEmailToClient(
-			email,
-			templates.forgotPassword(user.name || "user", url),
-			subjects.forgotPassword
-		)
-		return NextResponse.json(
-			{
-				message: token,
-			},
-			{
-				status: 200,
-			}
-		)
-	} catch (e: any) {
-		return NextResponse.json(
-			{
-				message: e.message,
-			},
-			{
-				status: 500,
-			}
-		)
+// Siempre la misma respuesta, exista o no la cuenta: no se puede usar para averiguar que correos son usuarios.
+const ok = () => NextResponse.json({ message: "If the account exists, an email has been sent" }, { status: 200 })
+
+export async function POST(request: NextRequest) {
+	const body = await request.json().catch(() => null)
+	const parsed = z.object({ email: z.string().trim().toLowerCase().email().max(254) }).safeParse(body)
+	if (!parsed.success) return NextResponse.json({ message: "Invalid email" }, { status: 400 })
+	const { email } = parsed.data
+
+	const ip = await consume(`forgot:ip:${clientIp(request.headers)}`, IP_LIMIT)
+	if (!ip.allowed) {
+		return NextResponse.json({ message: "Too many requests" }, { status: 429, headers: { "Retry-After": String(ip.retryAfterSec) } })
 	}
+	const perEmail = await consume(`forgot:email:${email}`, EMAIL_LIMIT)
+	if (!perEmail.allowed) return ok() // sin avisar: no se revela nada y no se envia otro correo
+
+	try {
+		const user = await getUser(email)
+		if (user) {
+			const token = await createResetToken(user.id)
+			const url = `${BASE_URL}/auth/change-password?token=${token}`
+			// No se espera al envio: la respuesta tarda lo mismo exista o no el usuario
+			void deliver({ to: email, subject: subjects.forgotPassword, html: templates.forgotPassword(escapeHtml(user.name || "user"), url) }).catch((e) =>
+				console.error("No se pudo enviar el correo de restablecimiento", e?.message)
+			)
+		}
+	} catch (e) {
+		console.error("forgot-password", e)
+	}
+	return ok()
 }
+

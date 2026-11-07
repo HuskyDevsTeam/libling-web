@@ -10,7 +10,7 @@ import Image, { StaticImageData } from 'next/image'
 interface IPackageCard {
     title: string
     alt: string
-    Icon: JSX.ElementType
+    Icon: React.ElementType
     image: StaticImageData
     list: string[]
     type?:"outline" | "main" | "secondary" | "tonal" | "text" | "warning" | "error" | undefined

@@ -4,16 +4,18 @@ import styles from './affiliatePlanList.module.css'
 import { dict } from '../utils'
 import AffiliateCard from './affiliateCard'
 import InputSwitch from './admin/inputSwitch'
-import { Payment } from './payment'
+import dynamic from 'next/dynamic'
 import ReactModal from 'react-modal'
 import useStore from '../hooks/useStore'
 import { useAffiliateStore } from '../hooks/useAffiliateStore'
 import { useSearchParams } from 'next/navigation'
 import { toast } from 'react-toastify';
 import CustomToast from './toast';
-import { paymentAssert, showAffiliate, verifyPayStatus } from '@/services'
-import { assertAffiliate, sendAffiliate, sendAffiliateAdmin, sendEmailToOwner } from '../utils/emails'
+import { paymentAssert, verifyPayStatus } from '@/services'
 import { templates } from '../utils/funtions'
+
+// El formulario de pago (y su validacion) solo se descarga cuando el visitante elige un plan
+const Payment = dynamic(() => import('./payment').then((m) => m.Payment), { ssr: false })
 
 interface IAffiliatePlanList{
     lang: "es" | "en" | "fr"
@@ -136,7 +138,6 @@ const AffiliatePlanList:React.FC<IAffiliatePlanList> = ({lang}) => {
     //states
     const [frecuency, setFrecuency] = useState<string | number>(1)
     const [plan, setPlan] = useState<string | number>(1)
-    const [frecuencyName, setFrecuencyName] = useState<string>(glosary.sectionOptionBy1)
     const store = useStore(useAffiliateStore, (state) => state)
 
     //functions
@@ -144,20 +145,19 @@ const AffiliatePlanList:React.FC<IAffiliatePlanList> = ({lang}) => {
         console.log('selected key', key)
         store?.setFrecuency(key)
     }
+    const frecuencyName = listFrecuency?.find(el=>el.key == store?.frecuency)?.priceFrecuency || glosary.sectionOptionBy1
     const handleSelectedPlan = (key:number) =>{
         console.log('the selected key was', key)
         store?.setPlan(key)
         setInitialForm(1)
         setOpen(true)
     }
-    const handlePayVerification = async (payId:string)=>{
-        const isWaitingVerify = await verifyPayStatus(payId)
+    const handlePayVerification = async (isWaitingVerify: number | null)=>{
         if(isWaitingVerify){
             toast.warning(<CustomToast type='warning' title={glosary.infoMessageTitle} content={glosary.infoMessageContent} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FFBB33', maxWidth: 450, padding: 24, borderRadius: 10 } })
             setIsVerifying(true)
-            const verifyResponse = await paymentAssert(isWaitingVerify)
+            const verifyResponse = await paymentAssert(isWaitingVerify, lang)
             if(verifyResponse.status === 200 && !!verifyResponse.affiliate){
-                assertAffiliate(verifyResponse?.affiliate?.id, lang)
                 toast.success(<CustomToast type='success' title={glosary.successMessageTitle} content={glosary.successMessageContent} />, { theme: 'colored', icon: false, style: { backgroundColor: '#00C851', maxWidth: 450, padding: 24, borderRadius: 10 } })
             }else{
                 toast.error(<CustomToast type='error' title={glosary.errorMessageTitle} content={glosary.errorMessageContent} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
@@ -168,20 +168,24 @@ const AffiliatePlanList:React.FC<IAffiliatePlanList> = ({lang}) => {
         
     }
 
+    // Pagos: al volver de Saferpay (?pay=ID) se confirma el pago en el servidor
+    const payQuery = query.get('pay')
     useEffect(()=>{
-        setFrecuencyName(listFrecuency?.find(el=>el.key == store?.frecuency)?.priceFrecuency || glosary.sectionOptionBy1)
-    },[store?.frecuency])
-    useEffect(()=>{
-        const payQuery = query.get('pay')
-        const memberQuery = query.get('member')
         if(payQuery && (parseInt(payQuery || '0') > 0) && isVerifying === false){
-            handlePayVerification(payQuery)
+            verifyPayStatus(payQuery).then(handlePayVerification)
         }
-        if(memberQuery && (memberQuery === '1' || memberQuery === '2')){
-          setInitialForm(parseInt(memberQuery))
-          setOpen(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo debe reaccionar al cambio del parametro de la URL
+    }, [payQuery])
+    // Alta de miembro (?member=1|2): abre el formulario. Se resuelve al cambiar la URL, durante el render.
+    const memberQuery = query.get('member')
+    const [handledMember, setHandledMember] = useState<string | null | undefined>(undefined)
+    if(handledMember !== memberQuery){
+        setHandledMember(memberQuery)
+        if(memberQuery === '1' || memberQuery === '2'){
+            setInitialForm(parseInt(memberQuery))
+            setOpen(true)
         }
-      }, [query])
+    }
 
     return (
     <>

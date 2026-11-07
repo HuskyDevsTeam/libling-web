@@ -6,11 +6,19 @@ import Link from 'next/link'
 import { FiCheckCircle, FiCreditCard, FiEdit3, FiHome, FiKey, FiPlusCircle, FiTag, FiUserCheck, FiUsers } from 'react-icons/fi'
 import { poppinsMedium } from '@/app/fonts'
 import { auth } from '@/auth'
-import { getDashboardStats } from '@/services'
+import { getDashboardStats } from '@/server/data'
+import { requireAdminPage } from '@/server/guard'
 
 export const dynamic = 'force-dynamic'
 
-const Dashboard: React.FC<IPage> = async ({ params: { lang } }) => {
+const Dashboard: React.FC<IPage> = async props => {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+  await requireAdminPage(params.lang)
+
   const glosary = dict[lang]?.adminDashboard
   const glosaryNav = dict[lang]?.adminNav
   const session = await auth()

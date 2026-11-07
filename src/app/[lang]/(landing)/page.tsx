@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { use } from 'react';
 import styles from './page.module.css'
 import globalStyles from '@/app/globals.module.css'
 import HighlightIMG1 from '@/app/img/Ellipse1.jpg'
@@ -19,11 +19,17 @@ import AsesoramientoIMG from '@/app/img/asesoramiento.jpeg'
 import ConoceIMG from '@/app/img/conoce.png'
 import AyudaIMG from '@/app/img/ayuda.jpeg'
 interface IPage {
-  params: {
+  params: Promise<{
     lang: "es" | "en" | "fr"
-  }
+  }>
 }
-const Home: React.FC<IPage> = ({ params: { lang } }) => {
+const Home: React.FC<IPage> = props => {
+  const params = use(props.params);
+
+  const {
+    lang
+  } = params;
+
   const glosary = dict[lang]?.home
   const { height, width } = useWindowDimensions();
 

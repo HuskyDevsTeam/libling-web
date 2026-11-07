@@ -4,14 +4,11 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 First, run the development server:
 
+Requiere Node 26 (LTS) y pnpm 12 (`npm install -g pnpm@12.18.0`; Node 25+ ya no trae corepack).
+
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -41,13 +38,30 @@ website for Libling solutions, that works as landing page and base for a web app
 
 ## Tests
 
-Los tests funcionales necesitan una base PostgreSQL con las migraciones aplicadas (`npx prisma migrate deploy`).
+Los tests funcionales necesitan una base PostgreSQL con las migraciones aplicadas (`pnpm exec prisma migrate deploy`).
 
 ```bash
 export POSTGRES_PRISMA_URL=postgresql://user:pass@localhost:5432/libling_test
 export POSTGRES_URL_NON_POOLING=$POSTGRES_PRISMA_URL
-npm test            # vitest: helpers de edición + updateProperty contra la BD real
-AUTH_SECRET=test AUTH_TRUST_HOST=true npm run test:e2e   # Playwright: editar una propiedad desde el admin
+pnpm test            # vitest: helpers de edición + updateProperty contra la BD real
+AUTH_SECRET=test AUTH_TRUST_HOST=true pnpm test:e2e   # Playwright: editar una propiedad desde el admin
 ```
 
 Los tests crean sus propios datos y los eliminan al terminar; usa una BD de pruebas, no la de producción.
+
+
+## Dependencias y seguridad
+
+- Gestor: pnpm. Los scripts de instalacion estan bloqueados salvo los de Prisma (`allowBuilds` en `pnpm-workspace.yaml`) y no se instalan versiones publicadas hace menos de 24 h (`minimumReleaseAge`).
+- Auditoria: `pnpm audit` y `osv-scanner scan source --lockfile pnpm-lock.yaml`.
+
+
+## Configuracion (variables de entorno)
+
+Todas las variables estan en `.env.example`, con una linea que explica para que sirve cada una y si es obligatoria. Copialo a `.env` para trabajar en local; en Dokploy se cargan en la pestaña de variables del servicio.
+
+## Papelera y tareas diarias
+
+- Borrar un inmueble o una foto en el admin los mueve a la **Papelera** (menu lateral): se ocultan del sitio pero se pueden restaurar (un inmueble vuelve como borrador).
+- `POST /api/cron/maintenance` (cabecera `Authorization: Bearer $CRON_SECRET`) debe ejecutarse **una vez al dia** (Dokploy > Schedules). Elimina del todo lo que lleva mas de 90 dias en la papelera, incluidos sus archivos del bucket, y convierte a WebP un lote de fotos antiguas.
+- `pnpm convert-images` convierte de golpe todas las fotos antiguas; `pnpm optimize-assets` optimiza las imagenes y videos estaticos de `public/`.

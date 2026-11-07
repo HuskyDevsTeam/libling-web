@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, use } from 'react';
 import styles from './page.module.css'
 import globalStyles from '@/app/globals.module.css'
 import { authenticate } from '@/app/actions'
@@ -12,7 +12,8 @@ import { FiEye, FiEyeOff } from 'react-icons/fi'
 import { Button } from '@/app/components/admin/button'
 import { useRouter } from 'next/navigation'
 
-const Login = ({ params }: { params: { lang: "es" | "en" | "fr" } }) => {
+const Login = (props: { params: Promise<{ lang: "es" | "en" | "fr" }> }) => {
+    const params = use(props.params);
     const [emailErrorMessage, setEmailErrorMessage] = useState<string | null>(null)
     const [passwordErrorMessage, setPasswordErrorMessage] = useState<string | null>(null)
     const lang = params.lang
@@ -60,7 +61,7 @@ const Login = ({ params }: { params: { lang: "es" | "en" | "fr" } }) => {
             if (password) formData.append('password', password)
             const response = await authenticate(undefined, formData)
             if (response)
-                toast.error(<CustomToast type='error' title='Error' content={glosary.error_credentials} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
+                toast.error(<CustomToast type='error' title='Error' content={response === 'rate_limited' ? glosary.error_rate_limited : glosary.error_credentials} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
         }
         catch (e) {
             toast.error(<CustomToast type='error' title='Error' content={glosary.error_default} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })

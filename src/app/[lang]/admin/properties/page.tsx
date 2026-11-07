@@ -8,12 +8,20 @@ import { poppinsMedium } from '@/app/fonts'
 import Link from 'next/link'
 import { Button } from '@/app/components/admin/button'
 import PropertyList from '@/app/components/admin/propertyList'
-import { indexProperty } from '@/services'
+import { indexProperty } from '@/server/data'
+import { requireAdminPage } from '@/server/guard'
 
-const Properties: React.FC<IPage> = async ({ params: { lang } }) => {
+const Properties: React.FC<IPage> = async props => {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+  await requireAdminPage(params.lang)
+
   const glosary = dict[lang]?.adminProperties
   const glosaryNav = dict[lang]?.adminNav
-  const properties = await indexProperty(undefined,undefined,undefined,undefined,false,true)
+  const properties = await indexProperty(undefined,undefined,undefined,undefined,false,'admin')
   return (<>
     <div className={styles.titleBar}>
       <h1 className={styles.titleBarTitle} style={poppinsMedium.style}>{glosaryNav.propertiesTitle}</h1>

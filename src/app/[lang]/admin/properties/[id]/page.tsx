@@ -1,7 +1,8 @@
 import React from 'react'
 import styles from './page.module.css'
 import { dict } from '@/app/utils'
-import { showProperty } from '@/services'
+import { showProperty } from '@/server/data'
+import { requireAdminPage } from '@/server/guard'
 import ImageGallery from '@/app/components/imageGallery'
 import InnerNav from '@/app/components/innerNav'
 import { poppinsMedium, poppinsRegular } from '@/app/fonts'
@@ -12,7 +13,7 @@ import IconBath from '@/app/components/icons/iconBath'
 import { Button } from '@/app/components/admin/button'
 import { ISelectElement, dataTranslate } from '@/app/interfaces'
 import { getMapStyles } from '@/app/actions'
-import CustomMap from '@/app/components/map'
+import CustomMap from '@/app/components/mapLazy'
 
 interface IDetail {
     params: {
@@ -21,7 +22,15 @@ interface IDetail {
     }
 }
 
-const Detail: React.FC<IDetail> = async ({ params: { id, lang } }) => {
+const Detail: React.FC<IDetail> = async props => {
+    const params = await props.params;
+
+    const {
+        id,
+        lang
+    } = params;
+  await requireAdminPage(params.lang)
+
     const [property, mapStyle] = await Promise.all([
         showProperty({ id: parseInt(id) }),
         getMapStyles(),

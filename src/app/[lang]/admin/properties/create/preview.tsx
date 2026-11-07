@@ -1,11 +1,12 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+import { useCurrencies, usePropertyTypes, useCountries } from '@/app/hooks/useCatalogs'
 import { toast } from 'react-toastify';
 import { poppinsMedium } from '@/app/fonts'
 import styles from './page.module.css'
 import globalStyles from '@/app/globals.module.css'
 import { dict } from '@/app/utils';
-import { IPage } from '../../layout';
+import { IPageSync as IPage } from '../../layout';
 import { getCountries, getCurrencies, getPropertyTypes } from '@/services'
 import { ISelectElement } from '@/app/interfaces'
 import { Button } from '@/app/components/admin/button'
@@ -33,31 +34,15 @@ const Preview: React.FC<IPreview> = ({ params: { lang }, onNext, onGo, files, fa
     const [list, setList] = useState<ISelectElement[]>([])
     const [open, setOpen] = useState<boolean>(false)
     const [checked, setChecked] = useState<boolean>(false)
-    const [currency, setCurrency] = useState<ISelectElement[]>([])
-    const [propertyTypes, setPropertyTypes] = useState<ISelectElement[]>([])
-    const [countries, setCountries] = useState<ISelectElement[]>([])
+    const currency = useCurrencies()
+    const [propertyTypes] = usePropertyTypes()
+    const countries = useCountries()
 
 
     const [periods, setPeriods] = useState<ISelectElement[]>(rentPaymentPeriods)
 
     const handleSubmit = () => {
         setOpen(true)
-    }
-    const fetchCurrency = async () => {
-        const data = await getCurrencies()
-        const newArray = data?.map(el => ({ key: el.id, value: el.symbol, description: el.name }))
-        setCurrency(newArray || [])
-    }
-    const fetchPropertyTypes = async () => {
-        const data = await getPropertyTypes()
-        const newArray = data?.map(el => ({ key: el.id, value: el.name }))
-        setPropertyTypes(newArray || [])
-        console.log(newArray)
-    }
-    const fetchCountries = async () => {
-        const data = await getCountries()
-        const newArray = data?.map(el => ({ key: el.id, value: el.name }))
-        setCountries(newArray || [])
     }
     const findByKey = (array: ISelectElement[], key: number | null | undefined) => {
         return array.find(el => key?.toString() === el.key.toString())?.value
@@ -71,11 +56,6 @@ const Preview: React.FC<IPreview> = ({ params: { lang }, onNext, onGo, files, fa
     }
 
     useEffect(() => {
-        fetchCurrency()
-        fetchPropertyTypes()
-        fetchCountries()
-    }, [])
-    useEffect(() => {
         if (interfaceStore?.setBarContent) {
             interfaceStore?.setShowBar(true)
             interfaceStore?.setBarContent(() => (
@@ -87,6 +67,7 @@ const Preview: React.FC<IPreview> = ({ params: { lang }, onNext, onGo, files, fa
             console.log('test')
         }
         return () => { interfaceStore?.setShowBar(false) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [interfaceStore?.setBarContent])
     return (<div className={styles.previewContainer}>
         <h1 className={styles.titlePreview} style={poppinsMedium.style}>{glosary.formPreviewTitle}</h1>

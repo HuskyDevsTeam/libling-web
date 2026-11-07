@@ -1,7 +1,7 @@
 'use server'
 import { auth, signIn, signOut, unstable_update } from "@/auth"
 import bcrypt from "bcryptjs"
-import { getUser, updateUser } from "@/services"
+import { getUser, updateUser } from "@/server/data"
 import { validateName, validatePasswordChange } from "@/app/utils/profile"
 import { AuthError } from "next-auth"
 
@@ -17,12 +17,9 @@ export async function authenticate(
 		await signIn("credentials", formData)
 	} catch (error) {
 		if (error instanceof AuthError) {
-			switch (error.type) {
-				case "CredentialsSignin":
-					return "Invalid credentials."
-				default:
-					return "Invalid credentials."
-			}
+			// "rate_limited" lo lanza authorize() tras demasiados intentos fallidos
+			if ((error as { code?: string }).code === "rate_limited") return "rate_limited"
+			return "Invalid credentials."
 		}
 		throw error
 	}
@@ -54,7 +51,7 @@ export async function getSession() {
 	}
 }
 
-export type ProfileResult = { ok: true } | { ok: false, error: 'nameRequired' | 'passwordMin' | 'passwordMismatch' | 'wrongPassword' | 'genericError' }
+export type ProfileResult = { ok: true } | { ok: false, error: 'nameRequired' | 'passwordMin' | 'passwordMax' | 'passwordMismatch' | 'wrongPassword' | 'genericError' }
 
 export async function updateProfileName(name: string): Promise<ProfileResult> {
 	const session = await auth()

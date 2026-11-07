@@ -5,7 +5,7 @@
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { PrismaClient } from '@prisma/client'
-import { updateProperty, showProperty, createProperty } from '@/services'
+import { updateProperty, showProperty, createProperty } from '@/server/data'
 
 const hasDb = !!process.env.POSTGRES_PRISMA_URL
 const prisma = new PrismaClient()
@@ -29,7 +29,6 @@ describe.skipIf(!hasDb)('updateProperty (functional, DB real)', () => {
 			LegalNotice: [{ name: 'Aviso', propertyId: 0 }],
 		})
 		propertyId = created.id
-		await new Promise(r => setTimeout(r, 300)) // createProperty no espera a los hijos
 	})
 	afterAll(async () => {
 		await prisma.property.deleteMany({ where: { publishedById: ids?.user } })

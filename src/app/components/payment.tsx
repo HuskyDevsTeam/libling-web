@@ -1,5 +1,7 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import useSyncedState from '@/app/hooks/useSyncedState'
+import useRemote from '@/app/hooks/useRemote'
 import styles from './payment.module.css'
 import globalStyles from '@/app/globals.module.css'
 import * as Yup from 'yup';
@@ -12,7 +14,7 @@ import { Form, Formik, FormikHelpers, FormikProps } from 'formik'
 import InputSelect from './admin/inputSelect'
 import { InputTextArea } from './admin/inputTextArea'
 import { ISelectElement } from '../interfaces'
-import { createAffiliate, getCountries, getStatesByCode, paymentInitialization, showAffiliate, updateAffiliate } from '@/services'
+import { findAffiliateByEmail, getCountries, getStatesByCode, paymentInitialization, registerAffiliate, updateAffiliatePlan } from '@/services'
 import { useStore } from 'zustand';
 import { toast } from 'react-toastify';
 import CustomToast from './toast';
@@ -53,6 +55,8 @@ interface IValues2 {
     email?: string
 
 }
+
+const NO_ITEMS: ISelectElement[] = []
 
 export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, plan = 1, frecuency = 1, initialForm=1 }) => {
 
@@ -201,13 +205,6 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
         console.log('getFrecuencyDate - Expire date: ',expirationDate)
         return expirationDate
     }
-    const getPlanMonths = (id?:number | string):number=>{
-        let months = 1
-        if(id?.toString() === '2') months = 6
-        if(id?.toString() === '3') months = 12
-        if(planSelected?.id === 3) months = 1
-        return months
-    }
 
     const steps = [
         {
@@ -219,15 +216,19 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
         //     text: glosary.formPageLabel_2
         // },
     ]
-    const [page, setPage] = useState(1)
+    const [page, setPage] = useSyncedState(initialForm)
+    const [submitting, setBusy] = useState(false)
     const [saferpayUrl, setSaferpayUrl] = useState<string|null>()
-    const [countries, setCountries] = useState<ISelectElement[]>([])
+    const [countriesData] = useRemote(getCountries)
+    const countries = useMemo<ISelectElement[]>(() => countriesData?.map(el => ({ key: el.id, value: el.name, extra: el.code })) ?? NO_ITEMS, [countriesData])
     const [lastCode, setLastCode] = useState<string>()
     const [states, setStates] = useState<ISelectElement[]>([])
-    const [planSelected, setPlanSelected] = useState<IPlan| undefined>(affiliateList?.at(0)?.plans?.at(0))
     const formRef_1 = useRef<FormikProps<IValues1>>(null)
     const formRef_2 = useRef<FormikProps<IValues2>>(null)
     const store = useStore(useAffiliateStore, (state) => state)
+    const planSelected: IPlan | undefined = (store?.frecuency && store?.plan
+        ? affiliateList?.find(el => el.id == store?.frecuency)?.plans.find(el => el.id == store?.plan)
+        : undefined) ?? affiliateList?.at(0)?.plans?.at(0)
     const phoneRegExp = /(?:([+]\d{1,4})[-.\s]?)?(?:[(](\d{1,3})[)][-.\s]?)?(\d{1,4})[-.\s]?(\d{1,4})[-.\s]?(\d{1,9})/g
     const initialValues_1: IValues1 = {
         country: store?.form_1?.country,
@@ -246,16 +247,6 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
     const onSubmit2 = () => {
         console.log(formRef_2.current)
         formRef_2.current?.handleSubmit()
-    }
-    const fetchCountries = async () => {
-        const data = await getCountries()
-        const newArray = data?.map(el => ({ key: el.id, value: el.name, extra: el.code }))
-        setCountries(newArray || [])
-    }
-    const fetchStates = async (code: string) => {
-        const data = await getStatesByCode(code)
-        const newArray = data
-        setStates(newArray || [])
     }
     const handleCountry_1 = (key: string) => {
         console.log('selected key', key)
@@ -289,30 +280,26 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
 
     });
     const handleSubmit_1 = async (values: IValues1, { setSubmitting }: FormikHelpers<IValues1>) => {
+        setBusy(true)
         const formData = values
         console.log('formik values', formData)
         try {
             store?.setForm_1(formData)
-            let affiliateStored = await showAffiliate({email:formData.email})
+            let affiliateStored = await findAffiliateByEmail(formData.email || '')
             let affiliateId
-            console.log('there is a previous affiliate ', affiliateStored)
             if(!affiliateStored){
-                const newAffiliate = await createAffiliate({
+                const newAffiliate = await registerAffiliate({
                     email:formData.email || '',
                     name:formData.name || '',
                     phone:formData.phone || '',
                     countryId: !!formData.country ? parseInt(formData.country) : 0,
                     plan:getPlanEnum(planSelected?.id),
-                    plan_date:new Date(),
-                    status:false,
                 })
-                console.log('there is a new affiliate ', newAffiliate)
                 formRef_1.current?.setFieldValue('id', newAffiliate.id)
                 affiliateId = newAffiliate.id
                 store.setAffiliateId(newAffiliate.id)
             }else{
-                await updateAffiliate({
-                    id:affiliateStored.id,
+                await updateAffiliatePlan(affiliateStored.id, {
                     name:formData.name || '',
                     phone:formData.phone || '',
                     countryId: !!formData.country ? parseInt(formData.country) : 0,
@@ -323,10 +310,9 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
                 store.setAffiliateId(affiliateStored.id)
             }
             console.log('making a saferpay bank request')
-            const response = await paymentInitialization(planSelected?.title || 'Description', planSelected?.price || 100, affiliateId, (window.location.origin + window.location.pathname), getPlanMonths(store?.frecuency))
-            console.log('repuesta del servidor: ',response)
-            if(response?.redirectUrl){
-                window.location.href = response?.redirectUrl
+            const response = await paymentInitialization({ affiliateId, plan: planSelected?.id ?? 1, period: Number(store?.frecuency) || 1, returnUrl: window.location.origin + window.location.pathname, lang })
+            if(response.status === 200 && response.redirectUrl){
+                window.location.href = response.redirectUrl
             }else{
                 throw new Error('Failed comunication with Saferpay')
             }
@@ -336,22 +322,22 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
             toast.error(<CustomToast type='error' title='Error' content={glosaryAuth.error_default} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
         } finally {
             setSubmitting(false)
+            setBusy(false)
 
         }
     }
     const handleSubmit_2 = async (values: IValues2, { setSubmitting }: FormikHelpers<IValues2>) => {
+        setBusy(true)
         const formData = values
         console.log('formik values', formData)
         try {
             store?.setForm_1(formData)
-            let affiliateStored = await showAffiliate({email:formData.email})
+            let affiliateStored = await findAffiliateByEmail(formData.email || '')
             let affiliateId
-            console.log('there is a previous affiliate ', affiliateStored)
             if(!affiliateStored){
                 return toast.error(<CustomToast type='error' title='Error' content={glosary.errorFindAffiliate} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
             }else{
-                await updateAffiliate({
-                    id:affiliateStored.id,
+                await updateAffiliatePlan(affiliateStored.id, {
                     plan:getPlanEnum(planSelected?.id),
                 })
                 formRef_1.current?.setFieldValue('id', affiliateStored.id)
@@ -359,10 +345,9 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
                 store.setAffiliateId(affiliateStored.id)
             }
             console.log('making a saferpay bank request')
-            const response = await paymentInitialization(planSelected?.title || 'Description', planSelected?.price || 100, affiliateId, (window.location.origin + window.location.pathname), getPlanMonths(store?.frecuency))
-            console.log('repuesta del servidor: ',response)
-            if(response?.redirectUrl){
-                window.location.href = response?.redirectUrl
+            const response = await paymentInitialization({ affiliateId, plan: planSelected?.id ?? 1, period: Number(store?.frecuency) || 1, returnUrl: window.location.origin + window.location.pathname, lang })
+            if(response.status === 200 && response.redirectUrl){
+                window.location.href = response.redirectUrl
             }else{
                 throw new Error('Failed comunication with Saferpay')
             }
@@ -372,29 +357,22 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
             toast.error(<CustomToast type='error' title='Error' content={glosaryAuth.error_default} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
         } finally {
             setSubmitting(false)
+            setBusy(false)
 
         }
     }
-    useEffect(() => {
-        fetchCountries()
-    }, [])
     useEffect(() => {
         formRef_1.current?.handleReset()
         formRef_2.current?.handleReset()
     }, [page])
     useEffect(() => {
-        setPage(initialForm)
-    }, [initialForm])
-    useEffect(() => {
-        if (lastCode) {
-            fetchStates(lastCode)
-        }
+        if (!lastCode) return
+        let cancelled = false
+        getStatesByCode(lastCode).then(data => {
+            if (!cancelled) setStates(data || [])
+        })
+        return () => { cancelled = true }
     }, [lastCode])
-    useEffect(()=>{
-        if(open && store?.frecuency && store?.plan){
-            setPlanSelected(affiliateList?.find(el => el.id == store?.frecuency)?.plans.find(el => el.id == store?.plan))
-        }
-    },[store?.frecuency, store?.plan, open])
     return (
         <>
             {
@@ -569,7 +547,7 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
                                 &&
                                 <>
                                     <Button title={glosary.buttonAction_1} onClick={closeModal} Icon={FaChevronLeft} type='outline' />
-                                    <Button title={glosary.buttonAction_2} grow={true} onClick={onSubmit1} loading={formRef_1.current?.isSubmitting} />
+                                    <Button title={glosary.buttonAction_2} grow={true} onClick={onSubmit1} loading={submitting} />
                                 </>
 
                             }
@@ -579,7 +557,7 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
                                 &&
                                 <>
                                     <Button title={glosary.buttonAction_1} onClick={closeModal} Icon={FaChevronLeft} type='outline' />
-                                    <Button title={glosary.buttonAction_2} grow={true} loading={formRef_2.current?.isSubmitting} onClick={onSubmit2} />
+                                    <Button title={glosary.buttonAction_2} grow={true} loading={submitting} onClick={onSubmit2} />
                                 </>
                             }
                         </div>
