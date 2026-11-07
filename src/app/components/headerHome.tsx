@@ -4,7 +4,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a lo
 import { Carousel } from 'react-responsive-carousel';
 import styles from './headerHome.module.css'
 import globalStyles from '@/app/globals.module.css'
-import Image from 'next/image';
+import { getImageProps, type StaticImageData } from 'next/image';
 import headerImg1_2 from '@/app/img/carrusel_banner_1_1920.webp'
 import headerImg1 from '@/app/img/carrusel_banner_1_1440.webp'
 import headerImg1_1 from '@/app/img/banner_home_mobile_1.webp'
@@ -18,32 +18,34 @@ import { dict } from '../utils';
 import { Button } from './admin/button';
 import { FaChevronRight } from 'react-icons/fa';
 import { poppinsMedium, poppinsSemiBold } from '../fonts';
-import useWindowDimensions from '../hooks/useWindowDimensions';
 interface IHeader {
     lang: "es" | "en" | "fr"
 }
+/**
+ * Imagen del hero con direccion de arte por CSS (movil / medio / grande). Se pinta ya en el HTML del servidor
+ * (antes esperaba a conocer el ancho de la ventana con JavaScript: el hero aparecia tarde y movia la pagina).
+ */
+const HeroPicture = ({ mobile, medium, large, first = false }: { mobile: StaticImageData; medium: StaticImageData; large: StaticImageData; first?: boolean }) => {
+    const common = { alt: 'header image', quality: 80, priority: first, loading: first ? undefined : ('lazy' as const) }
+    const m = getImageProps({ ...common, src: mobile, width: 360, height: 580, sizes: '100vw' })
+    const md = getImageProps({ ...common, src: medium, width: 1440, height: 500, sizes: '100vw' })
+    const lg = getImageProps({ ...common, src: large, width: 1920, height: 500, sizes: '1440px' })
+    const { srcSet, ...imgProps } = lg.props
+    return (
+        <picture>
+            <source media="(max-width: 500px)" srcSet={m.props.srcSet} sizes="100vw" />
+            <source media="(max-width: 1440px)" srcSet={md.props.srcSet} sizes="100vw" />
+            <img {...imgProps} alt={imgProps.alt} srcSet={srcSet} className={styles.sliderImage} style={{ objectFit: 'cover', objectPosition: 'right bottom', color: 'transparent' }} />
+        </picture>
+    )
+}
 const HeaderHome:React.FC<IHeader> = ({lang}) => {
     const glosary = dict[lang]?.home
-    const { height, width } = useWindowDimensions();
     return (
         <>
-        {
-            (width !== null)
-            &&
-            <Carousel autoPlay={true} infiniteLoop={true} interval={15000} showThumbs={false} showIndicators={false} showStatus={false} className={styles.sliderImage} preventMovementUntilSwipeScrollTolerance={true}>
+        <Carousel autoPlay={true} infiniteLoop={true} interval={15000} showThumbs={false} showIndicators={false} showStatus={false} className={styles.sliderImage} preventMovementUntilSwipeScrollTolerance={true}>
                 <div className={styles.sliderItem}>
-                    {
-                        (width !== null && width <= 500)
-                        ?
-                        <Image src={headerImg1_1} alt='header image' width={360} height={580} priority={true} style={{ objectFit: 'cover', objectPosition: 'center center' }} quality={100} sizes="(max-width: 360px) 100vw, 360px" className={styles.sliderImage}/>
-                        :
-                        (width !== null && width > 500 && width <= 1440)
-                        ?
-                        <Image src={headerImg1} alt='header image' width={1440} height={500} priority={true} style={{ objectFit: 'cover', objectPosition: 'right bottom' }} quality={100} sizes="(max-width: 1440px) 100vw, 1440px" className={styles.sliderImage}/>
-                        :
-                        <Image src={headerImg1_2} alt='header image' width={1920} height={500} priority={true} style={{ objectFit: 'cover', objectPosition: 'right bottom' }} quality={100} sizes="(max-width: 1920px) 100vw, 1920px" className={styles.sliderImage}/>
-
-                    }
+                    <HeroPicture mobile={headerImg1_1} medium={headerImg1} large={headerImg1_2} first />
                     <div className={styles.sliderTextContainer}>
                         <h4 className={[globalStyles.miniTitle, globalStyles.textPrimary].join(' ')} style={poppinsSemiBold.style}>{glosary.miniTitleHeader1}</h4>
                         <h2 className={globalStyles.bigTitle} style={poppinsMedium.style}><span>{glosary.bigTitleHeader1_1}</span><span className={globalStyles.textPrimary}>{glosary.bigTitleHeader1_2}</span> </h2>
@@ -55,18 +57,7 @@ const HeaderHome:React.FC<IHeader> = ({lang}) => {
                     </div>
                 </div>
                 <div className={styles.sliderItem}>
-                    {
-                        (width !== null && width <= 500)
-                        ?
-                        <Image src={headerImg2_1} alt='header image' width={360} height={580} priority={true} style={{ objectFit: 'cover', objectPosition: 'center center' }} quality={100} sizes="(max-width: 360px) 100vw, 360px" className={styles.sliderImage}/>
-                        :
-                        (width !== null && width > 500 && width <= 1440)
-                        ?
-                        <Image src={headerImg2} alt='header image' width={1440} height={500} priority={true} style={{ objectFit: 'cover', objectPosition: 'right bottom' }} quality={100} sizes="(max-width: 1440px) 100vw, 1440px" className={styles.sliderImage}/>
-                        :
-                        <Image src={headerImg2_2} alt='header image' width={1920} height={500} priority={true} style={{ objectFit: 'cover', objectPosition: 'right bottom' }} quality={100} sizes="(max-width: 1920px) 100vw, 1920px" className={styles.sliderImage}/>
-                        
-                    }
+                    <HeroPicture mobile={headerImg2_1} medium={headerImg2} large={headerImg2_2} />
                     <div className={styles.sliderTextContainer}>
                         <h4 className={globalStyles.miniTitle} style={poppinsSemiBold.style}>{glosary.miniTitleHeader2}</h4>
                         <h2 className={globalStyles.bigTitle} style={poppinsMedium.style}><span className={globalStyles.textPrimary}>{glosary.bigTitleHeader2_1}</span><span>{glosary.bigTitleHeader2_2}</span> </h2>
@@ -77,17 +68,7 @@ const HeaderHome:React.FC<IHeader> = ({lang}) => {
                     </div>
                 </div>
                 <div className={styles.sliderItem}>
-                    {
-                        (width !== null && width <= 500)
-                        ?
-                        <Image src={headerImg3_1} alt='header image' width={360} height={580} priority={true} style={{ objectFit: 'cover', objectPosition: 'center center' }} quality={100} sizes="(max-width: 360px) 100vw, 360px" className={styles.sliderImage}/>
-                        :
-                        (width !== null && width > 500 && width <= 1440)
-                        ?
-                        <Image src={headerImg3} alt='header image' width={1440} height={500} priority={true} style={{ objectFit: 'cover', objectPosition: 'right bottom' }} quality={100} sizes="(max-width: 1440px) 100vw, 1440px" className={styles.sliderImage}/>
-                        :
-                        <Image src={headerImg3_2} alt='header image' width={1920} height={500} priority={true} style={{ objectFit: 'cover', objectPosition: 'right bottom' }} quality={100} sizes="(max-width: 1920px) 100vw, 1920px" className={styles.sliderImage}/>
-                    }
+                    <HeroPicture mobile={headerImg3_1} medium={headerImg3} large={headerImg3_2} />
                     <div className={styles.sliderTextContainer}>
                         <h4 className={globalStyles.miniTitle} style={poppinsSemiBold.style}>{glosary.miniTitleHeader3}</h4>
                         <h2 className={globalStyles.bigTitle} style={poppinsMedium.style}><span>{glosary.bigTitleHeader3_1}</span><span className={globalStyles.textPrimary}>{glosary.bigTitleHeader3_2}</span> </h2>
@@ -97,8 +78,7 @@ const HeaderHome:React.FC<IHeader> = ({lang}) => {
                         </div>
                     </div>
                 </div>
-            </Carousel>
-        }
+        </Carousel>
         </>
     )
 }
