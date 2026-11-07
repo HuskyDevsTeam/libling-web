@@ -22,8 +22,7 @@ const PropertyCategory: React.FC<IPropertyCategory> = ({ title, description, fil
     const glosary = dict[lang].immo
     const glosaryData = dict[lang].data
     const glosaryAdmin = dict[lang].adminProperties
-    const fetchProperties = async () => {
-        const data = await indexPublicProperties(filters, orderBy, currentPage, limit)
+    const applyPage = (data: Awaited<ReturnType<typeof indexPublicProperties>>) => {
         console.log('propertyData', data)
         const newArray = data?.data
         setMeta(data?.meta)
@@ -36,6 +35,9 @@ const PropertyCategory: React.FC<IPropertyCategory> = ({ title, description, fil
             }
         })
         setCurrentPage(state => state + 1)
+    }
+    const fetchProperties = async () => {
+        applyPage(await indexPublicProperties(filters, orderBy, currentPage, limit))
     }
     const handleLeftScroll = (reference: React.RefObject<HTMLDivElement | null>) => {
         if (reference.current?.offsetWidth) {
@@ -72,7 +74,7 @@ const PropertyCategory: React.FC<IPropertyCategory> = ({ title, description, fil
     };
     useEffect(() => {
         if (properties === undefined) {
-            fetchProperties()
+            indexPublicProperties(filters, orderBy, currentPage, limit).then(applyPage)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [])

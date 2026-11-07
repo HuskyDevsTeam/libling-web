@@ -1,5 +1,5 @@
 'use client'
-import React, { MouseEventHandler, useEffect, useRef, useState } from 'react'
+import React, { MouseEventHandler, useRef, useState } from 'react'
 import styles from './input.module.css'
 import { poppinsMedium, poppinsRegular } from '@/app/fonts'
 import { FiChevronDown, FiChevronUp, FiPlus } from 'react-icons/fi'
@@ -14,22 +14,25 @@ const InputTextSelect: React.FC<IInputTextSelect> = ({ label, placeholder, list,
     const glosary = dict[lang]?.adminProperties
     const labelOf = (el: ISelectElement) => (!!lang && !!el.value && el.value in dict[lang].data && dict[lang].data[el.value as dataTranslate]) ? dict[lang].data[el.value as dataTranslate] : el.value.toString()
     const hasValue = (v: unknown) => v !== undefined && v !== null && v !== ''
+    const [typed, setTyped] = useState(() => {
+        const initialElement = hasValue(initialValue) ? list.find(el => el.key.toString() === initialValue?.toString()) : undefined
+        return initialElement ? labelOf(initialElement) : ''
+    })
     
 
     const handleChange: ((el: ISelectElement) => void) | undefined = (e) => {
                 if (hasValue(e.value) && (!error || !touched)) setFocused(true)
         if (hasValue(e.key) && hasValue(e.value) && !!onChange) {
-            if (inputRef?.current) {
-                inputRef.current.value = labelOf(e)
-            }
+            setTyped(labelOf(e))
             onChange(e.key.toString())
             handleBlur()
         }
     }
     const handleAdd: MouseEventHandler<HTMLDivElement> = () => {
-        if (!!inputRef?.current?.value?.trim() && !!onAdd) onAdd(inputRef?.current?.value?.trim())
+        if (!!typed.trim() && !!onAdd) onAdd(typed.trim())
     }
     const handleSearch: ((e: string | React.ChangeEvent<HTMLInputElement>) => void) | undefined = (e) => {
+        if (typeof e !== 'string') setTyped(e.target.value)
         if (typeof e !== 'string' && !!e.target.value.trim()) {
             handleFilter(e.target.value.trim())
         }
@@ -61,16 +64,19 @@ const InputTextSelect: React.FC<IInputTextSelect> = ({ label, placeholder, list,
             setOpenList(false)
         },200)
     }
-    useEffect(() => {
+    // Cuando cambian el valor inicial, la lista o el idioma se vuelve a calcular el texto mostrado.
+    // Se hace durante el render (estado derivado) y no en un efecto, para no pintar primero datos viejos.
+    const [previous, setPrevious] = useState({ initialValue, list, lang })
+    if (previous.initialValue !== initialValue || previous.list !== list || previous.lang !== lang) {
+        setPrevious({ initialValue, list, lang })
         setListFiltered(list)
         if (hasValue(initialValue)) {
             const initialElement = list.find(el => el.key.toString() === initialValue?.toString())
-            if (initialElement && inputRef?.current) inputRef.current.value = labelOf(initialElement)
-        } else if (initialValue === '' && inputRef?.current) {
-            inputRef.current.value = ''
+            if (initialElement) setTyped(labelOf(initialElement))
+        } else if (initialValue === '') {
+            setTyped('')
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
-    }, [initialValue, list, lang])
+    }
     return (
         <div className={styles.formControl}>
             {
@@ -85,7 +91,7 @@ const InputTextSelect: React.FC<IInputTextSelect> = ({ label, placeholder, list,
                 </label>
             }
             <div className={styles.inputContainer}>
-                <input id={`${name}Input`} name={name} type={"text"} ref={inputRef} placeholder={placeholder} style={poppinsRegular.style} onFocus={handleFocus} onBlur={handleBlur} onChange={handleSearch} className={(error && touched) ? styles.inputError : focused ? styles.inputFocus : styles.input} autoComplete='off'/>
+                <input id={`${name}Input`} name={name} type={"text"} ref={inputRef} value={typed} placeholder={placeholder} style={poppinsRegular.style} onFocus={handleFocus} onBlur={handleBlur} onChange={handleSearch} className={(error && touched) ? styles.inputError : focused ? styles.inputFocus : styles.input} autoComplete='off'/>
                 <div className={styles.passwordButton} onClick={handleClick}>
                     {
                         openList
@@ -99,7 +105,7 @@ const InputTextSelect: React.FC<IInputTextSelect> = ({ label, placeholder, list,
                     {
                         (listFiltered?.length <= 0)
                         &&
-                        <div className={styles.listItem} onClick={handleAdd}><FiPlus className={styles.iconPlus} /><span>{glosary.formPlaceholderSelectAdd}{`: "${inputRef?.current?.value}"`}</span></div>
+                        <div className={styles.listItem} onClick={handleAdd}><FiPlus className={styles.iconPlus} /><span>{glosary.formPlaceholderSelectAdd}{`: "${typed}"`}</span></div>
                     }
                     {
                         listFiltered.map((el, index) => (

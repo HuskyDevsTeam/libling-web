@@ -40,6 +40,7 @@ const StepTwo: React.FC<IStepTwo> = ({ params: { lang }, onNext, onBack }) => {
     const glosary = dict[lang]?.adminProperties
     const glosaryError = dict[lang]?.auth
     const formRef = useRef<FormikProps<IValues>>(null)
+    const [submitting, setBusy] = useState(false)
     const store = useStore(usePropertyStoreFromContext(), (state) => state)
     const initialValues: IValues = {
         area: store?.form_2?.area,
@@ -82,6 +83,7 @@ const StepTwo: React.FC<IStepTwo> = ({ params: { lang }, onNext, onBack }) => {
         parking: Yup.number().integer(glosary.formValidationNumbers).min(0, glosary.formValidationNumbers).optional().typeError(glosary.formValidationNumbers),
     });
     const handleSubmit = async (values: IValues, { setSubmitting }: FormikHelpers<IValues>) => {
+        setBusy(true)
         const formData = values
         console.log(formData)
         try {
@@ -92,6 +94,7 @@ const StepTwo: React.FC<IStepTwo> = ({ params: { lang }, onNext, onBack }) => {
             toast.error(<CustomToast type='error' title='Error' content={glosaryError.error_default} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
         } finally {
             setSubmitting(false)
+            setBusy(false)
 
         }
     }
@@ -162,7 +165,7 @@ const StepTwo: React.FC<IStepTwo> = ({ params: { lang }, onNext, onBack }) => {
             </div>
             <div className={styles.cardFooter}>
                 <Button title={glosary.formButtonBack} type='outline' onClick={onBack} />
-                <Button title={glosary.formButtonNext} onClick={formRef.current?.handleSubmit} loading={formRef.current?.isSubmitting} />
+                <Button title={glosary.formButtonNext} onClick={() => formRef.current?.handleSubmit()} loading={submitting} />
             </div>
         </div>
     )

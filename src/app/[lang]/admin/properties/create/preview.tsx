@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+import { useCurrencies, usePropertyTypes, useCountries } from '@/app/hooks/useCatalogs'
 import { toast } from 'react-toastify';
 import { poppinsMedium } from '@/app/fonts'
 import styles from './page.module.css'
@@ -33,31 +34,15 @@ const Preview: React.FC<IPreview> = ({ params: { lang }, onNext, onGo, files, fa
     const [list, setList] = useState<ISelectElement[]>([])
     const [open, setOpen] = useState<boolean>(false)
     const [checked, setChecked] = useState<boolean>(false)
-    const [currency, setCurrency] = useState<ISelectElement[]>([])
-    const [propertyTypes, setPropertyTypes] = useState<ISelectElement[]>([])
-    const [countries, setCountries] = useState<ISelectElement[]>([])
+    const currency = useCurrencies()
+    const [propertyTypes] = usePropertyTypes()
+    const countries = useCountries()
 
 
     const [periods, setPeriods] = useState<ISelectElement[]>(rentPaymentPeriods)
 
     const handleSubmit = () => {
         setOpen(true)
-    }
-    const fetchCurrency = async () => {
-        const data = await getCurrencies()
-        const newArray = data?.map(el => ({ key: el.id, value: el.symbol, description: el.name }))
-        setCurrency(newArray || [])
-    }
-    const fetchPropertyTypes = async () => {
-        const data = await getPropertyTypes()
-        const newArray = data?.map(el => ({ key: el.id, value: el.name }))
-        setPropertyTypes(newArray || [])
-        console.log(newArray)
-    }
-    const fetchCountries = async () => {
-        const data = await getCountries()
-        const newArray = data?.map(el => ({ key: el.id, value: el.name }))
-        setCountries(newArray || [])
     }
     const findByKey = (array: ISelectElement[], key: number | null | undefined) => {
         return array.find(el => key?.toString() === el.key.toString())?.value
@@ -70,11 +55,6 @@ const Preview: React.FC<IPreview> = ({ params: { lang }, onNext, onGo, files, fa
         setOpen(false)
     }
 
-    useEffect(() => {
-        fetchCurrency()
-        fetchPropertyTypes()
-        fetchCountries()
-    }, [])
     useEffect(() => {
         if (interfaceStore?.setBarContent) {
             interfaceStore?.setShowBar(true)

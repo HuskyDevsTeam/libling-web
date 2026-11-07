@@ -1,6 +1,7 @@
 'use client'
 import { IAffiliateList, IPropertyList } from '@/app/interfaces'
 import React, { useEffect, useState } from 'react'
+import useSyncedState from '@/app/hooks/useSyncedState'
 import styles from './affiliateList.module.css'
 import globalStyles from '@/app/globals.module.css'
 import { dict } from '@/app/utils'
@@ -24,7 +25,7 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
     const glosary = dict[lang].adminAffiliate
     const glosaryImmo = dict[lang].immo
     const store = useStore(useInterfaceStore, (state) => state)
-    const [properties, setProperties] = useState(initialData)
+    const [properties, setProperties] = useSyncedState(initialData)
     const [meta, setMeta] = useState<IMetaPaginate | undefined>(metaData)
     const [currentPage, setCurrentPage] = useState<number>(1)
     const [selected, setSelected] = useState<number[]>([])
@@ -60,14 +61,16 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
         setCurrentPage(1)
         setSearch(typeof e === 'string' ? e : e.target.value)
     }
-    const fetchProperties = async () => {
-        store?.setLoading(true)
-        console.log('executing fetch')
-        const data = await getAffiliates({ search: debouncedSearch || undefined }, {}, currentPage, store?.limit)
-        console.log('affiliateData', data)
+    // Pide la pagina actual al servidor (sin tocar el estado) y la aplica al resolverse
+    const loadPage = () => getAffiliates({ search: debouncedSearch || undefined }, {}, currentPage, store?.limit)
+    const applyPage = (data: Awaited<ReturnType<typeof loadPage>>) => {
         setMeta(data?.meta)
         setProperties(data?.data)
         store?.setLoading(false)
+    }
+    const fetchProperties = async () => {
+        store?.setLoading(true)
+        applyPage(await loadPage())
     }
 
     const paginationList = [
@@ -106,11 +109,9 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
         setOpenPreview(true)
      }
     useEffect(() => {
-        setProperties(initialData)
-    }, [initialData])
-    useEffect(() => {
         if (store?.limit) {
-            fetchProperties()
+            store?.setLoading(true)
+            loadPage().then(applyPage)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [store?.limit, currentPage, tab, debouncedSearch])

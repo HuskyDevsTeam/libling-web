@@ -45,6 +45,7 @@ const StepFour: React.FC<IStepFour> = ({ params: { lang }, onNext, onBack, files
         faceIndex: store?.form_4?.faceIndex || 0,
     }
     const formRef = useRef<FormikProps<IValues>>(null)
+    const [submitting, setBusy] = useState(false)
     const glosary = dict[lang]?.adminProperties
     const glosaryError = dict[lang]?.auth
     const [photos, setPhotos] = useState(store?.form_4?.photos)
@@ -62,6 +63,7 @@ const StepFour: React.FC<IStepFour> = ({ params: { lang }, onNext, onBack, files
         uploadedPhotos: hasExistingPhotos ? Yup.boolean() : Yup.string().required(glosary.formValidationRequired),
     });
     const handleSubmit = async (values: IValues, { setSubmitting }: FormikHelpers<IValues>) => {
+        setBusy(true)
         const formData = values
         try {
             console.log(formData)
@@ -76,6 +78,7 @@ const StepFour: React.FC<IStepFour> = ({ params: { lang }, onNext, onBack, files
             toast.error(<CustomToast type='error' title='Error' content={glosaryError.error_default} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
         } finally {
             setSubmitting(false)
+            setBusy(false)
 
         }
     }
@@ -115,7 +118,7 @@ const StepFour: React.FC<IStepFour> = ({ params: { lang }, onNext, onBack, files
             </div>
             <div className={styles.cardFooter}>
                 <Button title={glosary.formButtonBack} type='outline' onClick={onBack} />
-                <Button title={glosary.formButtonNext} onClick={formRef.current?.handleSubmit} loading={formRef.current?.isSubmitting} />
+                <Button title={glosary.formButtonNext} onClick={() => formRef.current?.handleSubmit()} loading={submitting} />
             </div>
         </div>
     )

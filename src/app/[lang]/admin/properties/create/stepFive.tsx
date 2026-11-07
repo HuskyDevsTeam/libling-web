@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
+import { useCurrencies, usePropertyTypes, useCountries } from '@/app/hooks/useCatalogs'
 import { toast } from 'react-toastify';
 import { poppinsMedium } from '@/app/fonts'
 import styles from './page.module.css'
@@ -35,8 +36,9 @@ const StepFive: React.FC<IStepFive> = ({ params: { lang }, onNext, onBack }) => 
     const glosary = dict[lang]?.adminProperties
     const glosaryError = dict[lang]?.auth
     const [list, setList] = useState<ISelectElement[]>([])
-    const [currency, setCurrency] = useState<ISelectElement[]>([])
+    const currency = useCurrencies()
     const formRef = useRef<FormikProps<IValues>>(null)
+    const [submitting, setBusy] = useState(false)
     const initialValues: IValues = {
         price: store?.form_5?.price || '',
         currency: store?.form_5?.currency,
@@ -45,11 +47,6 @@ const StepFive: React.FC<IStepFive> = ({ params: { lang }, onNext, onBack }) => 
 
     const [periods, setPeriods] = useState<ISelectElement[]>(rentPaymentPeriods)
 
-    const fetchCurrency = async () => {
-        const data = await getCurrencies()
-        const newArray = data?.map(el => ({ key: el.id, value: el.symbol, description: el.name }))
-        setCurrency(newArray || [])
-    }
     const handleCurrency = (key: string) => {
         console.log('selected key', key)
         formRef.current?.setFieldValue('currency', key)
@@ -64,6 +61,7 @@ const StepFive: React.FC<IStepFive> = ({ params: { lang }, onNext, onBack }) => 
         frecuency: !store?.form_1?.type ? Yup.number().required(glosary.formValidationRequired) : Yup.number().nullable().optional(),
     });
     const handleSubmit = async (values: IValues, { setSubmitting }: FormikHelpers<IValues>) => {
+        setBusy(true)
         const formData = values
         console.log(formData)
         try {
@@ -74,12 +72,10 @@ const StepFive: React.FC<IStepFive> = ({ params: { lang }, onNext, onBack }) => 
             toast.error(<CustomToast type='error' title='Error' content={glosaryError.error_default} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
         } finally {
             setSubmitting(false)
+            setBusy(false)
 
         }
     }
-    useEffect(() => {
-        fetchCurrency()
-    }, [])
     return (
         <div className={styles.card}>
             <div className={styles.cardBody}>
@@ -117,7 +113,7 @@ const StepFive: React.FC<IStepFive> = ({ params: { lang }, onNext, onBack }) => 
             </div>
             <div className={styles.cardFooter}>
                 <Button title={glosary.formButtonBack} type='outline' onClick={onBack} />
-                <Button title={glosary.formButtonNext} onClick={formRef.current?.handleSubmit} loading={formRef.current?.isSubmitting} />
+                <Button title={glosary.formButtonNext} onClick={() => formRef.current?.handleSubmit()} loading={submitting} />
             </div>
         </div>
     )

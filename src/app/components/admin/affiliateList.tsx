@@ -1,6 +1,7 @@
 'use client'
 import { IAffiliateList } from '@/app/interfaces'
 import React, { useEffect, useRef, useState } from 'react'
+import useSyncedState from '@/app/hooks/useSyncedState'
 import styles from './affiliateList.module.css'
 import { dict } from '@/app/utils'
 import { poppinsMedium, poppinsRegular, poppinsSemiBold } from '@/app/fonts'
@@ -24,7 +25,7 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
     const glosaryService = dict[lang].services
     const glosaryImmo = dict[lang].immo
     const store = useStore(useInterfaceStore, (state) => state)
-    const [properties, setProperties] = useState(initialData)
+    const [properties, setProperties] = useSyncedState(initialData)
     const [meta, setMeta] = useState<IMetaPaginate | undefined>(metaData)
     const [currentPage, setCurrentPage] = useState<number>(1)
     const [selected, setSelected] = useState<number[]>([])
@@ -62,15 +63,17 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
         setCurrentPage(1)
         setSearch(typeof e === 'string' ? e : e.target.value)
     }
-    const fetchProperties = async () => {
-        store?.setLoading(true)
-        console.log('executing fetch')
-        const data = await getAffiliates({ search: debouncedSearch || undefined }, {}, currentPage, store?.limit)
-        console.log('affiliateData', data)
+    // Pide la pagina actual al servidor (sin tocar el estado) y la aplica al resolverse
+    const loadPage = () => getAffiliates({ search: debouncedSearch || undefined }, {}, currentPage, store?.limit)
+    const applyPage = (data: Awaited<ReturnType<typeof loadPage>>) => {
         setMeta(data?.meta)
         setProperties(data?.data)
         if (data?.meta && data.meta.page !== currentPage) setCurrentPage(data.meta.page)
         store?.setLoading(false)
+    }
+    const fetchProperties = async () => {
+        store?.setLoading(true)
+        applyPage(await loadPage())
     }
 
     const paginationList = [
@@ -118,9 +121,6 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
 
         }
     }
-    useEffect(() => {
-        setProperties(initialData)
-    }, [initialData])
     const skipInitialFetch = useRef(true)
     useEffect(() => {
         // The server already rendered page 1 with default filters; avoid a duplicate query on mount.
@@ -129,7 +129,8 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
             if (store?.limit === 15 && currentPage === 1 && tab === 0 && !debouncedSearch) return
         }
         if (store?.limit) {
-            fetchProperties()
+            store?.setLoading(true)
+            loadPage().then(applyPage)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [store?.limit, currentPage, tab, debouncedSearch])

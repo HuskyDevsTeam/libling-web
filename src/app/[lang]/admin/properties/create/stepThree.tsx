@@ -52,6 +52,7 @@ const StepThree: React.FC<IStepThree> = ({ params: { lang }, onNext, onBack }) =
     const glosaryError = dict[lang]?.auth
     const [areaList, setAreaList] = useState<ISelectElement[]>(medidasAreaTerrenos)
     const formRef = useRef<FormikProps<IValues>>(null)
+    const [submitting, setBusy] = useState(false)
     const handleAreaSelect = (index: number, key: string) => {
         console.log('selected key', key)
         formRef.current?.setFieldValue(`surfaces.${index}.areaUnit`, key)
@@ -69,6 +70,7 @@ const StepThree: React.FC<IStepThree> = ({ params: { lang }, onNext, onBack }) =
         legalNotes: Yup.array().of(Yup.string().required(glosary.formValidationRequired)).optional(),
     });
     const handleSubmit = async (values: IValues, formikHelpers: FormikHelpers<IValues>) => {
+        setBusy(true)
         const formData = values
         console.log(formData)
         try {
@@ -79,6 +81,7 @@ const StepThree: React.FC<IStepThree> = ({ params: { lang }, onNext, onBack }) =
             toast.error(<CustomToast type='error' title='Error' content={glosaryError.error_default} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
         } finally {
             formikHelpers.setSubmitting(false)
+            setBusy(false)
 
         }
     }
@@ -229,7 +232,7 @@ const StepThree: React.FC<IStepThree> = ({ params: { lang }, onNext, onBack }) =
             </div>
             <div className={styles.cardFooter}>
                 <Button title={glosary.formButtonBack} type='outline' onClick={onBack} />
-                <Button title={glosary.formButtonNext} onClick={formRef.current?.handleSubmit} loading={formRef.current?.isSubmitting} />
+                <Button title={glosary.formButtonNext} onClick={() => formRef.current?.handleSubmit()} loading={submitting} />
             </div>
         </div>
     )

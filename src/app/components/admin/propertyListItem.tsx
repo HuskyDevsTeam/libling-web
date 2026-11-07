@@ -1,3 +1,4 @@
+import useSyncedState from '@/app/hooks/useSyncedState'
 import React, { useEffect, useState } from 'react'
 import styles from './propertyList.module.css'
 import globalStyles from '@/app/globals.module.css'
@@ -32,13 +33,10 @@ const PropertyListItem: React.FC<IListItem> = ({ item, lang, onSelect, onPreview
     const glosaryData = dict[lang].data
     const glosaryAdmin = dict[lang].adminProperties
     const glosary = dict[lang].immo
-    const [checked, setChecked] = useState(isChecked)
+    const [checked, setChecked] = useSyncedState(isChecked)
     const handleSelect = (event: React.FormEvent<HTMLInputElement>) => {
         if (onSelect) onSelect(item.id)
     }
-    useEffect(() => {
-        setChecked(isChecked)
-    }, [isChecked])
     return (
         <tr>
             <td>

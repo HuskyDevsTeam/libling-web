@@ -1,6 +1,6 @@
 "use client"
 import Image, { StaticImageData } from 'next/image'
-import React, { SyntheticEvent, useEffect, useState } from 'react'
+import React, { SyntheticEvent, useState } from 'react'
 import styles from './form.module.css'
 import Button from './button'
 import { poppinsBold, poppinsRegular } from '../fonts'
@@ -56,7 +56,11 @@ const ContactForm: React.FC<IContactForm> = ({ lang }) => {
         }
 
     }
-    useEffect(() => {
+    // Asunto y mensaje iniciales segun la URL (?pack= / ?date=). Se recalculan al cambiar la URL,
+    // durante el render, en lugar de en un efecto que pintaria primero el formulario vacio.
+    const [handledQuery, setHandledQuery] = useState<typeof query | undefined>(undefined)
+    if (handledQuery !== query) {
+        setHandledQuery(query)
         let initialSubject = ''
         let initialMessage = ''
         if (query.get('pack')) {
@@ -69,8 +73,7 @@ const ContactForm: React.FC<IContactForm> = ({ lang }) => {
         }
         setInputSubject(initialSubject)
         setInputMessage(initialMessage)
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
-    },[query])
+    }
 
     return (
         <form className={styles.container} onSubmit={handleSubmit} id='contactForm'>
