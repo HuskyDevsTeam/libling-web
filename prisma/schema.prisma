@@ -81,7 +81,10 @@ model Property {
   LegalNotice    LegalNotice[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+  // Borrado logico: la fila se conserva 90 dias y luego la purga diaria la elimina por completo
+  deletedAt      DateTime?
 
+  @@index([deletedAt])
   @@index([countryId])
   @@index([currencyId])
   @@index([propertyTypeId])
@@ -109,10 +112,13 @@ model PropertyImage {
   thumbPath   String?
   // Clave privada del original subido (respaldo); nunca se muestra
   originalKey String?
+  // Borrado logico (ver Property.deletedAt)
+  deletedAt   DateTime?
   property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId  Int
 
   @@index([propertyId])
+  @@index([deletedAt])
 }
 
 model Surface {

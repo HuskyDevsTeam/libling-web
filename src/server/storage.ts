@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, GetObjectCommand, type PutObjectCommandInput } from "@aws-sdk/client-s3"
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, type PutObjectCommandInput } from "@aws-sdk/client-s3"
 
 /**
  * Almacenamiento de objetos compatible con S3. Hoy AWS S3; para Cloudflare R2 basta con definir
@@ -53,4 +53,8 @@ export async function putObject(key: string, body: Buffer, contentType: string, 
 export async function getObject(key: string): Promise<Buffer> {
 	const res = await getClient().send(new GetObjectCommand({ Bucket: process.env.S3_BUCKET_NAME, Key: key }))
 	return Buffer.from(await res.Body!.transformToByteArray())
+}
+
+export async function deleteObject(key: string) {
+	await getClient().send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET_NAME, Key: key }))
 }

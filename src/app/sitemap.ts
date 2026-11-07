@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic"
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	// Un cliente de Prisma compartido (antes abria uno propio) y el listado se reutiliza durante 1 hora
 	const properties = await memo("properties", "sitemap", 3600_000, () =>
-		prisma.property.findMany({ where: { active: true }, select: { slug: true, updatedAt: true } })
+		prisma.property.findMany({ where: { active: true, deletedAt: null }, select: { slug: true, updatedAt: true } })
 	)
 	const propertyEntries: MetadataRoute.Sitemap = properties.map((p) => ({
 		url: `https://libling.lu/immo/${p.slug}`,

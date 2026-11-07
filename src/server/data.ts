@@ -222,7 +222,7 @@ const fullInclude = {
 	Surface: true,
 	NearPlace: true,
 	LegalNotice: true,
-	PropertyImage: true,
+	PropertyImage: { where: { deletedAt: null } },
 	Benefits: true,
 } as const
 export async function indexProperty(
@@ -241,6 +241,7 @@ export async function indexProperty(
 	const term = search?.trim()
 	const where = {
 		...rest,
+		deletedAt: null,
 		address: address
 			? { contains: address.trim(), mode: "insensitive" as const }
 			: undefined,
@@ -299,7 +300,7 @@ export async function showActiveProperty(filters: IPropertySearch) {
 }
 export async function showProperty(filters: IPropertySearch) {
 	const property = await prisma.property.findFirst({
-		where: filters,
+		where: { ...filters, deletedAt: null },
 		relationLoadStrategy: "join",
 		include: fullInclude,
 	})
@@ -401,7 +402,8 @@ export async function updateProperty(id: number, data: IPropertyUpdateDTO) {
 }
 export async function deleteProperty(id: number) {
 	try {
-		const propertyDeleted = await prisma.property.delete({ where: { id } })
+		// Borrado logico: se oculta de inmediato y la purga diaria lo elimina del todo a los 90 dias
+		const propertyDeleted = await prisma.property.update({ where: { id }, data: { deletedAt: new Date(), active: false } })
 		invalidate("properties")
 		return propertyDeleted
 	} catch (e) {
@@ -411,7 +413,7 @@ export async function deleteProperty(id: number) {
 }
 async function setActive(ids: number[], active: boolean) {
 	// Un solo UPDATE para todos (antes eran N consultas en paralelo)
-	const { count } = await prisma.property.updateMany({ where: { id: { in: ids } }, data: { active } })
+	const { count } = await prisma.property.updateMany({ where: { id: { in: ids }, deletedAt: null }, data: { active } })
 	invalidate("properties")
 	return { count }
 }
@@ -442,7 +444,7 @@ export async function createPropertyImage(data: IPropertyImageCreate) {
 }
 export async function deletePropertyImage(id: number) {
 	try {
-		const propertyImage = await prisma.propertyImage.delete({ where: { id } })
+		const propertyImage = await prisma.propertyImage.update({ where: { id }, data: { deletedAt: new Date() } })
 		invalidate("properties")
 		return propertyImage
 	} catch (e) {
@@ -550,6 +552,7 @@ export const getAffiliates = async (
 export const getDashboardStats = async () => {
 	const now = new Date()
 	const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+	const live = { deletedAt: null }
 	const [
 		properties,
 		active,
@@ -562,16 +565,17 @@ export const getDashboardStats = async () => {
 		payments,
 		recent,
 	] = await Promise.all([
-		prisma.property.count(),
-		prisma.property.count({ where: { active: true } }),
-		prisma.property.count({ where: { active: false } }),
-		prisma.property.count({ where: { type: true } }),
-		prisma.property.count({ where: { type: false } }),
-		prisma.property.count({ where: { createdAt: { gte: monthAgo } } }),
+		prisma.property.count({ where: live }),
+		prisma.property.count({ where: { ...live, active: true } }),
+		prisma.property.count({ where: { ...live, active: false } }),
+		prisma.property.count({ where: { ...live, type: true } }),
+		prisma.property.count({ where: { ...live, type: false } }),
+		prisma.property.count({ where: { ...live, createdAt: { gte: monthAgo } } }),
 		prisma.affiliate.count(),
 		prisma.affiliate.count({ where: { plan_date: { gt: now } } }),
 		prisma.pay.count({ where: { status: true } }),
 		prisma.property.findMany({
+			where: live,
 			orderBy: { createdAt: "desc" },
 			take: 5,
 			select: { id: true, title: true, active: true, createdAt: true },
