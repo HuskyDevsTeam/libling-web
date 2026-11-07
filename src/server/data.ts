@@ -22,6 +22,10 @@ import { PropertyCreate, PropertyUpdate } from "@/app/classes"
 import { cookies } from "next/headers"
 import countries from "@/app/utils/countries.json"
 import { slugify } from "@/app/utils/slug"
+import { invalidate, memo } from "@/server/memo"
+
+const CATALOG_TTL = 60_000
+const LISTING_TTL = 30_000
 const saltRounds = 12
 
 const buildMeta = (
@@ -115,7 +119,7 @@ export async function updateUser(id: number, data: IUserUpdateData) {
 }
 export async function getPropertyTypes() {
 	try {
-		const propertyTypes = await prisma.propertyType.findMany()
+		const propertyTypes = await memo("catalog", "propertyTypes", CATALOG_TTL, () => prisma.propertyType.findMany())
 		return propertyTypes
 	} catch (e) {
 		console.error("Error getting propertyTypes")
@@ -133,9 +137,9 @@ export async function findPropertyType(id: number) {
 }
 export async function findPropertyTypeByCode(code: string) {
 	try {
-		const propertyType = await prisma.propertyType.findFirst({
-			where: { code },
-		})
+		const propertyType = await memo("catalog", `propertyType:${code}`, CATALOG_TTL, () =>
+			prisma.propertyType.findFirst({ where: { code } })
+		)
 		return propertyType
 	} catch (e) {
 		console.error("Error getting propertyType")
@@ -144,9 +148,9 @@ export async function findPropertyTypeByCode(code: string) {
 }
 export async function getCountries() {
 	try {
-		const countries = await prisma.country.findMany({
-			orderBy: { name: "asc" },
-		})
+		const countries = await memo("catalog", "countries", CATALOG_TTL, () =>
+			prisma.country.findMany({ orderBy: { name: "asc" } })
+		)
 		return countries
 	} catch (e) {
 		console.error("Error getting Countries", e)
@@ -168,11 +172,9 @@ export async function getStatesByCode(code: string) {
 }
 export async function findCountryByCode(code: string) {
 	try {
-		const country = await prisma.country.findFirst({
-			where: {
-				code,
-			},
-		})
+		const country = await memo("catalog", `country:${code}`, CATALOG_TTL, () =>
+			prisma.country.findFirst({ where: { code } })
+		)
 		return country
 	} catch (e) {
 		console.error("Error getting Country", e)
@@ -181,20 +183,54 @@ export async function findCountryByCode(code: string) {
 }
 export async function getCurrencies() {
 	try {
-		const currencies = await prisma.currency.findMany()
+		const currencies = await memo("catalog", "currencies", CATALOG_TTL, () => prisma.currency.findMany())
 		return currencies
 	} catch (e) {
 		console.error("Error getting Currencies")
 		return undefined
 	}
 }
+/**
+ * Cuanta informacion se trae de cada inmueble:
+ *  - "card": solo lo que pintan las tarjetas publicas (sin descripcion ni fotos, beneficios, etc.),
+ *  - "admin": tablas del panel (moneda y tipo),
+ *  - "full": todo, con las relaciones.
+ */
+export type PropertyView = "full" | "admin" | "card"
+const cardSelect = {
+	id: true,
+	title: true,
+	slug: true,
+	price: true,
+	frecuency: true,
+	area: true,
+	bedrooms: true,
+	bathrooms: true,
+	type: true,
+	active: true,
+	thumbnail: true,
+	country: { select: { name: true } },
+	currency: { select: { symbol: true } },
+	propertyType: { select: { name: true } },
+} as const
+const fullInclude = {
+	publishedBy: { select: { id: true, name: true } },
+	country: true,
+	currency: true,
+	propertyType: true,
+	Surface: true,
+	NearPlace: true,
+	LegalNotice: true,
+	PropertyImage: true,
+	Benefits: true,
+} as const
 export async function indexProperty(
 	filters: IPropertySearch = {},
 	orderBy: IPropertyOrderBy = {},
 	page: number = 1,
 	limit: number = 15,
 	country: boolean = true,
-	lean: boolean = false
+	view: PropertyView = "full"
 ) {
 	let countryFilter
 	if (country) {
@@ -221,38 +257,35 @@ export async function indexProperty(
 			: undefined,
 		countryId: countryFilter,
 	}
-	const total = await prisma.property.count({ where })
 	const paging = normalizePage(page, limit)
-	const meta0 = buildMeta(total, paging.page, paging.limit)
-	const properties = await prisma.property.findMany({
-		where,
-		orderBy,
-		skip: (meta0.page - 1) * paging.limit,
-		take: paging.limit,
-		// Admin tables only need currency and type; skip the heavy relations.
-		include: lean
-			? { currency: true, propertyType: true }
-			: {
-					publishedBy: { select: { id: true, name: true } },
-					country: true,
-					currency: true,
-					propertyType: true,
-					Surface: true,
-					NearPlace: true,
-					LegalNotice: true,
-					PropertyImage: true,
-					Benefits: true,
-			  },
-	})
-	const data: IPropertyData[] = (properties as any[]).map((el) => ({
-		...el,
-		longitude: el.longitude?.toNumber(),
-		latitude: el.latitude?.toNumber(),
-		area: el.area?.toNumber(),
-		bedrooms: el.bedrooms?.toNumber(),
-		bathrooms: el.bathrooms?.toNumber(),
-		price: el.price?.toNumber(),
-	}))
+	// Los listados publicos (solo inmuebles activos) se comparten entre visitantes durante unos segundos
+	const cacheable = view === "card" && (filters as { active?: boolean }).active === true
+	const load = async () => {
+		const total = await prisma.property.count({ where })
+		const meta0 = buildMeta(total, paging.page, paging.limit)
+		const page = { where, orderBy, skip: (meta0.page - 1) * paging.limit, take: paging.limit, relationLoadStrategy: "join" as const }
+		// Una sola consulta con joins en lugar de una por relacion
+		const properties: unknown[] =
+			view === "card"
+				? await prisma.property.findMany({ ...page, select: cardSelect })
+				: await prisma.property.findMany({
+						...page,
+						include: view === "admin" ? { currency: true, propertyType: true } : fullInclude,
+				  })
+		const data: IPropertyData[] = (properties as any[]).map((el) => ({
+			...el,
+			longitude: el.longitude?.toNumber(),
+			latitude: el.latitude?.toNumber(),
+			area: el.area?.toNumber(),
+			bedrooms: el.bedrooms?.toNumber(),
+			bathrooms: el.bathrooms?.toNumber(),
+			price: el.price?.toNumber(),
+		}))
+		return { data, total }
+	}
+	const { data, total } = cacheable
+		? await memo("properties", JSON.stringify({ where, orderBy, page: paging.page, limit: paging.limit }), LISTING_TTL, load)
+		: await load()
 	const meta = buildMeta(total, paging.page, paging.limit)
 	return {
 		data,
@@ -266,17 +299,8 @@ export async function showActiveProperty(filters: IPropertySearch) {
 export async function showProperty(filters: IPropertySearch) {
 	const property = await prisma.property.findFirst({
 		where: filters,
-		include: {
-			publishedBy: { select: { id: true, name: true } },
-			country: true,
-			currency: true,
-			propertyType: true,
-			Surface: true,
-			NearPlace: true,
-			LegalNotice: true,
-			PropertyImage: true,
-			Benefits: true,
-		},
+		relationLoadStrategy: "join",
+		include: fullInclude,
 	})
 	return property
 }
@@ -291,41 +315,28 @@ async function uniqueSlug(title: string) {
 export async function createProperty(data: IPropertyCreateDTO) {
 	try {
 		const newProperty = new PropertyCreate(data)
-		const slug = await uniqueSlug(data.title)
-		const createdProperty = await prisma.property.create({ data: { ...newProperty, slug } })
-		const surfaces = data.Surface?.map(async (el) => {
-			return await prisma.surface.create({
-				data: {
-					...el,
-					propertyId: createdProperty.id,
-				},
-			})
-		})
-		const benefits = data.Benefits?.map(async (el) => {
-			return await prisma.benefits.create({
-				data: {
-					...el,
-					propertyId: createdProperty.id,
-				},
-			})
-		})
-		const nearPlaces = data.NearPlace?.map(async (el) => {
-			return await prisma.nearPlace.create({
-				data: {
-					...el,
-					propertyId: createdProperty.id,
-				},
-			})
-		})
-		const legalNotes = data.LegalNotice?.map(async (el) => {
-			return await prisma.legalNotice.create({
-				data: {
-					...el,
-					propertyId: createdProperty.id,
-				},
-			})
-		})
-		return createdProperty
+		// Propiedad y hijos en una sola transaccion: antes los hijos se lanzaban sin esperar y,
+		// si fallaban, quedaba un inmueble a medias sin que nadie se enterara.
+		for (let attempt = 0; ; attempt++) {
+			const slug = await uniqueSlug(data.title)
+			try {
+				const created = await prisma.$transaction(async (tx) => {
+					const createdProperty = await tx.property.create({ data: { ...newProperty, slug } })
+					const withParent = <T extends object>(list?: T[]) => (list ?? []).map((el) => ({ ...el, propertyId: createdProperty.id }))
+					await tx.surface.createMany({ data: withParent(data.Surface) })
+					await tx.benefits.createMany({ data: withParent(data.Benefits) })
+					await tx.nearPlace.createMany({ data: withParent(data.NearPlace) })
+					await tx.legalNotice.createMany({ data: withParent(data.LegalNotice) })
+					return createdProperty
+				})
+				invalidate("properties")
+				return created
+			} catch (e) {
+				// Otro alta con el mismo titulo gano el slug entre la comprobacion y el insert: se reintenta
+				if ((e as { code?: string }).code === "P2002" && attempt < 3) continue
+				throw e
+			}
+		}
 	} catch (e) {
 		console.error(e)
 		throw e
@@ -340,7 +351,7 @@ export async function updateProperty(id: number, data: IPropertyUpdateDTO) {
 		const { propertyId, ...rest } = el
 		return rest
 	}
-	return await prisma.$transaction(async (tx) => {
+	const result = await prisma.$transaction(async (tx) => {
 		const updatedProperty = await tx.property.update({
 			where: { id },
 			data: scalars,
@@ -380,55 +391,35 @@ export async function updateProperty(id: number, data: IPropertyUpdateDTO) {
 			price: updatedProperty.price?.toNumber(),
 		}
 	})
+	invalidate("properties")
+	return result
 }
 export async function deleteProperty(id: number) {
 	try {
 		const propertyDeleted = await prisma.property.delete({ where: { id } })
+		invalidate("properties")
 		return propertyDeleted
 	} catch (e) {
 		console.error(e)
 		throw e
 	}
 }
+async function setActive(ids: number[], active: boolean) {
+	// Un solo UPDATE para todos (antes eran N consultas en paralelo)
+	const { count } = await prisma.property.updateMany({ where: { id: { in: ids } }, data: { active } })
+	invalidate("properties")
+	return { count }
+}
 export async function activeMultipleProperty(ids: number[]) {
-	try {
-		let updatedProperties: any[] = []
-		await Promise.all(
-			ids.map(async (el) => {
-				const updatedProperty = await prisma.property.update({
-					where: { id: el },
-					data: { active: true },
-				})
-				updatedProperties.push(updatedProperty)
-			})
-		)
-		return updatedProperties
-	} catch (e) {
-		console.error(e)
-		throw e
-	}
+	return setActive(ids, true)
 }
 export async function deactivateMultipleProperty(ids: number[]) {
-	try {
-		let updatedProperties: any[] = []
-		await Promise.all(
-			ids.map(async (el) => {
-				const updatedProperty = await prisma.property.update({
-					where: { id: el },
-					data: { active: false },
-				})
-				updatedProperties.push(updatedProperty)
-			})
-		)
-		return updatedProperties
-	} catch (e) {
-		console.error(e)
-		throw e
-	}
+	return setActive(ids, false)
 }
 export async function createPropertyType(data: IPropertyTypeData) {
 	try {
 		const propertyType = await prisma.propertyType.create({ data })
+		invalidate("catalog")
 		return propertyType
 	} catch (e) {
 		console.error(e)
@@ -447,6 +438,7 @@ export async function createPropertyImage(data: IPropertyImageCreate) {
 export async function deletePropertyImage(id: number) {
 	try {
 		const propertyImage = await prisma.propertyImage.delete({ where: { id } })
+		invalidate("properties")
 		return propertyImage
 	} catch (e) {
 		console.error(e)

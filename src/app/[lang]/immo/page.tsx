@@ -22,20 +22,21 @@ const Home: React.FC<IPage> = async props => {
     lang
   } = params;
 
-  const fetchPropertyTypes = async () => {
-    const data = await getPropertyTypes()
-    const newArray = data?.map(el => ({ key: el.id, value: el.name }))
-    return newArray || []
-  }
   const glosary = dict[lang]?.immo
-  const country = (await cookies()).get('immo-country')?.value as countryType || 'LU'
-  const propertyTypes = await fetchPropertyTypes()
-  const lastProperties = await indexProperty({ active: true }, { id: 'desc' })
-  const saleProperties = await indexProperty({ active: true, type: true })
-  const officeType = await findPropertyTypeByCode('OFFICE')
-  const officeProperties = await indexProperty({ active: true, propertyTypeId: officeType?.id })
-  const furnishedProperties = await indexProperty({ active: true, furnished: true })
-  const bigProperties = await indexProperty({ active: true, bedrooms: { gte: 4 }, bathrooms: { gte: 3 } })
+  const bigFilters = { active: true, bedrooms: { gte: 4 }, bathrooms: { gte: 3 } }
+  // Todo lo que necesita la portada se pide a la vez (antes eran 8 esperas una detras de otra)
+  const [country, types, lastProperties, saleProperties, officeType, furnishedProperties, bigProperties] = await Promise.all([
+    cookies().then(c => (c.get('immo-country')?.value as countryType) || 'LU'),
+    getPropertyTypes(),
+    indexProperty({ active: true }, { id: 'desc' }, 1, 15, true, 'card'),
+    indexProperty({ active: true, type: true }, {}, 1, 15, true, 'card'),
+    findPropertyTypeByCode('OFFICE'),
+    indexProperty({ active: true, furnished: true }, {}, 1, 15, true, 'card'),
+    indexProperty(bigFilters, {}, 1, 15, true, 'card'),
+  ])
+  const propertyTypes = types?.map(el => ({ key: el.id, value: el.name })) || []
+  const officeFilters = { active: true, propertyTypeId: officeType?.id ?? -1 }
+  const officeProperties = await indexProperty(officeFilters, {}, 1, 15, true, 'card')
 
   return (
     <main className={styles.main}>
@@ -61,9 +62,9 @@ const Home: React.FC<IPage> = async props => {
       <section className={styles.propertiesSection}>
         <PropertyCategory title={glosary.sectionTitle_1} description={glosary.sectionDescription_1} initialData={lastProperties.data} filters={{ active: true }} orderBy={{ id: 'desc' }} lang={lang} metaData={lastProperties.meta} />
         <PropertyCategory title={glosary.sectionTitle_2} description={glosary.sectionDescription_2} initialData={saleProperties.data} filters={{ active: true, type: true }} lang={lang} metaData={saleProperties.meta} />
-        <PropertyCategory title={glosary.sectionTitle_3} description={glosary.sectionDescription_3} initialData={officeProperties.data} filters={{ active: true, propertyTypeId: 2 }} lang={lang} metaData={officeProperties.meta} />
+        <PropertyCategory title={glosary.sectionTitle_3} description={glosary.sectionDescription_3} initialData={officeProperties.data} filters={officeFilters} lang={lang} metaData={officeProperties.meta} />
         <PropertyCategory title={glosary.sectionTitle_4} description={glosary.sectionDescription_4} initialData={furnishedProperties.data} filters={{ active: true, furnished: true }} lang={lang} metaData={furnishedProperties.meta} />
-        <PropertyCategory title={glosary.sectionTitle_5} description={glosary.sectionDescription_5} initialData={bigProperties.data} filters={{ active: true, bedrooms: { gte: 4 }, bathrooms: { gte: 3 } }} lang={lang} metaData={bigProperties.meta} />
+        <PropertyCategory title={glosary.sectionTitle_5} description={glosary.sectionDescription_5} initialData={bigProperties.data} filters={bigFilters} lang={lang} metaData={bigProperties.meta} />
       </section>
     </main>
   )

@@ -25,7 +25,6 @@ const Search: React.FC<ISearch> = async props => {
         lang
     } = params;
 
-    console.log('Chemi aca esta', searchParams)
     const filters = {
         type: !!searchParams?.type && typeof searchParams?.type === 'string' && parseInt(searchParams?.type) ? true : false,
         propertyTypeId: !!searchParams?.propertyType && typeof searchParams?.propertyType === 'string' ? parseInt(searchParams?.propertyType) : undefined,
@@ -37,7 +36,7 @@ const Search: React.FC<ISearch> = async props => {
     const glosaryData = dict[lang].data
     const propertyType = await findPropertyType(filters.propertyTypeId || 0)
     const propertyTypeName = propertyType && propertyType.name in glosaryData ? glosaryData[propertyType.name as dataTranslate] : null
-    const response = await indexProperty(filters, {}, page)
+    const response = await indexProperty(filters, {}, page, undefined, true, 'card')
     const properties = response.data
     const pagination = response.meta
     const glosary = dict[lang].immo

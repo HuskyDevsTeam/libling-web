@@ -52,7 +52,7 @@ export async function indexProperty(
 		v.paging.page.parse(page),
 		v.paging.limit.parse(limit),
 		z.boolean().parse(country),
-		z.boolean().parse(lean)
+		z.boolean().parse(lean) ? "admin" : "full"
 	)
 }
 
@@ -128,7 +128,7 @@ export async function indexPublicProperties(
 		v.paging.page.parse(page),
 		v.paging.limit.parse(limit),
 		true,
-		false
+		"card"
 	)
 }
 

@@ -21,7 +21,7 @@ const Properties: React.FC<IPage> = async props => {
 
   const glosary = dict[lang]?.adminProperties
   const glosaryNav = dict[lang]?.adminNav
-  const properties = await indexProperty(undefined,undefined,undefined,undefined,false,true)
+  const properties = await indexProperty(undefined,undefined,undefined,undefined,false,'admin')
   return (<>
     <div className={styles.titleBar}>
       <h1 className={styles.titleBarTitle} style={poppinsMedium.style}>{glosaryNav.propertiesTitle}</h1>
