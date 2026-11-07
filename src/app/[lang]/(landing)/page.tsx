@@ -2,10 +2,10 @@
 import React, { use } from 'react';
 import styles from './page.module.css'
 import globalStyles from '@/app/globals.module.css'
-import HighlightIMG1 from '@/app/img/Ellipse1.jpg'
-import HighlightIMG2 from '@/app/img/Ellipse2.jpg'
-import HighlightIMG3 from '@/app/img/Ellipse3.jpg'
-import HighlightIMG4 from '@/app/img/Ellipse4.jpg'
+import HighlightIMG1 from '@/app/img/Ellipse1.webp'
+import HighlightIMG2 from '@/app/img/Ellipse2.webp'
+import HighlightIMG3 from '@/app/img/Ellipse3.webp'
+import HighlightIMG4 from '@/app/img/Ellipse4.webp'
 import { poppinsBold, poppinsRegular, poppinsSemiBold } from '@/app/fonts'
 import Article, { IArticleContent } from '@/app/components/article'
 import Section from '@/app/components/section'
@@ -15,9 +15,9 @@ import useWindowDimensions from '@/app/hooks/useWindowDimensions'
 import HeaderHome from '@/app/components/headerHome'
 import PartnerSlider from '@/app/components/partnerSlider'
 import AnimatedImage from '@/app/components/animatedImage'
-import AsesoramientoIMG from '@/app/img/asesoramiento.jpeg'
-import ConoceIMG from '@/app/img/conoce.png'
-import AyudaIMG from '@/app/img/ayuda.jpeg'
+import AsesoramientoIMG from '@/app/img/asesoramiento.webp'
+import ConoceIMG from '@/app/img/conoce.webp'
+import AyudaIMG from '@/app/img/ayuda.webp'
 interface IPage {
   params: Promise<{
     lang: "es" | "en" | "fr"

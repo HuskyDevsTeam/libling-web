@@ -6,10 +6,10 @@ import { dict } from '@/app/utils'
 import { Metadata } from 'next'
 import HeaderAbout from '@/app/components/headerAbout'
 import AnimatedImage from '@/app/components/animatedImage'
-import EmbraceIMG from '@/app/img/about_section_1.jpg'
-import MoveIMG from '@/app/img/about_section_1.png'
-import HelpIMG from '@/app/img/about_section_2.jpg'
-import HousesIMG from '@/app/img/about_section_3.jpg'
+import EmbraceIMG from '@/app/img/about_section_1.webp'
+import MoveIMG from '@/app/img/about_section_1.webp'
+import HelpIMG from '@/app/img/about_section_2.webp'
+import HousesIMG from '@/app/img/about_section_3.webp'
 interface IPage {
   params: Promise<{
     lang: "es" | "en" | "fr"

@@ -3,9 +3,9 @@ import React from 'react'
 import styles from './headerContact.module.css'
 import globalStyles from '@/app/globals.module.css'
 import Image from 'next/image';
-import headerImg1 from '@/app/img/contact_banner.jpg'
-import headerImg1_1 from '@/app/img/banner_contact_mobile.jpg'
-import headerImg1_2 from '@/app/img/banner_contactanos_1920.jpg'
+import headerImg1 from '@/app/img/contact_banner.webp'
+import headerImg1_1 from '@/app/img/banner_contact_mobile.webp'
+import headerImg1_2 from '@/app/img/banner_contactanos_1920.webp'
 import { dict } from '../utils';
 import { poppinsMedium, poppinsSemiBold } from '../fonts';
 import useWindowDimensions from '../hooks/useWindowDimensions';
