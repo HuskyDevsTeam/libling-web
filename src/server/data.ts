@@ -1,5 +1,5 @@
 import "server-only"
-import { PrismaClient } from "@prisma/client"
+import { prisma } from "@/server/db"
 import {
 	IAffiliateData,
 	IAffiliateOrderBy,
@@ -27,9 +27,6 @@ import { FEE_MULTIPLY } from "@/app/utils/data"
 import { slugify } from "@/app/utils/slug"
 const saltRounds = 12
 
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
-const prisma = globalForPrisma.prisma ?? new PrismaClient()
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
 const authCode =
 	"Basic " +
 	Buffer.from(
@@ -96,12 +93,12 @@ export async function getUser(email: string) {
 	try {
 		const user = await prisma.user.findFirstOrThrow({
 			where: {
-				email,
+				email: { equals: email, mode: "insensitive" },
 			},
 		})
 		return user
 	} catch (e) {
-		console.error("Error getting user")
+		// usuario inexistente: se devuelve undefined
 		return undefined
 	}
 }
@@ -114,7 +111,7 @@ export async function getUserById(id: number) {
 		})
 		return user
 	} catch (e) {
-		console.error("Error getting user")
+		// usuario inexistente: se devuelve undefined
 		return undefined
 	}
 }

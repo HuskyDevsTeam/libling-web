@@ -12,11 +12,32 @@ datasource db {
 }
 
 model User {
-  id         Int        @id @default(autoincrement())
-  email      String     @unique
-  name       String?
-  password   String
-  properties Property[]
+  id          Int                  @id @default(autoincrement())
+  email       String               @unique
+  name        String?
+  password    String
+  properties  Property[]
+  resetTokens PasswordResetToken[]
+}
+
+// Token de restablecimiento de contraseña: solo se guarda el hash (SHA-256) del token enviado por correo.
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+// Contadores para limitar intentos (login, reset de contraseña) de forma compartida entre instancias.
+model RateLimit {
+  key         String   @id
+  count       Int
+  windowStart DateTime
 }
 
 model Property {

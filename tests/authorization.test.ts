@@ -5,8 +5,6 @@ import { PrismaClient } from '@prisma/client'
 const session = vi.hoisted(() => ({ current: null as null | { user: { email: string } } }))
 vi.mock('@/auth', () => ({ auth: async () => session.current }))
 
-vi.mock('next/headers', () => ({ cookies: async () => ({ get: () => ({ value: 'ALL' }) }) }))
-
 import * as actions from '@/services'
 
 const hasDb = !!process.env.POSTGRES_PRISMA_URL

@@ -4,6 +4,8 @@ export const authConfig = {
 	pages: {
 		signIn: "auth/login",
 	},
+	// La sesion del panel caduca a las 12 horas (por defecto serian 30 dias)
+	session: { strategy: "jwt", maxAge: 12 * 60 * 60 },
     callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;

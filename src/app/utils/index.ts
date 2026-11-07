@@ -259,6 +259,7 @@ export const dict = {
 			passwordSaved: "Contraseña actualizada",
 			wrongPassword: "La contraseña actual es incorrecta",
 			passwordMin: "Mínimo 8 caracteres",
+			passwordMax: "Máximo 72 caracteres",
 			passwordMismatch: "Las contraseñas no coinciden",
 			genericError: "Ocurrió un error, intenta de nuevo",
 			emailLabel: "Correo electrónico",
@@ -300,6 +301,7 @@ export const dict = {
 			formButtonChangePassword: "Cambiar contraseña",
 			formButtonOrLogin: "O inicia sesión",
 			error_credentials: "Las credenciales no son correctas",
+			error_rate_limited: "Demasiados intentos. Espera unos minutos y vuelve a intentarlo.",
 			error_default: "Ha ocurrido un error",
 		},
 		navbar: {
@@ -975,6 +977,7 @@ export const dict = {
 			passwordSaved: "Password updated",
 			wrongPassword: "The current password is incorrect",
 			passwordMin: "At least 8 characters",
+			passwordMax: "At most 72 characters",
 			passwordMismatch: "Passwords do not match",
 			genericError: "Something went wrong, try again",
 			emailLabel: "Email",
@@ -1015,6 +1018,7 @@ export const dict = {
 			formButtonChangePassword: "Change password",
 			formButtonOrLogin: "Or log in",
 			error_credentials: "The credentials are not correct",
+			error_rate_limited: "Too many attempts. Wait a few minutes and try again.",
 			error_default: "An error has occurred",
 		},
 		navbar: {
@@ -1690,6 +1694,7 @@ export const dict = {
 			passwordSaved: "Mot de passe mis à jour",
 			wrongPassword: "Le mot de passe actuel est incorrect",
 			passwordMin: "Au moins 8 caractères",
+			passwordMax: "72 caractères au maximum",
 			passwordMismatch: "Les mots de passe ne correspondent pas",
 			genericError: "Une erreur est survenue, réessayez",
 			emailLabel: "E-mail",
@@ -1733,6 +1738,7 @@ export const dict = {
 			formButtonOrLogin: "Ou se connecter",
 			error_credentials:
 				"Les informations d'identification ne sont pas correctes",
+			error_rate_limited: "Trop de tentatives. Attendez quelques minutes et réessayez.",
 			error_default: "Une erreur s'est produite",
 		},
 		navbar: {

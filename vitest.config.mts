@@ -10,6 +10,7 @@ export default defineConfig({
 	},
 	test: {
 		environment: 'node',
+		setupFiles: ['./tests/setup.ts'],
 		include: ['tests/**/*.test.ts'],
 		// los tests funcionales comparten una base de datos: se ejecutan en serie
 		fileParallelism: false,
