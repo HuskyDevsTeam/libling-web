@@ -51,7 +51,6 @@ const StepFour: React.FC<IStepFour> = ({ params: { lang }, onNext, onBack, files
     const [photos, setPhotos] = useState(store?.form_4?.photos)
 
     const handlePhoto = (key: any[], index:number) => {
-        console.log('selected key', key)
         formRef.current?.setFieldValue('uploadedPhotos', key?.length > 0)
         formRef.current?.setFieldValue('faceIndex', index)
         // setPhotos(key)
@@ -66,8 +65,6 @@ const StepFour: React.FC<IStepFour> = ({ params: { lang }, onNext, onBack, files
         setBusy(true)
         const formData = values
         try {
-            console.log(formData)
-            console.log(files)
             if (files.length <= 0 && !hasExistingPhotos) return toast.error(<CustomToast type='error' title='Error' content={glosary.formValidationPhotos} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
             store?.setForm_4({
                 ...formData

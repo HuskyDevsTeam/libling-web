@@ -37,7 +37,6 @@ const ContactForm = ({ lang }: ILang) => {
     });
     const handleSubmit = async (values: IValues, { setSubmitting }: FormikHelpers<IValues>) => {
         const currentURL = window.location.toString()
-        console.log(values)
         try {
             setLoading(true)
             const result = await sendImmoInquiry({ email: values.email ?? '', name: values.name ?? '', pageUrl: currentURL, lang, ...spam.read() })

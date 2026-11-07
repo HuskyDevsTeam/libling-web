@@ -30,7 +30,7 @@ const HeaderHome:React.FC<IHeader> = ({lang}) => {
         {
             (width !== null)
             &&
-            <Carousel autoPlay={true} infiniteLoop={true} interval={15000} showIndicators={false} showStatus={false} className={styles.sliderImage} preventMovementUntilSwipeScrollTolerance={true}>
+            <Carousel autoPlay={true} infiniteLoop={true} interval={15000} showThumbs={false} showIndicators={false} showStatus={false} className={styles.sliderImage} preventMovementUntilSwipeScrollTolerance={true}>
                 <div className={styles.sliderItem}>
                     {
                         (width !== null && width <= 500)

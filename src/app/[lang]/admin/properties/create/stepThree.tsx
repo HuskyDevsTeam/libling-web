@@ -54,7 +54,6 @@ const StepThree: React.FC<IStepThree> = ({ params: { lang }, onNext, onBack }) =
     const formRef = useRef<FormikProps<IValues>>(null)
     const [submitting, setBusy] = useState(false)
     const handleAreaSelect = (index: number, key: string) => {
-        console.log('selected key', key)
         formRef.current?.setFieldValue(`surfaces.${index}.areaUnit`, key)
     }
     const validationSchema = Yup.object({
@@ -72,7 +71,6 @@ const StepThree: React.FC<IStepThree> = ({ params: { lang }, onNext, onBack }) =
     const handleSubmit = async (values: IValues, formikHelpers: FormikHelpers<IValues>) => {
         setBusy(true)
         const formData = values
-        console.log(formData)
         try {
             store?.setForm_3(formData)
             onNext()

@@ -58,7 +58,6 @@ const StepOne: React.FC<IStepOne> = ({ params: { lang }, onNext }) => {
         latitude: store?.form_1?.latitude || 49.61675,
     }
     const [latLng, setLatLng] = useState({ lat: initialValues.latitude, lng: initialValues.longitude })
-    console.log('initialValues',initialValues)
     const listSwitch = [
         {
             key: 1,
@@ -70,20 +69,16 @@ const StepOne: React.FC<IStepOne> = ({ params: { lang }, onNext }) => {
         },
     ]
     const handleSellType = (key: string | number) => {
-        console.log('selected key', key)
         formRef.current?.setFieldValue('type', key)
     }
     const handlePropertyType = (key: string) => {
-        console.log('selected key', key)
         formRef.current?.setFieldValue('propertyType', key)
     }
     const handleCountry = (key: string) => {
-        console.log('selected key', key)
         formRef.current?.setFieldValue('country', key)
     }
     const handleAddPropertyType = async (el: string) => {
         const added = await createPropertyType({ name: el, code: el.toUpperCase() })
-        console.log('added', added)
         await fetchPropertyTypes()
         formRef.current?.setFieldValue('propertyType', added.id)
     }
@@ -99,8 +94,6 @@ const StepOne: React.FC<IStepOne> = ({ params: { lang }, onNext }) => {
     const handleSubmit = async (values: IValues, { setSubmitting }: FormikHelpers<IValues>) => {
         setBusy(true)
         const formData = values
-        console.log('formik values', formData)
-        console.log('coordinates',latLng)
         try {
             store?.setForm_1(formData)
             onNext()
@@ -164,7 +157,6 @@ const StepOne: React.FC<IStepOne> = ({ params: { lang }, onNext }) => {
                                             mapStyle={mapStyle}
                                         >
                                             <Marker draggable={true} latitude={values.latitude} longitude={values.longitude} onDragEnd={(e) => {
-                                                console.log(e.lngLat)
                                                 setLatLng(e.lngLat)
                                                 formRef.current?.setFieldValue('longitude', e.lngLat.lng)
                                                 formRef.current?.setFieldValue('latitude', e.lngLat.lat)

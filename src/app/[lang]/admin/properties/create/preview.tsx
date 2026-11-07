@@ -64,7 +64,6 @@ const Preview: React.FC<IPreview> = ({ params: { lang }, onNext, onGo, files, fa
                     <Button title={glosary.formButtonRegister} onClick={handleSubmit} />
                 </div>
             ))
-            console.log('test')
         }
         return () => { interfaceStore?.setShowBar(false) }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito

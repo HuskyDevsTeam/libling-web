@@ -111,7 +111,6 @@ const PropertyCreate: React.FC<IPage> = props => {
                         method: 'POST',
                         body: file,
                     })
-                    console.log('chemi', await response.json())
                 }))
                 
             } else {

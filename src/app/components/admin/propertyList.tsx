@@ -109,7 +109,6 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
         }
     }
     const handleLimit = (key: string) => {
-        console.log('selected key', key)
         store?.setLimit(parseInt(key))
     }
     const handleDelete = (id: number, active: boolean) => {
@@ -162,7 +161,6 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
         },
     ]
     useEffect(() => {
-        console.log("selected Id's", selected)
         if (selected.length >= 1) {
             store?.setShowBar(true)
             store?.setBarContent(() => (

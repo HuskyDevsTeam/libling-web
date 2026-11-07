@@ -77,7 +77,6 @@ const Contact: React.FC<IPage> = async props => {
 
   const glosary = dict[lang]?.contact
   const events: ICalEvent[] | [] = (await getEvents()) || []
-  console.log(events?.length)
 
   return (
     <main className={styles.main}>

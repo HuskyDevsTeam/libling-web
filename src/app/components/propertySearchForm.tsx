@@ -37,11 +37,9 @@ const PropertySearchForm:React.FC<ISearchForm> = ({list, lang}) => {
         },
     ]
     const handlePropertyType = (key: string) => {
-        console.log('selected key', key)
         setPropertyType(key)
     }
     const handleSellType = (key: string | number) => {
-        console.log('selected key', key)
         setType(key)
     }
     const handleAddress: ((e: string | React.ChangeEvent<any>) => void) | undefined = (e) => {

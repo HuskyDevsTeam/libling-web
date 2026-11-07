@@ -8,7 +8,7 @@ import earthImg from '@/app/img/earth.png'
 import Image from 'next/image'
 import { ICountry, ILang, countryType } from '../interfaces'
 import { dict } from '../utils'
-import { getCookie, hasCookie, setCookie } from 'cookies-next'
+import { setCookie } from 'cookies-next'
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi'
 import { poppinsMedium } from '../fonts'
 import { useRouter } from 'next/navigation'
@@ -21,7 +21,7 @@ export const CountrySelector = ({ country, lang, dark = false }: ICountry & ILan
         'ALL': earthImg,
     }
     const [open, setOpen] = useState(false)
-    const [currentCountry, setCurrentCountry] = useState<countryType | undefined>(hasCookie('immo-country') ? getCookie('immo-country') as countryType : country)
+    const [currentCountry, setCurrentCountry] = useState<countryType | undefined>(country)
     const glosary = dict[lang].immo
     const router = useRouter()
 

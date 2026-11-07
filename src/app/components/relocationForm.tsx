@@ -60,12 +60,10 @@ const RelocationForm: React.FC<IRelocationForm> = ({ lang }) => {
         message: Yup.string().optional(),
     });
     const handleSubject = (key: string) => {
-        console.log('selected key', key)
         formRef.current?.setFieldValue('subject', key)
     }
     const handleSubmit = async (values: IValues, { setSubmitting }: FormikHelpers<IValues>) => {
         if (loading) { return }
-        console.log(values)
         try {
             setLoading(true)
             const result = await sendRelocationMessage({ email: values.email ?? '', name: values.name ?? '', subject: values.subject ?? '', message: values.message, lang, ...spam.read() })

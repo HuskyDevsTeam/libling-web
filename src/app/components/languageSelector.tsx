@@ -15,14 +15,10 @@ export const LanguageSelector = ({ lang }: { lang: "es" | "en" | "fr" }) => {
     const [open, setOpen] = useState(false)
 
     const handleClick = (currLang: string) => {
-        console.log(lang, currLang)
         if (currLang) {
             let currentLocation = window.location.href
-            console.log('current location', currentLocation)
             currentLocation = currentLocation.replace(`/${lang}`, `/${currLang}`)
-            console.log('new location', currentLocation)
             document.cookie = `NEXT_LOCALE=${currLang}; max-age=31536000; path=/`
-            console.log(document.cookie)
             window.location.replace(currentLocation)
 
         }

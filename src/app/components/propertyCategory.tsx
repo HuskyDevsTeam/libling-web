@@ -23,7 +23,6 @@ const PropertyCategory: React.FC<IPropertyCategory> = ({ title, description, fil
     const glosaryData = dict[lang].data
     const glosaryAdmin = dict[lang].adminProperties
     const applyPage = (data: Awaited<ReturnType<typeof indexPublicProperties>>) => {
-        console.log('propertyData', data)
         const newArray = data?.data
         setMeta(data?.meta)
         setProperties(state => {
