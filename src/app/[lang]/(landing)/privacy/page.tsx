@@ -26,6 +26,7 @@ const Privacy: React.FC<IPage> = props => {
         { title: glosary.title3, list: glosary.description3 },
         { title: glosary.title4, list: glosary.description4 },
         { title: glosary.title5, list: glosary.description5 },
+        { title: glosary.title6, list: glosary.description6 },
     ]
 
     return (

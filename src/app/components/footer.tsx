@@ -8,6 +8,7 @@ import { sendFooterMessage } from '@/mailActions'
 import { useAntiSpam } from './antiSpam'
 import CustomToast from './toast'
 import { toast } from 'react-toastify'
+import { openCookieSettings } from './cookieConsent'
 import Link from 'next/link';
 
 
@@ -141,7 +142,9 @@ export default function Footer({ lang }: { lang: "es" | "en" | "fr" }) {
                     <span className={styles.ribbonText}>{`© Libling 2024 | ${glosary.rights}.`}</span>
                 </div>
                 <div className={styles.ribbonHalf}>
-                    {/* <span className={styles.ribbonTextFaded}>{glosary.cookies}</span> */}
+                    <button type="button" onClick={openCookieSettings} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit' }}>
+                        <span className={styles.ribbonTextFaded}>Cookies</span>
+                    </button>
                     <Link href={'/privacy'}>
                         <span className={styles.ribbonTextFaded}>{glosary.privacy}</span>
                     </Link>

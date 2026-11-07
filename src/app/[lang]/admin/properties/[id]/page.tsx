@@ -13,7 +13,7 @@ import IconBath from '@/app/components/icons/iconBath'
 import { Button } from '@/app/components/admin/button'
 import { ISelectElement, dataTranslate } from '@/app/interfaces'
 import { getMapStyles } from '@/app/actions'
-import CustomMap from '@/app/components/map'
+import CustomMap from '@/app/components/mapLazy'
 
 interface IDetail {
     params: {

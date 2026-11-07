@@ -714,6 +714,8 @@ export const dict = {
             description4:[`No compartimos sus datos personales con terceros. Su información está segura con nosotros.`],
             title5:"¿Cómo puede controlar sus datos?",
             description5:[`Tiene derecho a acceder, corregir o eliminar sus datos personales en cualquier momento. Si desea ejercer alguno de estos derechos, puede contactarnos en info@libling.com`],
+            title6:"Cookies y analítica",
+            description6:[`Solo usamos cookies de analítica (Google Analytics) si usted las acepta en el aviso de cookies; si las rechaza, no se carga ninguna. Puede cambiar su elección en cualquier momento desde el enlace "Cookies" al pie de la página. Las cookies técnicas necesarias para iniciar sesión no requieren consentimiento.`],
         },
 		
 	},
@@ -1431,6 +1433,8 @@ export const dict = {
 			description4:[`We do not share your personal data with third parties. Your information is safe with us.`],
 			title5:"How can you control your data?",
 			description5:[`You have the right to access, correct or delete your personal data at any time. If you wish to exercise any of these rights, you can contact us at info@libling.com`],
+            title6:"Cookies and analytics",
+            description6:[`We only use analytics cookies (Google Analytics) if you accept them in the cookie notice; if you reject them, none is loaded. You can change your choice at any time from the "Cookies" link in the page footer. Technical cookies needed to sign in do not require consent.`],
 		}
 	},
 	fr: {
@@ -2180,6 +2184,8 @@ export const dict = {
             description4:[`Nous ne partageons pas vos données personnelles avec des tiers. Vos informations sont en sécurité chez nous.`],
             title5:"Comment pouvez-vous contrôler vos données ?",
             description5:[`Vous avez le droit d'accéder à vos données personnelles, de les rectifier ou de les supprimer à tout moment. Si desea ejercer l'un de ces droits, vous pouvez nous contacter à info@libling.com`],
+            title6:"Cookies et analyse",
+            description6:[`Nous n'utilisons des cookies d'analyse (Google Analytics) que si vous les acceptez dans l'avis sur les cookies ; si vous les refusez, aucun n'est chargé. Vous pouvez modifier votre choix à tout moment via le lien « Cookies » en bas de page. Les cookies techniques nécessaires à la connexion ne requièrent pas de consentement.`],
         }
 	},
 }

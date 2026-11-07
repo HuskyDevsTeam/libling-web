@@ -6,7 +6,7 @@ import Footer from '@/app/components/footer'
 import styles from '@/app/[lang]/(landing)/page.module.css'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Script from 'next/script'
+import CookieConsent from '@/app/components/cookieConsent'
 
 
 
@@ -44,28 +44,12 @@ export default async function RootLandingLayout(
 
   return (
     <html id='main' lang={lang}>
-      <Script
-        id="google-analytics-call"
-        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.GOOGLE_ANALYTICS}`}
-        strategy="afterInteractive">
-      </Script>
-      <Script
-        id="google-analytics"
-        strategy="afterInteractive"
-      >
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-  
-          gtag('config', '${process.env.GOOGLE_ANALYTICS}');`
-        }
-      </Script>
       <body style={poppinsRegular.style} className={styles.layout}>
         <ToastContainer />
         <Navbar lang={lang} />
         {children}
         <Footer lang={lang} />
+        <CookieConsent lang={lang} analyticsId={process.env.GOOGLE_ANALYTICS || undefined} />
       </body>
     </html>
   )

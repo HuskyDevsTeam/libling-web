@@ -4,7 +4,7 @@ import styles from './affiliatePlanList.module.css'
 import { dict } from '../utils'
 import AffiliateCard from './affiliateCard'
 import InputSwitch from './admin/inputSwitch'
-import { Payment } from './payment'
+import dynamic from 'next/dynamic'
 import ReactModal from 'react-modal'
 import useStore from '../hooks/useStore'
 import { useAffiliateStore } from '../hooks/useAffiliateStore'
@@ -13,6 +13,9 @@ import { toast } from 'react-toastify';
 import CustomToast from './toast';
 import { paymentAssert, verifyPayStatus } from '@/services'
 import { templates } from '../utils/funtions'
+
+// El formulario de pago (y su validacion) solo se descarga cuando el visitante elige un plan
+const Payment = dynamic(() => import('./payment').then((m) => m.Payment), { ssr: false })
 
 interface IAffiliatePlanList{
     lang: "es" | "en" | "fr"

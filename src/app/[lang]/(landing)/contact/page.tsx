@@ -10,7 +10,6 @@ import Section from '@/app/components/section'
 import ContactForm from '@/app/components/form'
 import ContactCard from '@/app/components/contactCard'
 import { dict } from '@/app/utils'
-import { Calendar } from 'react-calendar'
 import { poppinsMedium, poppinsRegular } from '@/app/fonts';
 import { CalendarEvent } from './calendar'
 import ical from 'ical'
