@@ -9,7 +9,7 @@ vi.mock('@/server/storage', () => ({
 	publicUrl: (k: string) => k,
 }))
 import { prisma } from '@/server/db'
-import { deleteProperty, deletePropertyImage, indexProperty, showProperty, createPropertyImage } from '@/server/data'
+import { deleteProperty, deletePropertyImage, indexProperty, showProperty, createPropertyImage, listTrash, restoreProperty, restorePropertyImage } from '@/server/data'
 import { purgeDeleted, RETENTION_DAYS } from '@/server/maintenance'
 import { GET, POST } from '@/app/api/cron/maintenance/route'
 
@@ -50,6 +50,28 @@ describe.skipIf(!hasDb)('borrado logico y purga', () => {
 		const row = await prisma.property.findUniqueOrThrow({ where: { id: p.id } })
 		expect(row.deletedAt).toBeInstanceOf(Date)
 		expect(row.active).toBe(false)
+	})
+
+	it('la papelera lista lo borrado y restaurar lo devuelve (inmueble como borrador)', async () => {
+		const p = await mk('trash')
+		const img = await createPropertyImage({ name: 'n', description: '', path: 'https://cdn.test/t.webp', propertyId: p.id } as never)
+		await deletePropertyImage(img.id)
+		let trash = await listTrash()
+		expect(trash.images.map((i) => i.id)).toContain(img.id)
+		expect((await restorePropertyImage(img.id)).count).toBe(1)
+		expect((await showProperty({ id: p.id }))?.PropertyImage).toHaveLength(1)
+		await deletePropertyImage(img.id)
+		await deleteProperty(p.id)
+		trash = await listTrash()
+		expect(trash.properties.map((x) => x.id)).toContain(p.id)
+		// las fotos de un inmueble borrado no se listan aparte, y no se pueden restaurar sueltas
+		expect(trash.images.map((i) => i.id)).not.toContain(img.id)
+		expect((await restorePropertyImage(img.id)).count).toBe(0)
+		expect((await restoreProperty(p.id)).count).toBe(1)
+		const back = await showProperty({ id: p.id })
+		expect(back?.active).toBe(false)
+		expect(back?.deletedAt).toBeNull()
+		expect((await restoreProperty(p.id)).count).toBe(0)
 	})
 
 	it('la purga solo elimina lo borrado hace mas de 90 dias y borra sus archivos', async () => {

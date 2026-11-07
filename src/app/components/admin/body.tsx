@@ -6,7 +6,7 @@ import Aside from './aside';
 import { poppinsMedium, poppinsRegular } from '@/app/fonts';
 import Navbar from './navbar';
 import { dict } from '@/app/utils';
-import { FiGrid, FiHome, FiCreditCard, FiExternalLink } from 'react-icons/fi';
+import { FiGrid, FiHome, FiCreditCard, FiExternalLink, FiTrash2 } from 'react-icons/fi';
 import { SIDEBAR_COOKIE } from './sidebarCookie';
 import type { IUserSession } from '@/server/data'
 import ActionBar from './actionBar';
@@ -60,6 +60,11 @@ export const Body = ({
             name: glosary.affiliateTitle,
             uri: '/admin/affiliates',
             icon: FiCreditCard
+        },
+        {
+            name: glosary.trashTitle,
+            uri: '/admin/trash',
+            icon: FiTrash2
         },
         {
             name: glosary.websiteTitle,

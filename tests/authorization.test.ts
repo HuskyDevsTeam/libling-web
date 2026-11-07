@@ -25,6 +25,9 @@ const adminActions: Array<[string, () => Promise<unknown>]> = [
 	['deactivateMultipleProperty', () => actions.deactivateMultipleProperty([1])],
 	['createPropertyType', () => actions.createPropertyType({ name: 'a', code: 'A' })],
 	['deletePropertyImage', () => actions.deletePropertyImage(1)],
+	['getTrash', () => actions.getTrash()],
+	['restoreProperty', () => actions.restoreProperty(1)],
+	['restorePropertyImage', () => actions.restorePropertyImage(1)],
 	['getAffiliates', () => actions.getAffiliates()],
 	['showAffiliate', () => actions.showAffiliate({ id: 1 })],
 ]

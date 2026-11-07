@@ -82,6 +82,21 @@ export async function deactivateMultipleProperty(propertyIds: number[]) {
 	return data.deactivateMultipleProperty(v.ids.parse(propertyIds))
 }
 
+export async function getTrash() {
+	await requireAdmin()
+	return data.listTrash()
+}
+
+export async function restoreProperty(propertyId: number) {
+	await requireAdmin()
+	return data.restoreProperty(v.id.parse(propertyId))
+}
+
+export async function restorePropertyImage(imageId: number) {
+	await requireAdmin()
+	return data.restorePropertyImage(v.id.parse(imageId))
+}
+
 export async function createPropertyType(input: { name: string; code: string }) {
 	await requireAdmin()
 	return data.createPropertyType(v.propertyTypeCreate.parse(input))

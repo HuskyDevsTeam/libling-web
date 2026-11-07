@@ -411,6 +411,34 @@ export async function deleteProperty(id: number) {
 		throw e
 	}
 }
+/** Papelera: inmuebles e imagenes borrados (se eliminan del todo a los 90 dias; ver maintenance.ts). */
+export async function listTrash() {
+	const [properties, images] = await Promise.all([
+		prisma.property.findMany({
+			where: { deletedAt: { not: null } },
+			orderBy: { deletedAt: "desc" },
+			select: { id: true, title: true, address: true, thumbnail: true, thumbnailWebp: true, deletedAt: true },
+		}),
+		prisma.propertyImage.findMany({
+			// Las fotos de un inmueble borrado se recuperan restaurando el inmueble
+			where: { deletedAt: { not: null }, property: { deletedAt: null } },
+			orderBy: { deletedAt: "desc" },
+			select: { id: true, thumbPath: true, path: true, deletedAt: true, property: { select: { id: true, title: true } } },
+		}),
+	])
+	return { properties, images }
+}
+export async function restoreProperty(id: number) {
+	// Vuelve como borrador: quien lo restaura decide cuando publicarlo de nuevo
+	const { count } = await prisma.property.updateMany({ where: { id, deletedAt: { not: null } }, data: { deletedAt: null, active: false } })
+	invalidate("properties")
+	return { count }
+}
+export async function restorePropertyImage(id: number) {
+	const { count } = await prisma.propertyImage.updateMany({ where: { id, deletedAt: { not: null }, property: { deletedAt: null } }, data: { deletedAt: null } })
+	invalidate("properties")
+	return { count }
+}
 async function setActive(ids: number[], active: boolean) {
 	// Un solo UPDATE para todos (antes eran N consultas en paralelo)
 	const { count } = await prisma.property.updateMany({ where: { id: { in: ids }, deletedAt: null }, data: { active } })
