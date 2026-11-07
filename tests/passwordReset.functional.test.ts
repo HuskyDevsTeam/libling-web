@@ -4,8 +4,9 @@ import bcrypt from 'bcryptjs'
 import { NextRequest } from 'next/server'
 
 const sent = vi.hoisted(() => [] as { to: string; message: string }[])
-vi.mock('@/app/utils/emails', () => ({
-	sendEmailToClient: async (to: string, message: string) => { sent.push({ to, message }) },
+vi.mock('@/server/mail', async (orig) => ({
+	...(await orig<object>()),
+	deliver: async ({ to, html }: { to: string; html: string }) => { sent.push({ to, message: html }) },
 }))
 
 import { POST as forgot } from '@/app/api/auth/forgot-password/route'

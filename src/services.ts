@@ -22,6 +22,9 @@ import {
 import { requireAdmin } from "@/server/guard"
 import * as data from "@/server/data"
 import * as v from "@/server/schemas"
+import { deliver, MAILBOXES } from "@/server/mail"
+import { dict } from "@/app/utils/serverDict"
+import { templates as serverTemplates } from "@/app/utils/serverFuntions"
 
 export type {
 	IUserData,
@@ -203,6 +206,27 @@ export async function verifyPayStatus(payId: string) {
 	return data.verifyPayStatus(z.string().regex(/^\d{1,10}$/).parse(payId))
 }
 
-export async function paymentAssert(payId: number) {
-	return data.paymentAssert(v.id.parse(payId))
+export async function paymentAssert(payId: number, lang: "es" | "en" | "fr" = "en") {
+	const id = v.id.parse(payId)
+	const language = z.enum(["es", "en", "fr"]).catch("en").parse(lang)
+	const before = await data.showPay({ id })
+	const result = await data.paymentAssert(id)
+	// Los correos salen desde el servidor y solo en el paso de "sin pagar" a "pagado":
+	// asi un cliente no puede provocarlos a voluntad ni repetirlos.
+	if (before && !before.status && result.status === 200 && result.affiliate) {
+		await sendAffiliatePaidEmails(result.affiliate.id, language)
+	}
+	return result
+}
+
+async function sendAffiliatePaidEmails(affiliateId: number, lang: "es" | "en" | "fr") {
+	try {
+		const affiliate = await data.showAffiliate({ id: affiliateId })
+		if (!affiliate) return
+		const subject = dict[lang].mail.affiliateTitle
+		await deliver({ to: MAILBOXES.affiliate, subject, html: serverTemplates.affiliateAdmin(lang, affiliate), replyTo: affiliate.email })
+		await deliver({ to: affiliate.email, subject, html: serverTemplates.affiliate(lang), replyTo: MAILBOXES.affiliate })
+	} catch (e) {
+		console.error("correo de afiliado no enviado", (e as Error)?.message)
+	}
 }

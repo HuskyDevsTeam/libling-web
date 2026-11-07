@@ -3,7 +3,7 @@ import { z } from "zod"
 import { getUser } from "@/server/data"
 import { createResetToken } from "@/server/passwordReset"
 import { clientIp, consume } from "@/server/rateLimit"
-import { sendEmailToClient } from "@/app/utils/emails"
+import { deliver, escapeHtml } from "@/server/mail"
 import { subjects, templates } from "@/app/utils/funtions"
 
 const BASE_URL = process.env.APP_URL || "http://localhost:3000"
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 			const token = await createResetToken(user.id)
 			const url = `${BASE_URL}/auth/change-password?token=${token}`
 			// No se espera al envio: la respuesta tarda lo mismo exista o no el usuario
-			void sendEmailToClient(email, templates.forgotPassword(user.name || "user", url), subjects.forgotPassword).catch((e) =>
+			void deliver({ to: email, subject: subjects.forgotPassword, html: templates.forgotPassword(escapeHtml(user.name || "user"), url) }).catch((e) =>
 				console.error("No se pudo enviar el correo de restablecimiento", e?.message)
 			)
 		}

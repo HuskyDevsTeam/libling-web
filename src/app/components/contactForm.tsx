@@ -7,8 +7,8 @@ import * as Yup from 'yup';
 import styles from './contactForm.module.css'
 import { InputText } from './admin/inputText';
 import { poppinsMedium } from '../fonts';
-import { subjects, templates } from '../utils/funtions'
-import { sendImmoConfirmation, sendInfo } from '../utils/emails'
+import { sendImmoInquiry } from '@/mailActions'
+import { useAntiSpam } from './antiSpam'
 import CustomToast from './toast'
 import { toast } from 'react-toastify'
 import { Button } from './admin/button'
@@ -25,6 +25,7 @@ const ContactForm = ({ lang }: ILang) => {
     const glosary = dict[lang]?.immo
     const formRef = useRef<FormikProps<IValues>>(null)
     const [loading,setLoading] = useState(false)
+    const spam = useAntiSpam()
     const initialValues: IValues = {
         name: '',
         email: '',
@@ -39,16 +40,9 @@ const ContactForm = ({ lang }: ILang) => {
         console.log(values)
         try {
             setLoading(true)
-            await sendInfo(
-                values.email || 'email',
-                templates.immo(values.name || '', currentURL, lang),
-                subjects.immo
-            )
-            await sendImmoConfirmation(
-                values.email || 'email',
-                templates.immoConfirmation(lang),
-                subjects.welcomeImmo
-            )
+            const result = await sendImmoInquiry({ email: values.email ?? '', name: values.name ?? '', pageUrl: currentURL, lang, ...spam.read() })
+            spam.reset()
+            if (!result.ok) throw new Error(result.reason)
             toast.success(<CustomToast type='success' title={glosary.success} content={glosary.successEmail} />, { theme: 'colored', icon: false, style: { backgroundColor: '#00C851', maxWidth: 450, padding: 24, borderRadius: 10 } })
             
         } catch (error) {
@@ -71,6 +65,7 @@ const ContactForm = ({ lang }: ILang) => {
                     <h4 className={styles.formTitle} style={poppinsMedium.style}>{glosary.contactFormTitle}</h4>
                     <InputText label={glosaryContact.form_name} name='name' placeholder={glosaryAdmin.formPlaceholderText} value={values.name} error={errors.name} touched={touched.name} onChange={handleChange('name')} />
                     <InputText label={glosaryContact.form_email} name='email' placeholder={glosaryAdmin.formPlaceholderText} value={values.email} error={errors.email} touched={touched.email} onChange={handleChange('email')} />
+                    {spam.field}
                     <div className={styles.buttonContainer}>
                         <Button title={'Whatsapp'} type='outline' icon='ws' goTo={`https://api.whatsapp.com/send?phone=${352691367757}`}/>
                         <button className={styles.button} style={poppinsMedium.style} disabled={loading}>

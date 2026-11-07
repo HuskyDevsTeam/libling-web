@@ -4,11 +4,11 @@ import React, { SyntheticEvent, useEffect, useRef, useState } from 'react'
 import styles from './relocationForm.module.css'
 import { poppinsBold, poppinsMedium, poppinsRegular } from '../fonts'
 import { dict } from '../utils'
-import { subjects, templates } from '../utils/funtions'
 import { useSearchParams } from 'next/navigation'
 import CustomToast from './toast'
 import { toast } from 'react-toastify'
-import { sendEmailToOwner, sendInfo, sendEmailToClient } from '../utils/emails'
+import { sendRelocationMessage } from '@/mailActions'
+import { useAntiSpam } from './antiSpam'
 import { Form, Formik, FormikHelpers, FormikProps } from 'formik'
 import * as Yup from 'yup';
 import { InputText } from './admin/inputText'
@@ -45,6 +45,7 @@ const RelocationForm: React.FC<IRelocationForm> = ({ lang }) => {
     const [loading, setLoading] = useState<boolean | undefined>(false);
 
     const formRef = useRef<FormikProps<IValues>>(null)
+    const spam = useAntiSpam()
     const initialValues: IValues = {
         name: '',
         email: '',
@@ -67,16 +68,9 @@ const RelocationForm: React.FC<IRelocationForm> = ({ lang }) => {
         console.log(values)
         try {
             setLoading(true)
-            await sendEmailToClient(
-                values.email || 'email',
-                templates.infoClient(glosaryHome.bigTitleHeader1_1 + glosaryHome.bigTitleHeader1_2, values.name || '', lang),
-                mailMessages.subject_3
-            )
-            await sendEmailToOwner(
-                values.email || 'email',
-                templates.info(glosaryHome.bigTitleHeader1_1 + glosaryHome.bigTitleHeader1_2, values.name || '', values.message || '', lang),
-                glosary.formSubjectList.find(el=>el.key === values.subject)?.value || glosary.formSubjectList[0]?.value
-            )
+            const result = await sendRelocationMessage({ email: values.email ?? '', name: values.name ?? '', subject: values.subject ?? '', message: values.message, lang, ...spam.read() })
+            spam.reset()
+            if (!result.ok) throw new Error(result.reason)
             toast.success(<CustomToast type='success' title={glosaryImmo.success} content={glosaryImmo.successEmail} />, { theme: 'colored', icon: false, style: { backgroundColor: '#00C851', maxWidth: 450, padding: 24, borderRadius: 10 } })
             formRef?.current?.resetForm({values:{...initialValues, subject:values.subject}})
             
@@ -123,6 +117,7 @@ const RelocationForm: React.FC<IRelocationForm> = ({ lang }) => {
                         </div>
                     </div>
                     <InputTextArea label={glosary.formLabelMessage} placeholder={glosary.formPlaceholderMessage} onChange={handleChange('message')} value={values.message} error={errors.message} touched={touched.message} />
+                    {spam.field}
                     <div className={styles.buttonContainer}>
                     <button className={styles.button} style={poppinsMedium.style} disabled={loading}>
                         {glosary.formActionButton}

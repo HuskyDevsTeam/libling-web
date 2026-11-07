@@ -12,7 +12,6 @@ import { useSearchParams } from 'next/navigation'
 import { toast } from 'react-toastify';
 import CustomToast from './toast';
 import { paymentAssert, verifyPayStatus } from '@/services'
-import { assertAffiliate, sendAffiliate, sendAffiliateAdmin, sendEmailToOwner } from '../utils/emails'
 import { templates } from '../utils/funtions'
 
 interface IAffiliatePlanList{
@@ -155,9 +154,8 @@ const AffiliatePlanList:React.FC<IAffiliatePlanList> = ({lang}) => {
         if(isWaitingVerify){
             toast.warning(<CustomToast type='warning' title={glosary.infoMessageTitle} content={glosary.infoMessageContent} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FFBB33', maxWidth: 450, padding: 24, borderRadius: 10 } })
             setIsVerifying(true)
-            const verifyResponse = await paymentAssert(isWaitingVerify)
+            const verifyResponse = await paymentAssert(isWaitingVerify, lang)
             if(verifyResponse.status === 200 && !!verifyResponse.affiliate){
-                assertAffiliate(verifyResponse?.affiliate?.id, lang)
                 toast.success(<CustomToast type='success' title={glosary.successMessageTitle} content={glosary.successMessageContent} />, { theme: 'colored', icon: false, style: { backgroundColor: '#00C851', maxWidth: 450, padding: 24, borderRadius: 10 } })
             }else{
                 toast.error(<CustomToast type='error' title={glosary.errorMessageTitle} content={glosary.errorMessageContent} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
