@@ -11,7 +11,7 @@ import { useAffiliateStore } from '../hooks/useAffiliateStore'
 import { useSearchParams } from 'next/navigation'
 import { toast } from 'react-toastify';
 import CustomToast from './toast';
-import { paymentAssert, showAffiliate, verifyPayStatus } from '@/services'
+import { paymentAssert, verifyPayStatus } from '@/services'
 import { assertAffiliate, sendAffiliate, sendAffiliateAdmin, sendEmailToOwner } from '../utils/emails'
 import { templates } from '../utils/funtions'
 

@@ -8,7 +8,7 @@ import Navbar from './navbar';
 import { dict } from '@/app/utils';
 import { FiGrid, FiHome, FiCreditCard, FiExternalLink } from 'react-icons/fi';
 import { SIDEBAR_COOKIE } from './sidebarCookie';
-import { IUserSession } from '@/services';
+import type { IUserSession } from '@/server/data'
 import ActionBar from './actionBar';
 import useStore from '@/app/hooks/useStore';
 import { useInterfaceStore } from '@/app/hooks/useInterfaceStore';

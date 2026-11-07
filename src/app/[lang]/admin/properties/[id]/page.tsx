@@ -1,7 +1,8 @@
 import React from 'react'
 import styles from './page.module.css'
 import { dict } from '@/app/utils'
-import { showProperty } from '@/services'
+import { showProperty } from '@/server/data'
+import { requireAdminPage } from '@/server/guard'
 import ImageGallery from '@/app/components/imageGallery'
 import InnerNav from '@/app/components/innerNav'
 import { poppinsMedium, poppinsRegular } from '@/app/fonts'
@@ -28,6 +29,7 @@ const Detail: React.FC<IDetail> = async props => {
         id,
         lang
     } = params;
+  await requireAdminPage(params.lang)
 
     const [property, mapStyle] = await Promise.all([
         showProperty({ id: parseInt(id) }),

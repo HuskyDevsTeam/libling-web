@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import styles from './propertyCategory.module.css'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { IMetaPaginate, IPropertyData, IPropertyOrderBy, IPropertySearch } from '../interfaces/models'
-import { indexProperty } from '@/services'
+import { indexPublicProperties } from '@/services'
 import PropertyCard from './propertyCard'
 import { rentPaymentPeriods } from '../utils/data'
 import { dict } from '../utils'
@@ -23,7 +23,7 @@ const PropertyCategory: React.FC<IPropertyCategory> = ({ title, description, fil
     const glosaryData = dict[lang].data
     const glosaryAdmin = dict[lang].adminProperties
     const fetchProperties = async () => {
-        const data = await indexProperty(filters, orderBy, currentPage, limit)
+        const data = await indexPublicProperties(filters, orderBy, currentPage, limit)
         console.log('propertyData', data)
         const newArray = data?.data
         setMeta(data?.meta)

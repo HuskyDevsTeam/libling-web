@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import jwt from "jsonwebtoken"
 import { auth } from "@/auth"
-import { getUser } from "@/services"
+import { getUser } from "@/server/data"
 import { sendEmailToClient } from "@/app/utils/emails"
 import { subjects, templates } from "@/app/utils/funtions"
 

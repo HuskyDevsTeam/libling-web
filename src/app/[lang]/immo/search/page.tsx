@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './page.module.css'
 import { dict } from '@/app/utils'
-import { findPropertyType, indexProperty } from '@/services'
+import { findPropertyType, indexProperty } from '@/server/data'
 import InnerNav from '@/app/components/innerNav'
 import { poppinsMedium } from '@/app/fonts'
 import { rentPaymentPeriods } from '@/app/utils/data'

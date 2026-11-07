@@ -1,7 +1,7 @@
 'use server'
 import { auth, signIn, signOut, unstable_update } from "@/auth"
 import bcrypt from "bcryptjs"
-import { getUser, updateUser } from "@/services"
+import { getUser, updateUser } from "@/server/data"
 import { validateName, validatePasswordChange } from "@/app/utils/profile"
 import { AuthError } from "next-auth"
 

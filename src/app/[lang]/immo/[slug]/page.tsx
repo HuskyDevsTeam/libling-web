@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './page.module.css'
 import { dict } from '@/app/utils'
-import { showProperty } from '@/services'
+import { showActiveProperty } from '@/server/data'
 import ImageGallery from '@/app/components/imageGallery'
 import InnerNav from '@/app/components/innerNav'
 import { poppinsMedium, poppinsRegular } from '@/app/fonts'
@@ -18,7 +18,7 @@ import { notFound, permanentRedirect } from 'next/navigation'
 
 // Las URLs antiguas usaban el id numérico: /immo/12
 const findProperty = (slug: string) =>
-    /^\d+$/.test(slug) ? showProperty({ id: parseInt(slug) }) : showProperty({ slug })
+    /^\d+$/.test(slug) ? showActiveProperty({ id: parseInt(slug) }) : showActiveProperty({ slug })
 
 interface IDetail {
     params: Promise<{

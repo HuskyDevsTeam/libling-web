@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import jwt from "jsonwebtoken"
 import { headers } from "next/headers"
-import { getUserById, updateUser } from "@/services"
+import { getUserById, updateUser } from "@/server/data"
 import bcrypt from "bcryptjs"
 
 interface IBodyProps {

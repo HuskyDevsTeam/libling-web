@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import jwt from "jsonwebtoken"
 import { headers } from "next/headers"
-import { getUserById } from "@/services"
+import { getUserById } from "@/server/data"
 
 export async function POST(request: NextRequest) {
 	try {

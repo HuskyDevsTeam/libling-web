@@ -12,7 +12,7 @@ import { Form, Formik, FormikHelpers, FormikProps } from 'formik'
 import InputSelect from './admin/inputSelect'
 import { InputTextArea } from './admin/inputTextArea'
 import { ISelectElement } from '../interfaces'
-import { createAffiliate, getCountries, getStatesByCode, paymentInitialization, showAffiliate, updateAffiliate } from '@/services'
+import { findAffiliateByEmail, getCountries, getStatesByCode, paymentInitialization, registerAffiliate, updateAffiliatePlan } from '@/services'
 import { useStore } from 'zustand';
 import { toast } from 'react-toastify';
 import CustomToast from './toast';
@@ -293,26 +293,21 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
         console.log('formik values', formData)
         try {
             store?.setForm_1(formData)
-            let affiliateStored = await showAffiliate({email:formData.email})
+            let affiliateStored = await findAffiliateByEmail(formData.email || '')
             let affiliateId
-            console.log('there is a previous affiliate ', affiliateStored)
             if(!affiliateStored){
-                const newAffiliate = await createAffiliate({
+                const newAffiliate = await registerAffiliate({
                     email:formData.email || '',
                     name:formData.name || '',
                     phone:formData.phone || '',
                     countryId: !!formData.country ? parseInt(formData.country) : 0,
                     plan:getPlanEnum(planSelected?.id),
-                    plan_date:new Date(),
-                    status:false,
                 })
-                console.log('there is a new affiliate ', newAffiliate)
                 formRef_1.current?.setFieldValue('id', newAffiliate.id)
                 affiliateId = newAffiliate.id
                 store.setAffiliateId(newAffiliate.id)
             }else{
-                await updateAffiliate({
-                    id:affiliateStored.id,
+                await updateAffiliatePlan(affiliateStored.id, {
                     name:formData.name || '',
                     phone:formData.phone || '',
                     countryId: !!formData.country ? parseInt(formData.country) : 0,
@@ -344,14 +339,12 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
         console.log('formik values', formData)
         try {
             store?.setForm_1(formData)
-            let affiliateStored = await showAffiliate({email:formData.email})
+            let affiliateStored = await findAffiliateByEmail(formData.email || '')
             let affiliateId
-            console.log('there is a previous affiliate ', affiliateStored)
             if(!affiliateStored){
                 return toast.error(<CustomToast type='error' title='Error' content={glosary.errorFindAffiliate} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
             }else{
-                await updateAffiliate({
-                    id:affiliateStored.id,
+                await updateAffiliatePlan(affiliateStored.id, {
                     plan:getPlanEnum(planSelected?.id),
                 })
                 formRef_1.current?.setFieldValue('id', affiliateStored.id)

@@ -14,7 +14,7 @@ import { FiLogOut, FiMenu, FiUser } from 'react-icons/fi'
 import { userInitial } from '@/app/utils/profile'
 import { useSession } from "next-auth/react"
 import { UserDTO } from '@/dto';
-import { IUserSession } from '@/services';
+import type { IUserSession } from '@/server/data'
 import { Button } from './button';
 
 

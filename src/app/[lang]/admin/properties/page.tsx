@@ -8,7 +8,8 @@ import { poppinsMedium } from '@/app/fonts'
 import Link from 'next/link'
 import { Button } from '@/app/components/admin/button'
 import PropertyList from '@/app/components/admin/propertyList'
-import { indexProperty } from '@/services'
+import { indexProperty } from '@/server/data'
+import { requireAdminPage } from '@/server/guard'
 
 const Properties: React.FC<IPage> = async props => {
   const params = await props.params;
@@ -16,6 +17,7 @@ const Properties: React.FC<IPage> = async props => {
   const {
     lang
   } = params;
+  await requireAdminPage(params.lang)
 
   const glosary = dict[lang]?.adminProperties
   const glosaryNav = dict[lang]?.adminNav

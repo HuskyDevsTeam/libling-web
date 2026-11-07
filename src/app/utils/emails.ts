@@ -1,5 +1,5 @@
 "use server"
-import { showAffiliate } from "@/services"
+import { showAffiliate } from "@/server/data"
 import nodemailer from "nodemailer"
 import { templates } from "./serverFuntions"
 import { langType } from "../interfaces"
@@ -26,12 +26,6 @@ export const sendEmailToOwner = async (
 			console.log("Server is ready to take our messages")
 		}
 	})
-	console.log(
-		"sending email... ",
-		process.env.SMTP_SERVER,
-		process.env.MAIL_USER,
-		process.env.MAIL_PWD
-	)
 	console.log('env variables... ',from,subject)
 	const info = await transporter.sendMail({
 		from, // sender address
@@ -54,12 +48,6 @@ export const sendEmailToClient = async (
 			console.log("Server is ready to take our messages")
 		}
 	})
-	console.log(
-		"sending email... ",
-		process.env.SMTP_SERVER,
-		process.env.MAIL_USER,
-		process.env.MAIL_PWD
-	)
 	console.log('env variables... ',to,subject)
 	const info = await transporter.sendMail({
 		from:'"Libling solutions" <no-reply@libling.lu>', // sender address
@@ -82,12 +70,6 @@ export const sendAffiliateAdmin = async (
 			console.log("Server is ready to take our messages")
 		}
 	})
-	console.log(
-		"sending email... ",
-		process.env.SMTP_SERVER,
-		process.env.MAIL_USER,
-		process.env.MAIL_PWD
-	)
 	console.log('env variables... ',from,subject)
 	const info = await transporter.sendMail({
 		from: '"Libling solutions" <no-reply@libling.lu>', // sender address
@@ -110,12 +92,6 @@ export const sendAffiliate = async (
 			console.log("Server is ready to take our messages")
 		}
 	})
-	console.log(
-		"sending email... ",
-		process.env.SMTP_SERVER,
-		process.env.MAIL_USER,
-		process.env.MAIL_PWD
-	)
 	console.log('env variables... ',to,subject)
 	const info = await transporter.sendMail({
 		from:'"Libling solutions" <no-reply@libling.lu>', // sender address
@@ -139,12 +115,6 @@ export const sendInfo = async (
 			console.log("Server is ready to take our messages")
 		}
 	})
-	console.log(
-		"sending email... ",
-		process.env.SMTP_SERVER,
-		process.env.MAIL_USER,
-		process.env.MAIL_PWD
-	)
 	const info = await transporter.sendMail({
 		from:'no-reply@libling.lu',
 		replyTo:from,
@@ -167,12 +137,6 @@ export const sendImmoConfirmation = async (
 			console.log("Server is ready to take our messages")
 		}
 	})
-	console.log(
-		"sending email... ",
-		process.env.SMTP_SERVER,
-		process.env.MAIL_USER,
-		process.env.MAIL_PWD
-	)
 	const info = await transporter.sendMail({
 		from:'no-reply@libling.lu',
 		replyTo:'"Libling Immo" <immo@libling.lu>',

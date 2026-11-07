@@ -14,7 +14,7 @@ import { usePropertyStore } from '@/app/hooks/usePropertyStore'
 import Preview from './preview'
 import { toast } from 'react-toastify'
 import CustomToast from '@/app/components/toast'
-import { createProperty, getUser } from '@/services'
+import { createProperty } from '@/services'
 import { IPropertyCreateDTO } from '@/app/interfaces/models'
 import { useInterfaceStore } from '@/app/hooks/useInterfaceStore'
 
@@ -58,8 +58,7 @@ const PropertyCreate: React.FC<IPage> = props => {
     const handleSubmit = async (active: boolean) => {
         try {
             storeInterface?.setLoading(true)
-            const user = await getUser(storeInterface?.user?.email || '')
-            const data: IPropertyCreateDTO = {
+            const data: Omit<IPropertyCreateDTO, 'publishedById'> = {
                 title: store?.form_4?.title || '',
                 content: store?.form_4?.description,
                 address: store?.form_1?.address || '',
@@ -80,7 +79,6 @@ const PropertyCreate: React.FC<IPage> = props => {
                 active,
                 type: !!store?.form_1?.type,
                 frecuency: (store?.form_5?.frecuency || 0).toString(),
-                publishedById: user?.id || 0,
                 countryId: parseInt(store?.form_1?.country?.toString() || '0'),
                 currencyId: parseInt(store?.form_5?.currency?.toString() || '0'),
                 propertyTypeId: parseInt(store?.form_1?.propertyType?.toString() || '0'),
