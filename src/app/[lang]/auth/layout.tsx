@@ -14,14 +14,21 @@ export const metadata: Metadata = {
   description: 'login for Libling solutions admin',
 }
 
-export default function RootLandingLayout({
-  children,
-  params: { lang }
-}: {
-  children: React.ReactNode,
-  params: { lang: "es" | "en" | "fr" }
+export default async function RootLandingLayout(
+  props: {
+    children: React.ReactNode,
+    params: Promise<{ lang: string }>
 
-}) {
+  }
+) {
+  const params = await props.params;
+
+  const lang = params.lang as "es" | "en" | "fr";
+
+  const {
+    children
+  } = props;
+
   return (
     <html lang={lang}>
       <body style={poppinsRegular.style} className={styles.layout}>

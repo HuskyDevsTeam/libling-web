@@ -270,7 +270,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
             </div>
             <article className={styles.cardContent}>
                 <table className={styles.tableContainer}>
-                    <thead>
+                    <thead><tr>
                         <th style={poppinsMedium.style}>
                             <div className={globalStyles.checkboxControl}>
                                 <input type="checkbox" id="cboxInput" name="select_all" onChange={handleCheck} checked={selected.length === properties?.length} />
@@ -281,7 +281,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
                         <th style={poppinsMedium.style}>{glosary.formLabelPropertyType}</th>
                         <th style={poppinsMedium.style}>{glosary.listStatus}</th>
                         <th style={poppinsMedium.style}>{glosary.listActions}</th>
-                    </thead>
+                    </tr></thead>
                     <tbody>
                         {
                             properties?.map((el, index) => (

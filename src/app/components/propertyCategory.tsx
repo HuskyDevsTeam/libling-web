@@ -37,13 +37,13 @@ const PropertyCategory: React.FC<IPropertyCategory> = ({ title, description, fil
         })
         setCurrentPage(state => state + 1)
     }
-    const handleLeftScroll = (reference: React.RefObject<HTMLDivElement>) => {
+    const handleLeftScroll = (reference: React.RefObject<HTMLDivElement | null>) => {
         if (reference.current?.offsetWidth) {
             reference.current?.scrollBy({ left: -reference.current.offsetWidth, behavior: 'smooth' })
         }
 
     }
-    const handleRightScroll = (reference: React.RefObject<HTMLDivElement>) => {
+    const handleRightScroll = (reference: React.RefObject<HTMLDivElement | null>) => {
         if (reference.current?.offsetWidth) {
             reference.current?.scrollBy({ left: reference.current.offsetWidth, behavior: 'smooth' })
         }

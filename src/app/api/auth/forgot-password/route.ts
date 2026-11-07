@@ -7,7 +7,7 @@ import { subjects, templates } from "@/app/utils/funtions"
 
 const BASE_URL = process.env.APP_URL || "http://localhost:3000"
 
-export async function POST(request: NextRequest, response: NextResponse) {
+export async function POST(request: NextRequest) {
 	try {
 		console.log(request)
 		const { email } = await request.json()

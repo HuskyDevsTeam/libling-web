@@ -15,22 +15,35 @@ export const metadata: Metadata = {
   description: 'Landing page for Libling solutions',
 }
 export interface IPage {
+  params: Promise<{
+    lang: "es" | "en" | "fr"
+  }>
+}
+// Props sincronos para componentes hijos que reciben `params` ya resuelto
+export interface IPageSync {
   params: {
     lang: "es" | "en" | "fr"
   }
 }
 
-export default async function RootLandingLayout({
-  children,
-  params: { lang }
-}: {
-  children: React.ReactNode,
-  params: { lang: "es" | "en" | "fr" }
-  
-}) {
+export default async function RootLandingLayout(
+  props: {
+    children: React.ReactNode,
+    params: Promise<{ lang: string }>
+    
+  }
+) {
+  const params = await props.params;
+
+  const lang = params.lang as "es" | "en" | "fr";
+
+  const {
+    children
+  } = props;
+
   const session = await auth()
   // Default open on desktop; only an explicit '0' cookie means closed.
-  const initialOpen = cookies().get(SIDEBAR_COOKIE)?.value !== '0'
+  const initialOpen = (await cookies()).get(SIDEBAR_COOKIE)?.value !== '0'
   return (
     <html id='main' lang={lang}>
       <Body lang={lang} user={session?.user} initialOpen={initialOpen}>

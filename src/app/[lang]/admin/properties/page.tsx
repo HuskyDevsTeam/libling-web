@@ -10,7 +10,13 @@ import { Button } from '@/app/components/admin/button'
 import PropertyList from '@/app/components/admin/propertyList'
 import { indexProperty } from '@/services'
 
-const Properties: React.FC<IPage> = async ({ params: { lang } }) => {
+const Properties: React.FC<IPage> = async props => {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
   const glosary = dict[lang]?.adminProperties
   const glosaryNav = dict[lang]?.adminNav
   const properties = await indexProperty(undefined,undefined,undefined,undefined,false,true)

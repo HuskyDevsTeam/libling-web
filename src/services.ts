@@ -482,7 +482,7 @@ export async function deletePropertyImage(id: number) {
 }
 
 export const getCountryFilter = async () => {
-	const countryCookie = cookies().get("immo-country")?.value
+	const countryCookie = (await cookies()).get("immo-country")?.value
 	if (!countryCookie) {
 		return (await findCountryByCode("LU"))?.id
 	}

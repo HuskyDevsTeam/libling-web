@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { poppinsMedium } from '@/app/fonts'
 import styles from './page.module.css'
 import { dict } from '@/app/utils';
-import { IPage } from '../../layout';
+import { IPageSync as IPage } from '../../layout';
 import { ISelectElement } from '@/app/interfaces'
 import CustomToast from '@/app/components/toast'
 import * as Yup from 'yup';

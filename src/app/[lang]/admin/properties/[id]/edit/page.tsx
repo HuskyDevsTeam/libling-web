@@ -11,7 +11,14 @@ interface IEdit {
     }
 }
 
-const Edit: React.FC<IEdit> = async ({ params: { id, lang } }) => {
+const Edit: React.FC<IEdit> = async props => {
+    const params = await props.params;
+
+    const {
+        id,
+        lang
+    } = params;
+
     const propertyId = parseInt(id)
     if (Number.isNaN(propertyId)) notFound()
     const property = await showProperty({ id: propertyId })

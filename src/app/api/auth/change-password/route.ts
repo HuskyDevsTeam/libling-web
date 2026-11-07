@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 				{ status: 422 }
 			)
 		}
-		const headersList = headers()
+		const headersList = await headers()
 		const token = headersList.get("token")
 		if (!token) {
 			return NextResponse.json(

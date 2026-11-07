@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect } from 'react'
+import React, { useEffect, use } from 'react';
 import styles from './page.module.css'
 import globalStyles from '@/app/globals.module.css'
 import Section from '@/app/components/section'
@@ -14,11 +14,17 @@ import ServiceCard from '@/app/components/serviceCard'
 import { ScheduleBanner } from '@/app/components/scheduleBanner'
 import PackagePlanList from '@/app/components/packagePlanList'
 interface IPage {
-  params: {
+  params: Promise<{
     lang: "es" | "en" | "fr"
-  }
+  }>
 }
-const Services: React.FC<IPage> = ({ params: { lang } }) => {
+const Services: React.FC<IPage> = props => {
+  const params = use(props.params);
+
+  const {
+    lang
+  } = params;
+
   const glosary = dict[lang]?.services
   const { height, width } = useWindowDimensions();
   const router = useRouter()

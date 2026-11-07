@@ -11,9 +11,9 @@ import MoveIMG from '@/app/img/about_section_1.png'
 import HelpIMG from '@/app/img/about_section_2.jpg'
 import HousesIMG from '@/app/img/about_section_3.jpg'
 interface IPage {
-  params: {
+  params: Promise<{
     lang: "es" | "en" | "fr"
-  }
+  }>
 }
 export const metadata: Metadata = {
   title: 'Relocation - About Us | Libling Solutions',
@@ -30,7 +30,13 @@ export const metadata: Metadata = {
     }
   }
 }
-const Services: React.FC<IPage> = ({ params: { lang } }) => {
+const Services: React.FC<IPage> = async props => {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
   const glosary = dict[lang]?.about
   const content_1: IArticleContent[] = [
     {

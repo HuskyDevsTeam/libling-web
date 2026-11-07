@@ -21,7 +21,14 @@ interface IDetail {
     }
 }
 
-const Detail: React.FC<IDetail> = async ({ params: { id, lang } }) => {
+const Detail: React.FC<IDetail> = async props => {
+    const params = await props.params;
+
+    const {
+        id,
+        lang
+    } = params;
+
     const [property, mapStyle] = await Promise.all([
         showProperty({ id: parseInt(id) }),
         getMapStyles(),

@@ -8,7 +8,13 @@ import ProfileForms from '@/app/components/admin/profileForms'
 
 export const dynamic = 'force-dynamic'
 
-const Profile: React.FC<IPage> = async ({ params: { lang } }) => {
+const Profile: React.FC<IPage> = async props => {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
   const glosary = dict[lang]?.adminNav
   const session = await auth()
   return (<>

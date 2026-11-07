@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, use } from 'react';
 import styles from './page.module.css'
 import globalStyles from '@/app/globals.module.css'
 import { authenticate } from '@/app/actions'
@@ -12,7 +12,8 @@ import { FiEye, FiEyeOff } from 'react-icons/fi'
 import { Button } from '@/app/components/admin/button'
 import { useRouter } from 'next/navigation'
 
-const Login = ({ params }: { params: { lang: "es" | "en" | "fr" } }) => {
+const Login = (props: { params: Promise<{ lang: "es" | "en" | "fr" }> }) => {
+    const params = use(props.params);
     const [emailErrorMessage, setEmailErrorMessage] = useState<string | null>(null)
     const [passwordErrorMessage, setPasswordErrorMessage] = useState<string | null>(null)
     const lang = params.lang

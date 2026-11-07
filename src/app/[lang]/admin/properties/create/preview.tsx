@@ -5,7 +5,7 @@ import { poppinsMedium } from '@/app/fonts'
 import styles from './page.module.css'
 import globalStyles from '@/app/globals.module.css'
 import { dict } from '@/app/utils';
-import { IPage } from '../../layout';
+import { IPageSync as IPage } from '../../layout';
 import { getCountries, getCurrencies, getPropertyTypes } from '@/services'
 import { ISelectElement } from '@/app/interfaces'
 import { Button } from '@/app/components/admin/button'

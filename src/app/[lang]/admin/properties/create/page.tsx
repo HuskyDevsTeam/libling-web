@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, use } from 'react';
 import styles from './page.module.css'
 import { dict } from '@/app/utils'
 import { IPage } from '../../layout'
@@ -19,7 +19,13 @@ import { IPropertyCreateDTO } from '@/app/interfaces/models'
 import { useInterfaceStore } from '@/app/hooks/useInterfaceStore'
 
 
-const PropertyCreate: React.FC<IPage> = ({ params: { lang } }) => {
+const PropertyCreate: React.FC<IPage> = props => {
+    const params = use(props.params);
+
+    const {
+        lang
+    } = params;
+
     const store = useStore(usePropertyStore, (state) => state)
     const storeInterface = useStore(useInterfaceStore, (state) => state)
     const step = store?.lastStep

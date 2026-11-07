@@ -132,14 +132,14 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
             </div>
             <article className={styles.cardContent}>
                 <table className={styles.tableContainer}>
-                    <thead>
+                    <thead><tr>
                         <th style={poppinsMedium.style}>{glosary.listName}</th>
                         <th style={poppinsMedium.style}>{glosary.listPhone}</th>
                         <th style={poppinsMedium.style}>{glosary.listEmail}</th>
                         <th style={poppinsMedium.style}>{glosary.listLastPay}</th>
                         <th style={poppinsMedium.style}>{glosary.listStatus}</th>
                         <th style={poppinsMedium.style}>{glosary.listActions}</th>
-                    </thead>
+                    </tr></thead>
                     <tbody>
                         {
                             properties?.map((el, index) => (

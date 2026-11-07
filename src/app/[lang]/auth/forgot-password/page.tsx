@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, use } from 'react';
 import { Formik, Form, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { dict } from '@/app/utils';
@@ -19,7 +19,8 @@ interface IValues {
     email: string
 }
 
-const ForgotPassword = ({ params }: { params: { lang: "es" | "en" | "fr" } }) => {
+const ForgotPassword = (props: { params: Promise<{ lang: "es" | "en" | "fr" }> }) => {
+    const params = use(props.params);
     const lang = params.lang
     const glosary = dict[lang]?.auth
     const [success, setSuccess] = useState(false)

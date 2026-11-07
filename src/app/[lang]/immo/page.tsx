@@ -11,18 +11,24 @@ import { CountrySelector } from '@/app/components/countrySelector'
 import { cookies } from 'next/headers'
 import { countryType } from '@/app/interfaces'
 interface IPage {
-  params: {
+  params: Promise<{
     lang: "es" | "en" | "fr"
-  }
+  }>
 }
-const Home: React.FC<IPage> = async ({ params: { lang } }) => {
+const Home: React.FC<IPage> = async props => {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
   const fetchPropertyTypes = async () => {
     const data = await getPropertyTypes()
     const newArray = data?.map(el => ({ key: el.id, value: el.name }))
     return newArray || []
   }
   const glosary = dict[lang]?.immo
-  const country = cookies().get('immo-country')?.value as countryType || 'LU'
+  const country = (await cookies()).get('immo-country')?.value as countryType || 'LU'
   const propertyTypes = await fetchPropertyTypes()
   const lastProperties = await indexProperty({ active: true }, { id: 'desc' })
   const saleProperties = await indexProperty({ active: true, type: true })

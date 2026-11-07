@@ -19,9 +19,9 @@ import HeaderContact from '@/app/components/headerContact'
 import RelocationForm from '@/app/components/relocationForm'
 
 interface IPage {
-  params: {
+  params: Promise<{
     lang: "es" | "en" | "fr"
-  }
+  }>
 }
 interface ICalEvent {
   type: string
@@ -54,22 +54,30 @@ export const metadata: Metadata = {
   }
 }
 
-const getEvents = async () => {
-  let items: ICalEvent[] | [] = await new Promise((resolve, reject) => {
-    ical.fromURL('https://calendar.google.com/calendar/ical/liblinglc%40gmail.com/public/basic.ics', {}, (err: any, data: any) => {
-      if (err) {
-        reject([])
-      }
-      resolve(Object.values(data))
+const getEvents = async (): Promise<ICalEvent[]> => {
+  // Si Google Calendar no responde, la pagina de contacto debe seguir cargando.
+  try {
+    const res = await fetch('https://calendar.google.com/calendar/ical/liblinglc%40gmail.com/public/basic.ics', {
+      signal: AbortSignal.timeout(5000),
+      next: { revalidate: 300 },
     })
-  })
-  console.log(items)
-  return items
-
+    if (!res.ok) return []
+    const data = ical.parseICS(await res.text())
+    return Object.values(data) as unknown as ICalEvent[]
+  } catch (e) {
+    console.error('No se pudo cargar el calendario', e)
+    return []
+  }
 }
-const Contact: React.FC<IPage> = async ({ params: { lang } }) => {
+const Contact: React.FC<IPage> = async props => {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
   const glosary = dict[lang]?.contact
-  const events: ICalEvent[] | [] = await getEvents() || []
+  const events: ICalEvent[] | [] = (await getEvents()) || []
   console.log(events?.length)
 
   return (

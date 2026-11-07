@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState, use } from 'react';
 import { Formik, Form, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { dict } from '@/app/utils';
@@ -21,7 +21,8 @@ interface IValues {
     passwordConfirmation: string
 }
 
-const ChangePassword = ({ params }: { params: { lang: "es" | "en" | "fr" } }) => {
+const ChangePassword = (props: { params: Promise<{ lang: "es" | "en" | "fr" }> }) => {
+    const params = use(props.params);
     const lang = params.lang
     const glosary = dict[lang]?.auth
     const router = useRouter()

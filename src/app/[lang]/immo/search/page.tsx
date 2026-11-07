@@ -10,14 +10,21 @@ import Pagination from '@/app/components/pagination'
 import { dataTranslate } from '@/app/interfaces'
 
 interface ISearch {
-    params: {
+    params: Promise<{
         lang: "es" | "en" | "fr"
-    },
+    }>,
     searchParams: { [key: string]: string | string[] | undefined }
 
 }
 
-const Search: React.FC<ISearch> = async ({ params: { lang }, searchParams }) => {
+const Search: React.FC<ISearch> = async props => {
+    const searchParams = await props.searchParams;
+    const params = await props.params;
+
+    const {
+        lang
+    } = params;
+
     console.log('Chemi aca esta', searchParams)
     const filters = {
         type: !!searchParams?.type && typeof searchParams?.type === 'string' && parseInt(searchParams?.type) ? true : false,
@@ -41,7 +48,7 @@ const Search: React.FC<ISearch> = async ({ params: { lang }, searchParams }) => 
     urlQuery.set('propertyType', searchParams?.propertyType?.toString() || '')
     urlQuery.set('address', searchParams?.address?.toString() || '')
 
-    
+
     return (<>
         <InnerNav text={glosary.backSearch} />
         <div className={styles.container}>

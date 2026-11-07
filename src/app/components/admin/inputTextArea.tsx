@@ -37,7 +37,7 @@ export const InputTextArea: React.FC<ITextInput> = ({ name, error, touched, labe
                 </label>
             }
             <div className={styles.inputContainer}>
-                <textarea id={`${name}Input`} name={name} ref={inputRef} value={value} placeholder={placeholder} style={poppinsRegular.style} onFocus={handleFocus} onBlur={handleBlur} onChange={handleChange} className={(error && touched) ? styles.inputError : focused ? styles.inputFocus : styles.input} rows={4}>{value}</textarea>
+                <textarea id={`${name}Input`} name={name} ref={inputRef} value={value} placeholder={placeholder} style={poppinsRegular.style} onFocus={handleFocus} onBlur={handleBlur} onChange={handleChange} className={(error && touched) ? styles.inputError : focused ? styles.inputFocus : styles.input} rows={4} />
             </div>
             {
                 !!(error && touched) && <span className={styles.errorMessage} style={poppinsRegular.style}>{error}</span>

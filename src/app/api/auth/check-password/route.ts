@@ -5,7 +5,7 @@ import { getUserById } from "@/services"
 
 export async function POST(request: NextRequest) {
 	try {
-		const headersList = headers()
+		const headersList = await headers()
 		const token = headersList.get("token")
 		if (!token) {
 			return NextResponse.json(

@@ -21,15 +21,13 @@ const findProperty = (slug: string) =>
     /^\d+$/.test(slug) ? showProperty({ id: parseInt(slug) }) : showProperty({ slug })
 
 interface IDetail {
-    params: {
+    params: Promise<{
         slug: string
         lang: "es" | "en" | "fr"
-    }
+    }>
 }
-export async function generateMetadata(
-    { params }: IDetail,
-    parent: ResolvingMetadata
-  ): Promise<Metadata> {
+export async function generateMetadata(props: IDetail, parent: ResolvingMetadata): Promise<Metadata> {
+    const params = await props.params;
     const property = await findProperty(params.slug)
     const previousImages = property?.PropertyImage?.map(el=>el.path || "") || []
     return {
@@ -44,10 +42,17 @@ export async function generateMetadata(
       robots:"index,follow",
       
     }
-  }
+}
 
 
-const Detail: React.FC<IDetail> = async ({ params: { slug, lang } }) => {
+const Detail: React.FC<IDetail> = async props => {
+    const params = await props.params;
+
+    const {
+        slug,
+        lang
+    } = params;
+
     const property = await findProperty(slug)
     if (!property) notFound()
     // URL antigua (id numérico) -> redirección permanente a la URL semántica
