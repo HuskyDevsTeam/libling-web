@@ -64,4 +64,9 @@ Todas las variables estan en `.env.example`, con una linea que explica para que 
 
 - Borrar un inmueble o una foto en el admin los mueve a la **Papelera** (menu lateral): se ocultan del sitio pero se pueden restaurar (un inmueble vuelve como borrador).
 - `POST /api/cron/maintenance` (cabecera `Authorization: Bearer $CRON_SECRET`) debe ejecutarse **una vez al dia** (Dokploy > Schedules). Elimina del todo lo que lleva mas de 90 dias en la papelera, incluidos sus archivos del bucket, y convierte a WebP un lote de fotos antiguas.
-- `pnpm convert-images` convierte de golpe todas las fotos antiguas; `pnpm optimize-assets` optimiza las imagenes y videos estaticos de `public/`.
+- En el contenedor desplegado NO existen `pnpm` ni los scripts (la imagen solo lleva el servidor). Para convertir de golpe todas las fotos antiguas, desde la consola del contenedor (necesita `CRON_SECRET` definido):
+  ```bash
+  node -e "(async()=>{for(;;){const r=await fetch('http://127.0.0.1:3000/api/cron/maintenance',{method:'POST',headers:{authorization:'Bearer '+process.env.CRON_SECRET}});const j=await r.json();console.log(JSON.stringify(j.convert));if(!j.convert||j.convert.remaining<=0||j.convert.done===0)break}})()"
+  ```
+  Repite lotes de 25 hasta que `remaining` sea 0 (o hasta que un lote no convierta nada). Es seguro repetirlo.
+- En local, `pnpm convert-images` hace lo mismo con el script; `pnpm optimize-assets` optimiza las imagenes y videos estaticos de `public/`.
