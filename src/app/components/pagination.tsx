@@ -18,8 +18,6 @@ const Pagination: React.FC<IPagination> = ({ pagination, searchParams, url }) =>
     const count = (lastPage + 1) - initialPage
     const arrayPage = new Array(count).fill(1)
     const router = useRouter()
-    console.log(url)
-    console.log(searchParams)
     return (
         <div className={styles.paginationContainer}>
             {

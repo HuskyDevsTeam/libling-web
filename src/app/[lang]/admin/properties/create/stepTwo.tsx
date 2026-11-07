@@ -55,22 +55,18 @@ const StepTwo: React.FC<IStepTwo> = ({ params: { lang }, onNext, onBack }) => {
     }
 
     const handleFurnishedChange = (key: boolean) => {
-        console.log('selected key', key)
         formRef.current?.setFieldValue('furnished', key)
     }
     const handleElevatorChange = (key: boolean) => {
         formRef.current?.setFieldValue('elevator', key)
     }
     const handleHeatingType = (key: string) => {
-        console.log('selected key', key)
         formRef.current?.setFieldValue('heatingType', key)
     }
     const handleHeatingMedium = (key: string) => {
-        console.log('selected key', key)
         formRef.current?.setFieldValue('heatingMedium', key)
     }
     const handleHeatingEnergy = (key: string) => {
-        console.log('selected key', key)
         formRef.current?.setFieldValue('heatingEnergy', key)
     }
     const validationSchema = Yup.object({
@@ -85,7 +81,6 @@ const StepTwo: React.FC<IStepTwo> = ({ params: { lang }, onNext, onBack }) => {
     const handleSubmit = async (values: IValues, { setSubmitting }: FormikHelpers<IValues>) => {
         setBusy(true)
         const formData = values
-        console.log(formData)
         try {
             store?.setForm_2(formData)
             onNext()

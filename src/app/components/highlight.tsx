@@ -18,7 +18,6 @@ interface IHighlight {
 const Highlight: React.FC<IHighlight> = ({ title, description, img, Icon, alt }) => {
     const [open, setOpen] = useState(false)
     const handleClose = (event: BaseSyntheticEvent) => {
-        console.log(event)
         if (event?.target?.id === 'dialogBackdrop') {
             setOpen(false)
         }

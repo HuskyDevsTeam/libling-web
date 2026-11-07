@@ -16,6 +16,7 @@
 }
 
 .propertyPhoto {
+    object-fit: cover;
     width: 280px;
     height: 188px;
 }

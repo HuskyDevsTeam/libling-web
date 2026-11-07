@@ -142,12 +142,10 @@ const AffiliatePlanList:React.FC<IAffiliatePlanList> = ({lang}) => {
 
     //functions
     const handleFrecuency = (key: string | number) => {
-        console.log('selected key', key)
         store?.setFrecuency(key)
     }
     const frecuencyName = listFrecuency?.find(el=>el.key == store?.frecuency)?.priceFrecuency || glosary.sectionOptionBy1
     const handleSelectedPlan = (key:number) =>{
-        console.log('the selected key was', key)
         store?.setPlan(key)
         setInitialForm(1)
         setOpen(true)

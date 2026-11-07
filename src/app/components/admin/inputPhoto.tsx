@@ -23,8 +23,6 @@ const InputPhoto: React.FC<IInputPhoto> = ({ description, facename, onChange, in
         maxFiles: 5,
         maxSize: 2_097_152,
         onDrop: (acceptedFiles: any) => {
-            console.log(acceptedFiles)
-            console.log(typeof acceptedFiles)
             setFiles(
                 acceptedFiles.map((file: any) =>
                     Object.assign(file, {

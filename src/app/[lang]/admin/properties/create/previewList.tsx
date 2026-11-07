@@ -49,7 +49,6 @@ const PreviewList: React.FC<IPreviewList> = ({ params: { lang }, files }) => {
         const data = await getPropertyTypes()
         const newArray = data?.map(el => ({ key: el.id, value: el.name }))
         setPropertyTypes(newArray || [])
-        console.log(newArray)
     }
     const fetchCountries = async () => {
         const data = await getCountries()

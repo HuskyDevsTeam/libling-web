@@ -190,7 +190,6 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
         let enumerable = Plan.Student
         if(id === 2) return Plan.JobSeeker
         if(id === 3) return Plan.Business
-        console.log('getPlanEnum: ', enumerable)
         return enumerable
     }
     const getFrecuencyDate = (id?:number | string):Date=>{
@@ -199,10 +198,8 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
         if(id?.toString() === '3') months = 12
         if(planSelected?.id === 3) months = 1
         const today = new Date()
-        console.log('getFrecuencyDate - Today date: ',today)
         today.setMonth(today.getMonth() + months)
         const expirationDate = new Date(today)
-        console.log('getFrecuencyDate - Expire date: ',expirationDate)
         return expirationDate
     }
 
@@ -241,26 +238,20 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
         email: store?.form_1?.email
     }
     const onSubmit1 = () => {
-        console.log(formRef_1.current)
         formRef_1.current?.handleSubmit()
     }
     const onSubmit2 = () => {
-        console.log(formRef_2.current)
         formRef_2.current?.handleSubmit()
     }
     const handleCountry_1 = (key: string) => {
-        console.log('selected key', key)
         formRef_1.current?.setFieldValue('country', key)
         const countrySelected = countries.find(el => el.key == key)
-        console.log('country selected: ', countrySelected)
         setLastCode(countrySelected?.extra)
     }
     const handlePlan = (key: string|number) => {
-        console.log('selected key', key)
         store?.setPlan(key?.toString())
     }
     const handleFrecuency = (key: string|number) => {
-        console.log('selected key', key)
         store?.setFrecuency(key)
     }
     const handleCheckChange = (event:React.ChangeEvent<HTMLInputElement>)=>{
@@ -282,7 +273,6 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
     const handleSubmit_1 = async (values: IValues1, { setSubmitting }: FormikHelpers<IValues1>) => {
         setBusy(true)
         const formData = values
-        console.log('formik values', formData)
         try {
             store?.setForm_1(formData)
             let affiliateStored = await findAffiliateByEmail(formData.email || '')
@@ -309,7 +299,6 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
                 affiliateId = affiliateStored.id
                 store.setAffiliateId(affiliateStored.id)
             }
-            console.log('making a saferpay bank request')
             const response = await paymentInitialization({ affiliateId, plan: planSelected?.id ?? 1, period: Number(store?.frecuency) || 1, returnUrl: window.location.origin + window.location.pathname, lang })
             if(response.status === 200 && response.redirectUrl){
                 window.location.href = response.redirectUrl
@@ -329,7 +318,6 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
     const handleSubmit_2 = async (values: IValues2, { setSubmitting }: FormikHelpers<IValues2>) => {
         setBusy(true)
         const formData = values
-        console.log('formik values', formData)
         try {
             store?.setForm_1(formData)
             let affiliateStored = await findAffiliateByEmail(formData.email || '')
@@ -344,7 +332,6 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
                 affiliateId = affiliateStored.id
                 store.setAffiliateId(affiliateStored.id)
             }
-            console.log('making a saferpay bank request')
             const response = await paymentInitialization({ affiliateId, plan: planSelected?.id ?? 1, period: Number(store?.frecuency) || 1, returnUrl: window.location.origin + window.location.pathname, lang })
             if(response.status === 200 && response.redirectUrl){
                 window.location.href = response.redirectUrl

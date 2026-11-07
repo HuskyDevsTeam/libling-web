@@ -25,7 +25,6 @@ const AnimatedText = () => {
         }
     }
     const moveList = () =>{
-        console.log('This will run every 3 second!');
         setMove(true)
         setTimeout(()=>{
             setMove(false)

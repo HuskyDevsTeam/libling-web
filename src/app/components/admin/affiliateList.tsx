@@ -103,7 +103,6 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
         },
     ]
     const handleLimit = (key: string) => {
-        console.log('selected key', key)
         store?.setLimit(parseInt(key))
     }
     const handlePreview = async (id: number) => {

@@ -6,7 +6,6 @@ import { poppinsMedium } from '@/app/fonts'
 
 const InputSwitch: React.FC<IInputSwitch> = ({ list, initialValue, onChange, label, mainColor = '#1973FA', textColor = '#fff', backgroundColor='#fff', grow=false }) => {
     const [selected, setSelected] = useSyncedState(initialValue)
-    console.log('initial switch key', initialValue)
     const handleClick = (key: string | number) => {
         setSelected(key)
         if (!!onChange) onChange(key)

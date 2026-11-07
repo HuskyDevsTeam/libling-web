@@ -6,7 +6,6 @@ export const getPlanEnum = (id?: number): Plan => {
 	let enumerable = Plan.Student
 	if (id === 2) return Plan.JobSeeker
 	if (id === 3) return Plan.Business
-	console.log("getPlanEnum: ", enumerable)
 	return enumerable
 }
 

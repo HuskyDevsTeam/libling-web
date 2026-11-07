@@ -48,11 +48,9 @@ const StepFive: React.FC<IStepFive> = ({ params: { lang }, onNext, onBack }) => 
     const [periods, setPeriods] = useState<ISelectElement[]>(rentPaymentPeriods)
 
     const handleCurrency = (key: string) => {
-        console.log('selected key', key)
         formRef.current?.setFieldValue('currency', key)
     }
     const handleFrecuency = (key: string) => {
-        console.log('selected key', key)
         formRef.current?.setFieldValue('frecuency', key)
     }
     const validationSchema = Yup.object({
@@ -63,7 +61,6 @@ const StepFive: React.FC<IStepFive> = ({ params: { lang }, onNext, onBack }) => 
     const handleSubmit = async (values: IValues, { setSubmitting }: FormikHelpers<IValues>) => {
         setBusy(true)
         const formData = values
-        console.log(formData)
         try {
             store?.setForm_5(formData)
             onNext()

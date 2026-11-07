@@ -16,7 +16,7 @@ import Logo9 from '@/app/img/logo_partner_zak_architect-100.webp'
 const PartnerSlider = () => {
   return (
     <>
-    <Carousel autoPlay={true} infiniteLoop={true} showIndicators={false} showStatus={false} showArrows={false} centerMode={true} centerSlidePercentage={18} className={styles.slider}>
+    <Carousel autoPlay={true} infiniteLoop={true} showThumbs={false} showIndicators={false} showStatus={false} showArrows={false} centerMode={true} centerSlidePercentage={18} className={styles.slider}>
         <div className={styles.sliderItem}>
             <Image src={Logo1} alt='header image' width={164} height={64} priority={true} style={{ objectFit: 'cover', objectPosition: 'center center' }} quality={100}/>
         </div>
