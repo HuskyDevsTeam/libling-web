@@ -82,6 +82,7 @@ export const Body = ({
         if (store?.setUser) {
             store.setUser(user)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [store?.setUser, user])
     return (
         <body style={poppinsRegular.style} className={styles.layout}>

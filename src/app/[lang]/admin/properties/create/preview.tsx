@@ -87,6 +87,7 @@ const Preview: React.FC<IPreview> = ({ params: { lang }, onNext, onGo, files, fa
             console.log('test')
         }
         return () => { interfaceStore?.setShowBar(false) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [interfaceStore?.setBarContent])
     return (<div className={styles.previewContainer}>
         <h1 className={styles.titlePreview} style={poppinsMedium.style}>{glosary.formPreviewTitle}</h1>

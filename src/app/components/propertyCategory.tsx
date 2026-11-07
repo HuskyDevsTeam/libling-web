@@ -74,6 +74,7 @@ const PropertyCategory: React.FC<IPropertyCategory> = ({ title, description, fil
         if (properties === undefined) {
             fetchProperties()
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [])
     useEffect(() => {
         if (sectionRef.current && sectionRef.current?.scrollWidth > sectionRef.current?.offsetWidth) {

@@ -11,7 +11,7 @@ export default defineConfig({
 		launchOptions: process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {},
 	},
 	webServer: process.env.E2E_BASE_URL ? undefined : {
-		command: 'npx next dev -p 3100',
+		command: 'pnpm exec next dev -p 3100',
 		url: 'http://localhost:3100/api/health',
 		timeout: 180_000,
 		reuseExistingServer: true,

@@ -4,14 +4,11 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 First, run the development server:
 
+Requiere Node 26 (LTS) y pnpm 12 (`npm install -g pnpm@12.18.0`; Node 25+ ya no trae corepack).
+
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -41,13 +38,19 @@ website for Libling solutions, that works as landing page and base for a web app
 
 ## Tests
 
-Los tests funcionales necesitan una base PostgreSQL con las migraciones aplicadas (`npx prisma migrate deploy`).
+Los tests funcionales necesitan una base PostgreSQL con las migraciones aplicadas (`pnpm exec prisma migrate deploy`).
 
 ```bash
 export POSTGRES_PRISMA_URL=postgresql://user:pass@localhost:5432/libling_test
 export POSTGRES_URL_NON_POOLING=$POSTGRES_PRISMA_URL
-npm test            # vitest: helpers de edición + updateProperty contra la BD real
-AUTH_SECRET=test AUTH_TRUST_HOST=true npm run test:e2e   # Playwright: editar una propiedad desde el admin
+pnpm test            # vitest: helpers de edición + updateProperty contra la BD real
+AUTH_SECRET=test AUTH_TRUST_HOST=true pnpm test:e2e   # Playwright: editar una propiedad desde el admin
 ```
 
 Los tests crean sus propios datos y los eliminan al terminar; usa una BD de pruebas, no la de producción.
+
+
+## Dependencias y seguridad
+
+- Gestor: pnpm. Los scripts de instalacion estan bloqueados salvo los de Prisma (`allowBuilds` en `pnpm-workspace.yaml`) y no se instalan versiones publicadas hace menos de 24 h (`minimumReleaseAge`).
+- Auditoria: `pnpm audit` y `osv-scanner scan source --lockfile pnpm-lock.yaml`.

@@ -1,0 +1,26 @@
+# Configuracion de pnpm (gestor de paquetes del proyecto)
+
+# Solo estos paquetes pueden ejecutar scripts de instalacion (seguridad: por defecto ninguno).
+allowBuilds:
+  '@prisma/client': true
+  '@prisma/engines': true
+  prisma: true
+
+# Proteccion contra supply chain: no instalar versiones publicadas hace menos de 1 dia.
+minimumReleaseAge: 1440
+
+# El proveedor de email de next-auth no se usa; su peer opcional de nodemailer pide ^7||^8.
+peerDependencyRules:
+  allowedVersions:
+    next-auth>nodemailer: '10'
+    '@auth/core>nodemailer': '10'
+    # eslint 10: los plugins de eslint-config-next aun declaran peer hasta 9 pero funcionan.
+    eslint-plugin-import>eslint: '10'
+    eslint-plugin-jsx-a11y>eslint: '10'
+    eslint-plugin-react>eslint: '10'
+
+overrides:
+  'minimatch@>=7 <11': ^11.0.5
+
+# node_modules plano (como npm): la imagen Docker copia node_modules/prisma, @prisma y .prisma tal cual.
+nodeLinker: hoisted

@@ -170,6 +170,7 @@ const AffiliatePlanList:React.FC<IAffiliatePlanList> = ({lang}) => {
 
     useEffect(()=>{
         setFrecuencyName(listFrecuency?.find(el=>el.key == store?.frecuency)?.priceFrecuency || glosary.sectionOptionBy1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     },[store?.frecuency])
     useEffect(()=>{
         const payQuery = query.get('pay')
@@ -181,6 +182,7 @@ const AffiliatePlanList:React.FC<IAffiliatePlanList> = ({lang}) => {
           setInitialForm(parseInt(memberQuery))
           setOpen(true)
         }
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
       }, [query])
 
     return (

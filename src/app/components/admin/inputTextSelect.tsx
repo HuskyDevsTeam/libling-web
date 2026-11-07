@@ -69,6 +69,7 @@ const InputTextSelect: React.FC<IInputTextSelect> = ({ label, placeholder, list,
         } else if (initialValue === '' && inputRef?.current) {
             inputRef.current.value = ''
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [initialValue, list, lang])
     return (
         <div className={styles.formControl}>

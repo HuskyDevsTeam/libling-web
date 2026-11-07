@@ -394,6 +394,7 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
         if(open && store?.frecuency && store?.plan){
             setPlanSelected(affiliateList?.find(el => el.id == store?.frecuency)?.plans.find(el => el.id == store?.plan))
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     },[store?.frecuency, store?.plan, open])
     return (
         <>

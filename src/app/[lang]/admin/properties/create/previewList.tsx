@@ -72,6 +72,7 @@ const PreviewList: React.FC<IPreviewList> = ({ params: { lang }, files }) => {
             storeInterface?.setLoading(false)
 
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [])
     return (
 

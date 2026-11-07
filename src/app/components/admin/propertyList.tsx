@@ -189,6 +189,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
             ))
         }
         return () => { store?.setShowBar(false) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [selected])
     const skipInitialFetch = useRef(true)
     useEffect(() => {
@@ -200,6 +201,7 @@ const PropertyList: React.FC<IPropertyList> = ({ lang, initialData, metaData }) 
         if (store?.limit) {
             fetchProperties()
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [store?.limit, currentPage, tab, debouncedSearch])
     return (
         <div className={styles.card}>

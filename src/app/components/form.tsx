@@ -75,6 +75,7 @@ const ContactForm: React.FC<IContactForm> = ({ lang }) => {
         }
         setInputSubject(initialSubject)
         setInputMessage(initialMessage)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     },[query])
 
     return (

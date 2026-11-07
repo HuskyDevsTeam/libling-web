@@ -100,6 +100,7 @@ const RelocationForm: React.FC<IRelocationForm> = ({ lang }) => {
         }
         formRef.current?.setFieldValue('subject', initialSubject)
         formRef.current?.setFieldValue('message', initialMessage)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     },[query])
 
     return (

@@ -112,6 +112,7 @@ const AffiliateList: React.FC<IAffiliateList> = ({ lang, initialData, metaData }
         if (store?.limit) {
             fetchProperties()
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
     }, [store?.limit, currentPage, tab, debouncedSearch])
     return (
         <div className={styles.card}>

@@ -26,6 +26,7 @@ export default function useWindowDimensions() {
 			window.addEventListener("resize", handleResize)
 			return () => window.removeEventListener("resize", handleResize)
 		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps -- el efecto se ejecuta solo cuando cambian estas dependencias a proposito
 	}, [hasWindow])
 
 
