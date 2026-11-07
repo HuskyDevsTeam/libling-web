@@ -46,7 +46,7 @@ const PropertyListItem: React.FC<IListItem> = ({ item, lang, onSelect, onPreview
             </td>
             <td>
                 <div className={styles.basicContainer}>
-                    <Image className={styles.basicMini} src={item.thumbnail || placeholder} alt={item.title} width={70} height={70} style={{ width: 70, height: 70, minWidth: 70, objectFit: 'cover' }} />
+                    <Image className={styles.basicMini} src={item.thumbnailWebp || item.thumbnail || placeholder} alt={item.title} width={70} height={70} style={{ width: 70, height: 70, minWidth: 70, objectFit: 'cover' }} />
                     <div className={styles.basicTextContainer}>
                         <span className={styles.basicTitle}>{truncateText(item.title, TITLE_MAX_CHARS)}</span>
                         <span className={styles.basicSubtitle}>{truncateText(item.content)}</span>

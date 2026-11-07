@@ -2,35 +2,9 @@ import { createPropertyImage, showProperty, updateProperty } from "@/server/data
 import { requireAdmin, UnauthorizedError } from "@/server/guard"
 import { randomUUID } from "node:crypto"
 import { NextResponse } from "next/server"
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"
+import { processImage } from "@/server/images"
+import { putObject } from "@/server/storage"
 
-// Se crea bajo demanda: en el build de Docker no hay variables de entorno
-let _bucketClient: S3Client | undefined
-const getBucketClient = () =>
-	(_bucketClient ??= new S3Client({
-		region: process.env.S3_REGION || "",
-		credentials: {
-			accessKeyId: process.env.S3_ACCESS_KEY || "",
-			secretAccessKey: process.env.S3_SECRET_KEY || "",
-		},
-	}))
-const uploadFileToS3 = async (file: Buffer, filename: string, contentType: string) => {
-	const key = `${Date.now()}-${randomUUID()}-${filename}`
-	const params = {
-		Bucket: process.env.S3_BUCKET_NAME,
-		Key: key,
-		Body: file,
-		ContentType: contentType,
-	}
-	const command = new PutObjectCommand(params)
-	await getBucketClient().send(command)
-	const url = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_REGION}.amazonaws.com/${key}`
-	const response = {
-		filename: key,
-		url,
-	}
-	return response
-}
 const MAX_BYTES = 15 * 1024 * 1024
 
 // Tipo real del archivo por sus primeros bytes (no se fia de la extension ni de la cabecera del cliente)
@@ -63,15 +37,32 @@ export async function POST(request: Request): Promise<NextResponse> {
 	if (!image) return json("Unsupported image type", 415)
 	if (!(await showProperty({ id: propertyId }))) return json("Property not found", 404)
 
-	const response = await uploadFileToS3(buffer, `file.${image.ext}`, image.mime)
+	// Siempre se guarda un WebP optimizado (ficha) y una miniatura (listados); el original queda solo como
+	// respaldo privado (nunca se enlaza) salvo que se desactive con KEEP_ORIGINALS=false.
+	let processed
+	try {
+		processed = await processImage(buffer)
+	} catch {
+		return json("Unreadable image", 422)
+	}
+	const stem = `${Date.now()}-${randomUUID()}`
+	const originalKey = process.env.KEEP_ORIGINALS === "false" ? null : `originals/${stem}.${image.ext}`
+	const [url, thumbUrl] = await Promise.all([
+		putObject(`${stem}.webp`, processed.large.buffer, "image/webp"),
+		putObject(`${stem}-thumb.webp`, processed.thumb.buffer, "image/webp"),
+		...(originalKey ? [putObject(originalKey, buffer, image.mime, { CacheControl: "private, no-store" })] : []),
+	])
 	await createPropertyImage({
-		name: response.filename,
+		name: `${stem}.webp`,
 		description: "",
-		path: response.url,
+		path: url,
+		thumbPath: thumbUrl,
+		originalKey,
 		propertyId,
 	})
 	if (face == "1") {
-		await updateProperty(propertyId, { thumbnail: response.url })
+		await updateProperty(propertyId, { thumbnail: url })
 	}
+	const response = { filename: `${stem}.webp`, url, thumbUrl }
 	return NextResponse.json(response)
 }

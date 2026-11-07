@@ -9,7 +9,9 @@
 		"lint": "eslint .",
 		"postinstall": "prisma generate",
 		"test": "vitest run",
-		"test:e2e": "playwright test"
+		"test:e2e": "playwright test",
+		"optimize-assets": "node scripts/optimize-assets.mjs",
+		"convert-images": "node scripts/convert-existing-images.ts"
 	},
 	"prisma": {
 		"seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seeder.ts"

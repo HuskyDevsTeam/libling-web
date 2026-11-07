@@ -48,6 +48,8 @@ model Property {
   content        String?
   address        String
   thumbnail      String?
+  // Miniatura WebP (480 px) de la portada para listados y tarjetas; si falta se usa thumbnail
+  thumbnailWebp  String?
   longitude      Decimal?
   latitude       Decimal?
   area           Decimal?
@@ -101,7 +103,12 @@ model PropertyImage {
   id          Int      @id @default(autoincrement())
   name        String
   description String
+  // URL de la imagen que se muestra (para subidas nuevas, el WebP optimizado de hasta 1920 px)
   path        String
+  // Miniatura WebP de 480 px (listados, galeria)
+  thumbPath   String?
+  // Clave privada del original subido (respaldo); nunca se muestra
+  originalKey String?
   property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId  Int
 

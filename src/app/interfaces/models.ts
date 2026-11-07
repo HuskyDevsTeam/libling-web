@@ -68,6 +68,7 @@ export interface IPropertyData {
 	content: string | null
 	address: string
 	thumbnail: string | null
+	thumbnailWebp?: string | null
 	longitude?: number
 	latitude?: number
 	area?: number
@@ -239,6 +240,8 @@ export interface IPropertyImage {
 	name: string
 	description: string
 	path: string
+	thumbPath?: string | null
+	originalKey?: string | null
 	property?: IPropertyData
 	propertyId: number
 }
@@ -246,6 +249,8 @@ export interface IPropertyImageCreate {
 	name: string
 	description: string
 	path: string
+	thumbPath?: string | null
+	originalKey?: string | null
 	propertyId: number
 }
 

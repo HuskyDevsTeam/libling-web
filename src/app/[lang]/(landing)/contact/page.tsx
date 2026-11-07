@@ -2,7 +2,7 @@ import React from 'react'
 import styles from './page.module.css'
 import globalStyles from '@/app/globals.module.css'
 import Image from 'next/image'
-import headerImg from '@/app/img/contact_banner.gif'
+import headerImg from '@/app/img/contact_banner.webp'
 import familyImg from '@/app/img/CEO_contact.jpg'
 import Article from '@/app/components/article'
 import { RiWhatsappLine, RiInstagramLine, RiMessengerLine, RiLinkedinFill } from "react-icons/ri";

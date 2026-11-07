@@ -86,7 +86,7 @@ describe.skipIf(!hasDb)('rendimiento de datos', () => {
 		expect(data.length).toBeGreaterThan(0)
 		const item = data[0] as unknown as Record<string, unknown>
 		expect(Object.keys(item).filter((k) => item[k] !== undefined).sort()).toEqual(
-			['active', 'area', 'bathrooms', 'bedrooms', 'country', 'currency', 'frecuency', 'id', 'price', 'propertyType', 'slug', 'thumbnail', 'title', 'type'].sort()
+			['active', 'area', 'bathrooms', 'bedrooms', 'country', 'currency', 'frecuency', 'id', 'price', 'propertyType', 'slug', 'thumbnail', 'thumbnailWebp', 'title', 'type'].sort()
 		)
 		expect(item.content).toBeUndefined()
 		expect(item.PropertyImage).toBeUndefined()

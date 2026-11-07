@@ -209,6 +209,7 @@ const cardSelect = {
 	type: true,
 	active: true,
 	thumbnail: true,
+	thumbnailWebp: true,
 	country: { select: { name: true } },
 	currency: { select: { symbol: true } },
 	propertyType: { select: { name: true } },
@@ -352,9 +353,13 @@ export async function updateProperty(id: number, data: IPropertyUpdateDTO) {
 		return rest
 	}
 	const result = await prisma.$transaction(async (tx) => {
+		// Al cambiar la portada se actualiza tambien su miniatura (la de la imagen con esa URL; null si es una foto antigua)
+		const coverImage = data.thumbnail
+			? await tx.propertyImage.findFirst({ where: { propertyId: id, path: data.thumbnail }, select: { thumbPath: true } })
+			: undefined
 		const updatedProperty = await tx.property.update({
 			where: { id },
-			data: scalars,
+			data: { ...scalars, ...(data.thumbnail ? { thumbnailWebp: coverImage?.thumbPath ?? null } : {}) },
 		})
 		if (data.Surface) {
 			await tx.surface.deleteMany({ where: { propertyId: id } })
