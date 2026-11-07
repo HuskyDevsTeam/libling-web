@@ -196,6 +196,8 @@ model Pay {
   months      Int       @default(1)
   quantity    Decimal?
   status      Boolean
+  // Plan contratado en este pago: se aplica al afiliado solo cuando Saferpay confirma el cobro
+  plan        Plan?
   affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
   affiliateId Int
 

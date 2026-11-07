@@ -86,10 +86,10 @@ describe('acciones publicas: validacion de entradas', () => {
 		await expect(actions.indexPublicProperties({}, {}, 1, 100000)).rejects.toThrow()
 		await expect(actions.indexPublicProperties({}, {}, -5, 15)).rejects.toThrow()
 	})
-	it('paymentInitialization rechaza importes negativos y retorno a otro dominio', async () => {
+	it('paymentInitialization no acepta precio del cliente: solo plan y periodo validos, y retorno del propio dominio', async () => {
 		process.env.APP_URL = 'https://libling.lu'
-		await expect(actions.paymentInitialization('x', -1, 1, 'https://libling.lu/p', 1)).rejects.toThrow()
-		await expect(actions.paymentInitialization('x', 10, 1, 'https://evil.example/p', 1)).rejects.toThrow()
+		await expect(actions.paymentInitialization({ affiliateId: 1, plan: 9, period: 1, returnUrl: 'https://libling.lu/p' })).rejects.toThrow()
+		await expect(actions.paymentInitialization({ affiliateId: 1, plan: 1, period: 1, returnUrl: 'https://evil.example/p' })).rejects.toThrow()
 	})
 	it('findAffiliateByEmail rechaza emails invalidos', async () => {
 		await expect(actions.findAffiliateByEmail('no-es-un-email')).rejects.toThrow()

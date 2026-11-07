@@ -22,9 +22,9 @@ import {
 import { requireAdmin } from "@/server/guard"
 import * as data from "@/server/data"
 import * as v from "@/server/schemas"
-import { deliver, MAILBOXES } from "@/server/mail"
-import { dict } from "@/app/utils/serverDict"
-import { templates as serverTemplates } from "@/app/utils/serverFuntions"
+import { headers } from "next/headers"
+import { clientIp, consume } from "@/server/rateLimit"
+import { confirmAndNotify, startPayment } from "@/server/payments"
 
 export type {
 	IUserData,
@@ -186,20 +186,27 @@ const returnUrlSchema = z.url().refine((value) => {
 	}
 }, "returnUrl fuera del dominio de la aplicacion")
 
-export async function paymentInitialization(
-	description: string,
-	price: number,
-	affiliateId: number,
-	returnUrl: string,
-	months: number
-) {
-	return data.paymentInitialization(
-		z.string().trim().min(1).max(200).parse(description),
-		z.number().positive().max(100_000).parse(price),
-		v.id.parse(affiliateId),
-		returnUrlSchema.parse(returnUrl),
-		z.number().int().min(1).max(24).parse(months)
-	)
+const payLimit = { max: 30, windowSec: 60 * 60 }
+const langSchema = z.enum(["es", "en", "fr"]).catch("en")
+
+/** El navegador solo elige plan y periodo: el importe, los meses y el OrderId los fija el servidor. */
+export async function paymentInitialization(input: {
+	affiliateId: number
+	plan: number
+	period: number
+	returnUrl: string
+	lang?: string
+}) {
+	const parsed = z
+		.object({
+			affiliateId: v.id,
+			plan: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+			period: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+			returnUrl: returnUrlSchema,
+		})
+		.parse(input)
+	if (!(await consume(`pay:init:${clientIp(await headers())}`, payLimit)).allowed) return { status: 429 as const }
+	return startPayment({ ...parsed, lang: langSchema.parse(input.lang) })
 }
 
 export async function verifyPayStatus(payId: string) {
@@ -208,25 +215,7 @@ export async function verifyPayStatus(payId: string) {
 
 export async function paymentAssert(payId: number, lang: "es" | "en" | "fr" = "en") {
 	const id = v.id.parse(payId)
-	const language = z.enum(["es", "en", "fr"]).catch("en").parse(lang)
-	const before = await data.showPay({ id })
-	const result = await data.paymentAssert(id)
-	// Los correos salen desde el servidor y solo en el paso de "sin pagar" a "pagado":
-	// asi un cliente no puede provocarlos a voluntad ni repetirlos.
-	if (before && !before.status && result.status === 200 && result.affiliate) {
-		await sendAffiliatePaidEmails(result.affiliate.id, language)
-	}
-	return result
-}
-
-async function sendAffiliatePaidEmails(affiliateId: number, lang: "es" | "en" | "fr") {
-	try {
-		const affiliate = await data.showAffiliate({ id: affiliateId })
-		if (!affiliate) return
-		const subject = dict[lang].mail.affiliateTitle
-		await deliver({ to: MAILBOXES.affiliate, subject, html: serverTemplates.affiliateAdmin(lang, affiliate), replyTo: affiliate.email })
-		await deliver({ to: affiliate.email, subject, html: serverTemplates.affiliate(lang), replyTo: MAILBOXES.affiliate })
-	} catch (e) {
-		console.error("correo de afiliado no enviado", (e as Error)?.message)
-	}
+	if (!(await consume(`pay:assert:${clientIp(await headers())}`, payLimit)).allowed) return { status: 429 as const }
+	const result = await confirmAndNotify(id, langSchema.parse(lang))
+	return result.paid ? { status: 200 as const, affiliate: { id: result.affiliateId } } : { status: result.status }
 }

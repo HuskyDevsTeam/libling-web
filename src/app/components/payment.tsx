@@ -205,13 +205,6 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
         console.log('getFrecuencyDate - Expire date: ',expirationDate)
         return expirationDate
     }
-    const getPlanMonths = (id?:number | string):number=>{
-        let months = 1
-        if(id?.toString() === '2') months = 6
-        if(id?.toString() === '3') months = 12
-        if(planSelected?.id === 3) months = 1
-        return months
-    }
 
     const steps = [
         {
@@ -317,10 +310,9 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
                 store.setAffiliateId(affiliateStored.id)
             }
             console.log('making a saferpay bank request')
-            const response = await paymentInitialization(planSelected?.title || 'Description', planSelected?.price || 100, affiliateId, (window.location.origin + window.location.pathname), getPlanMonths(store?.frecuency))
-            console.log('repuesta del servidor: ',response)
-            if(response?.redirectUrl){
-                window.location.href = response?.redirectUrl
+            const response = await paymentInitialization({ affiliateId, plan: planSelected?.id ?? 1, period: Number(store?.frecuency) || 1, returnUrl: window.location.origin + window.location.pathname, lang })
+            if(response.status === 200 && response.redirectUrl){
+                window.location.href = response.redirectUrl
             }else{
                 throw new Error('Failed comunication with Saferpay')
             }
@@ -353,10 +345,9 @@ export const Payment: React.FC<IPayment> = ({ open = false, lang, closeModal, pl
                 store.setAffiliateId(affiliateStored.id)
             }
             console.log('making a saferpay bank request')
-            const response = await paymentInitialization(planSelected?.title || 'Description', planSelected?.price || 100, affiliateId, (window.location.origin + window.location.pathname), getPlanMonths(store?.frecuency))
-            console.log('repuesta del servidor: ',response)
-            if(response?.redirectUrl){
-                window.location.href = response?.redirectUrl
+            const response = await paymentInitialization({ affiliateId, plan: planSelected?.id ?? 1, period: Number(store?.frecuency) || 1, returnUrl: window.location.origin + window.location.pathname, lang })
+            if(response.status === 200 && response.redirectUrl){
+                window.location.href = response.redirectUrl
             }else{
                 throw new Error('Failed comunication with Saferpay')
             }
