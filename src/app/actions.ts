@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs"
 import { getUser, updateUser } from "@/server/data"
 import { validateName, validatePasswordChange } from "@/app/utils/profile"
 import { AuthError } from "next-auth"
+import { logger } from "@/server/logger"
 
 export async function getMapStyles(){
 	return `https://api.maptiler.com/maps/streets/style.json?key=${process.env.MAP_KEY}`
@@ -14,13 +15,15 @@ export async function authenticate(
 	formData: FormData
 ) {
 	try {
-		await signIn("credentials", formData)
+		await signIn("credentials", { ...Object.fromEntries(formData), redirect: false })
+		return "ok"
 	} catch (error) {
 		if (error instanceof AuthError) {
 			// "rate_limited" lo lanza authorize() tras demasiados intentos fallidos
 			if ((error as { code?: string }).code === "rate_limited") return "rate_limited"
 			return "Invalid credentials."
 		}
+		logger.error("login_unexpected_error", { error })
 		throw error
 	}
 }

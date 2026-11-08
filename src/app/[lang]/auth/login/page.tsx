@@ -39,6 +39,7 @@ const Login = (props: { params: Promise<{ lang: "es" | "en" | "fr" }> }) => {
     const onBlurPassword = () => setFocusedPassword(false)
     const emailRef = useRef<HTMLInputElement | null>(null)
     const passwordRef = useRef<HTMLInputElement | null>(null)
+    const cboxRef = useRef<HTMLInputElement | null>(null)
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         try {
@@ -57,13 +58,20 @@ const Login = (props: { params: Promise<{ lang: "es" | "en" | "fr" }> }) => {
                 setLoading(false)
             }
             if (!email || !password) return
+            if (cboxRef.current?.checked) formData.append('remember_me', 'on')
             if (email) formData.append('email', email)
             if (password) formData.append('password', password)
             const response = await authenticate(undefined, formData)
+            if (response === 'ok') {
+                router.replace(`/${lang}/admin/dashboard`)
+                router.refresh()
+                return
+            }
             if (response)
                 toast.error(<CustomToast type='error' title='Error' content={response === 'rate_limited' ? glosary.error_rate_limited : glosary.error_credentials} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
         }
         catch (e) {
+            console.error('login_error', e)
             toast.error(<CustomToast type='error' title='Error' content={glosary.error_default} />, { theme: 'colored', icon: false, style: { backgroundColor: '#FF4444', maxWidth: 450, padding: 24, borderRadius: 10 } })
 
         } finally {
@@ -125,7 +133,7 @@ const Login = (props: { params: Promise<{ lang: "es" | "en" | "fr" }> }) => {
                         }
                     </div>
                     <div className={styles.checkboxControl}>
-                        <input type="checkbox" id="cboxInput" name="remember_me" />
+                        <input type="checkbox" id="cboxInput" name="remember_me" ref={cboxRef} />
                         <label htmlFor="cboxInput">{glosary.login_remember}</label>
                     </div>
                     <Button title={glosary.login_button} loading={loading} type='main' submit={true} />
