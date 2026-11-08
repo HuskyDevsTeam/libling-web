@@ -1,5 +1,6 @@
 'use client'
 import React from 'react'
+import { openCookieSettings } from './cookieConsent'
 import styles from './footer.module.css'
 import { poppinsRegular } from '../fonts'
 import { RiFacebookFill, RiInstagramFill, RiLinkedinFill } from "react-icons/ri";
@@ -39,7 +40,9 @@ export default function FooterImmo({ lang }: { lang: "es" | "en" | "fr" }) {
                     <span className={styles.ribbonText}>{`© Libling 2024 | ${glosary.rights}.`}</span>
                 </div>
                 <div className={styles.ribbonHalf}>
-                    <span className={styles.ribbonTextFaded}>{glosary.cookies}</span>
+                    <button type="button" onClick={openCookieSettings} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', font: 'inherit' }}>
+                        <span className={styles.ribbonTextFaded}>{glosary.cookies}</span>
+                    </button>
                     <span className={styles.ribbonTextFaded}>{glosary.privacy}</span>
                     <span className={styles.ribbonTextFaded}>{glosary.terms}</span>
                 </div>
