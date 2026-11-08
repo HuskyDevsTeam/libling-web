@@ -10,6 +10,7 @@ import FooterImmo from '@/app/components/footerImmo'
 import { countryType } from '@/app/interfaces'
 import { cookies } from 'next/headers'
 import ContactForm from '@/app/components/contactForm'
+import CookieConsent from '@/app/components/cookieConsent'
 
 
 
@@ -57,6 +58,7 @@ export default async function RootLandingLayout(
           <ContactForm lang={lang} />
         </div>
         <FooterImmo lang={lang} />
+        <CookieConsent lang={lang} analyticsId={process.env.GOOGLE_ANALYTICS || undefined} />
       </body>
     </html>
   )
