@@ -4,8 +4,8 @@ export const authConfig = {
 	pages: {
 		signIn: "auth/login",
 	},
-	// La sesion del panel caduca a las 12 horas (por defecto serian 30 dias)
-	session: { strategy: "jwt", maxAge: 12 * 60 * 60 },
+	// maxAge = vida maxima de la cookie (30 dias, con "Recuerdame"). La caducidad real la fija el JWT en auth.ts: 12 h sin "Recuerdame".
+	session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
     callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
