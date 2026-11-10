@@ -77,8 +77,10 @@ export async function sendFooterMessage(input: z.input<typeof schemas.footer>): 
 	if (blocked) return blocked
 	const g = dict[d.lang].mail
 	return run(async () => {
-		await deliver({ to: d.email, subject: g.subject_3, html: templates.infoClient(banner(d.lang), null, d.lang), replyTo: MAILBOXES.info })
-		await deliver({ to: MAILBOXES.info, subject: g.subject_1, html: ownerBody(d.lang, d.email, d.email, g.main), replyTo: d.email })
+		await Promise.all([
+			deliver({ to: d.email, subject: g.subject_3, html: templates.infoClient(banner(d.lang), null, d.lang), replyTo: MAILBOXES.info }),
+			deliver({ to: MAILBOXES.info, subject: g.subject_1, html: ownerBody(d.lang, d.email, d.email, g.main), replyTo: d.email }),
+		])
 	})
 }
 
@@ -90,8 +92,10 @@ export async function sendContactMessage(input: z.input<typeof schemas.contact>)
 	if (blocked) return blocked
 	const g = dict[d.lang].mail
 	return run(async () => {
-		await deliver({ to: d.email, subject: g.subject_3, html: templates.infoClient(banner(d.lang), d.name, d.lang), replyTo: MAILBOXES.info })
-		await deliver({ to: MAILBOXES.info, subject: cleanSubject(d.subject), html: ownerBody(d.lang, d.name, d.email, d.message), replyTo: d.email })
+		await Promise.all([
+			deliver({ to: d.email, subject: g.subject_3, html: templates.infoClient(banner(d.lang), d.name, d.lang), replyTo: MAILBOXES.info }),
+			deliver({ to: MAILBOXES.info, subject: cleanSubject(d.subject), html: ownerBody(d.lang, d.name, d.email, d.message), replyTo: d.email }),
+		])
 	})
 }
 
@@ -107,8 +111,10 @@ export async function sendRelocationMessage(input: z.input<typeof schemas.reloca
 	if (blocked) return blocked
 	const g = dict[d.lang].mail
 	return run(async () => {
-		await deliver({ to: d.email, subject: g.subject_3, html: templates.infoClient(banner(d.lang), d.name, d.lang), replyTo: MAILBOXES.info })
-		await deliver({ to: MAILBOXES.info, subject, html: ownerBody(d.lang, d.name, d.email, d.message ?? ""), replyTo: d.email })
+		await Promise.all([
+			deliver({ to: d.email, subject: g.subject_3, html: templates.infoClient(banner(d.lang), d.name, d.lang), replyTo: MAILBOXES.info }),
+			deliver({ to: MAILBOXES.info, subject, html: ownerBody(d.lang, d.name, d.email, d.message ?? ""), replyTo: d.email }),
+		])
 	})
 }
 
@@ -128,13 +134,15 @@ export async function sendImmoInquiry(input: z.input<typeof schemas.immo>): Prom
 	const blocked = await gate(d, "immo")
 	if (blocked) return blocked
 	return run(async () => {
-		await deliver({
-			to: MAILBOXES.immo,
-			from: "no-reply@libling.lu",
-			subject: subjects.immo,
-			html: templates.immo(escapeHtml(d.name), escapeHtml(pageUrl), d.lang) + `<p>${escapeHtml(d.email)}</p>`,
-			replyTo: d.email,
-		})
-		await deliver({ to: d.email, from: "no-reply@libling.lu", subject: subjects.welcomeImmo, html: templates.immoConfirmation(d.lang), replyTo: MAILBOXES.immo })
+		await Promise.all([
+			deliver({
+				to: MAILBOXES.immo,
+				from: "no-reply@libling.lu",
+				subject: subjects.immo,
+				html: templates.immo(escapeHtml(d.name), escapeHtml(pageUrl), d.lang) + `<p>${escapeHtml(d.email)}</p>`,
+				replyTo: d.email,
+			}),
+			deliver({ to: d.email, from: "no-reply@libling.lu", subject: subjects.welcomeImmo, html: templates.immoConfirmation(d.lang), replyTo: MAILBOXES.immo }),
+		])
 	})
 }

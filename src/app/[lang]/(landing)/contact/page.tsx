@@ -62,7 +62,8 @@ const getEvents = async (): Promise<ICalEvent[]> => {
     })
     if (!res.ok) return []
     const data = ical.parseICS(await res.text())
-    return Object.values(data) as unknown as ICalEvent[]
+    // al cliente solo viaja la fecha de inicio (no todo el .ics)
+    return Object.values(data).filter((el: any) => el?.start instanceof Date).map((el: any) => ({ start: el.start })) as unknown as ICalEvent[]
   } catch (e) {
     console.error('No se pudo cargar el calendario', e)
     return []
