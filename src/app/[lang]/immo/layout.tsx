@@ -16,10 +16,17 @@ import CookieConsent from '@/app/components/cookieConsent'
 
 
 export const viewport: Viewport = {
-  themeColor: '#225FE7',
+  themeColor: '#FB8601',
 }
 
 export const metadata: Metadata = {
+  icons: {
+    icon: [
+      { url: '/icons/immo-favicon.ico', sizes: '48x48' },
+      { url: '/icons/immo-icon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/icons/immo-apple-icon.png',
+  },
   title: 'Real Estate - Luxembourg | Libling Immo',
   description: 'Get your new property with Libling Immo a solution to find a property, get a new life in Luxembourg, and search for properties arround the world',
   robots: 'index, follow',
