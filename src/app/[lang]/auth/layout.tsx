@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import '../../globals.css'
 import { poppinsRegular } from '../../fonts'
 import { ToastContainer } from 'react-toastify';
@@ -8,6 +8,10 @@ import { LanguageSelector } from '@/app/components/languageSelector';
 
 
 
+
+export const viewport: Viewport = {
+  themeColor: '#225FE7',
+}
 
 export const metadata: Metadata = {
   title: 'Libling Solutions',

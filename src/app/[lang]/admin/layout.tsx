@@ -1,5 +1,5 @@
 
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import '../../globals.css'
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,6 +10,10 @@ import { cookies } from 'next/headers';
 import { SIDEBAR_COOKIE } from '@/app/components/admin/sidebarCookie';
 
 
+
+export const viewport: Viewport = {
+  themeColor: '#225FE7',
+}
 
 export const metadata: Metadata = {
   title: 'Libling Solutions',

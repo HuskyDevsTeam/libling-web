@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import '../../globals.css'
 import { poppinsRegular } from '../../fonts'
 import styles from '@/app/[lang]/(landing)/page.module.css'
@@ -14,6 +14,10 @@ import CookieConsent from '@/app/components/cookieConsent'
 
 
 
+
+export const viewport: Viewport = {
+  themeColor: '#225FE7',
+}
 
 export const metadata: Metadata = {
   title: 'Real Estate - Luxembourg | Libling Immo',

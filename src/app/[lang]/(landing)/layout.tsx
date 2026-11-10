@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import '../../globals.css'
 import Navbar from '../../components/navbar'
 import { poppinsRegular } from '../../fonts'
@@ -10,6 +10,10 @@ import CookieConsent from '@/app/components/cookieConsent'
 
 
 
+
+export const viewport: Viewport = {
+  themeColor: '#225FE7',
+}
 
 export const metadata: Metadata = {
   title: 'Relocation - Luxembourg | Libling Solutions',
