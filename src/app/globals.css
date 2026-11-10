@@ -1,5 +1,9 @@
 :root {
   --max-width: 1920px;
+  /* Mismo ancho de contenido que la barra de navegacion (1214px + 32px de margen a cada lado) */
+  --content-width: 1214px;
+  --content-gutter: 32px;
+  --content-inset: max(var(--content-gutter), calc((100% - var(--content-width)) / 2));
   --border-radius: 12px;
   --font-mono: ui-monospace, Menlo, Monaco, 'Cascadia Mono', 'Segoe UI Mono',
     'Roboto Mono', 'Oxygen Mono', 'Ubuntu Monospace', 'Source Code Pro',

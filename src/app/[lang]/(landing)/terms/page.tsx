@@ -36,7 +36,7 @@ const Terms: React.FC<IPage> = props => {
     return (
         <main className={styles.main}>
             <Section backgroundColor='#fff' vertical={true}>
-                <div style={{padding:24}}>
+                <div>
                 <h2>{glosary.mainTitle}</h2>
                 {
                     list.map((el,index)=>(<div key={index}>

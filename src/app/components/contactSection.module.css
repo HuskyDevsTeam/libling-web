@@ -18,7 +18,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 100px 140px;
+    padding: 100px var(--content-inset);
     gap: 100px;
 }
 

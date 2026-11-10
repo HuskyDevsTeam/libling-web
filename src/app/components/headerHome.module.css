@@ -9,7 +9,7 @@
     position: absolute;
     z-index: 2;
     top: 0;
-    left: 140px;
+    left: var(--content-inset);
     padding: 130px 0;
     max-width: 680px;
     display: flex;

@@ -11,10 +11,13 @@
 .header {
   position: relative;
   padding: 0;
-  margin: 0 5rem;
+  margin: 0;
 }
 .textContainer {
-  width: 100vw;
+  width: 100%;
+  padding: 0 var(--content-gutter);
+  max-width: calc(var(--content-width) + 2 * var(--content-gutter));
+  margin: 0 auto;
 }
 
 .headerMask {

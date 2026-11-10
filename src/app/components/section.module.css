@@ -7,7 +7,7 @@
     position: relative;
 }
 .innerContainer{
-    padding: 80px 140px;
+    padding: 80px var(--content-inset);
     max-width: var(--max-width);
     width: 100%;
     z-index: 2;

@@ -34,14 +34,15 @@
 .header {
   position: relative;
   padding: 0;
-  margin: 0 5rem;
+  margin: 0;
   z-index: 1;
 }
 
 .textContainer {
-  width: 100vw;
-  padding: 0rem 3rem;
-  max-width: 1200px;
+  width: 100%;
+  padding: 0 var(--content-gutter);
+  max-width: calc(var(--content-width) + 2 * var(--content-gutter));
+  margin: 0 auto;
   text-align: left;
   display: flex;
   flex-direction: column;
